@@ -32,7 +32,7 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
 
 <script>
   import { embed, onModelState } from '../lib/embed-client';
-  import { api, hasApi, WAKING } from '../lib/api';
+  import { api, hasApi, wake, API_BASE, WAKING } from '../lib/api';
   import { topMatches, whyLine, type Doc } from '../lib/search';
 
   const root = document.querySelector<HTMLElement>('[data-ask]');
@@ -57,6 +57,8 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
     });
 
     const clearHits = () => document.querySelectorAll('.ask-hit').forEach((el) => el.classList.remove('ask-hit'));
+
+    for (const ev of ['focus', 'pointerdown']) input.addEventListener(ev, () => wake(API_BASE), { once: true });
 
     let seq = 0;
     const go = root.querySelector<HTMLButtonElement>('[data-ask-go]')!;

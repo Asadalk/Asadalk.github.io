@@ -66,7 +66,7 @@ const lines: string[][] = (sample as { lines?: string[][] }).lines ?? [];
 <script>
   import type { WorkerOut } from '../workers/detect.worker';
   import sample from '../content/data/scan-sample.json';
-  import { api, hasApi, WAKING } from '../lib/api';
+  import { api, hasOcr, wake, OCR_BASE, WAKING } from '../lib/api';
 
   type Word = { box: number[]; text: string; script: string; confidence?: number };
   type OcrOut = { width: number; height: number; words: Word[]; lines: string[][]; timings_ms: Record<string, number> };
@@ -167,12 +167,12 @@ const lines: string[][] = (sample as { lines?: string[][] }).lines ?? [];
     };
 
     async function viaServer(file: Blob): Promise<boolean> {
-      if (!hasApi()) return false;
+      if (!hasOcr()) return false;
       try {
         status.textContent = 'Reading the text…';
         const body = new FormData();
         body.append('image', await shrink(file), 'photo.jpg');
-        const r = await api<OcrOut>('/ocr', { method: 'POST', body }, { onSlow: () => (status.textContent = WAKING), timeoutMs: 180_000 });
+        const r = await api<OcrOut>('/ocr', { method: 'POST', body }, { base: OCR_BASE, onSlow: () => (status.textContent = WAKING), timeoutMs: 180_000 });
         draw(r.width, r.height, r.words);
         showText(r.words, r.lines);
         stage.dataset.result = JSON.stringify({ width: r.width, height: r.height, words: r.words.length, source: 'server' });
@@ -261,6 +261,20 @@ const lines: string[][] = (sample as { lines?: string[][] }).lines ?? [];
         status.textContent = `Could not load the sample (${String(err)}).`;
       }
     });
+
+    // Wake the OCR server when the demo comes near the screen.
+    if (!localOnly) {
+      const near = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            wake(OCR_BASE);
+            near.disconnect();
+          }
+        },
+        { rootMargin: '600px 0px' },
+      );
+      near.observe(root);
+    }
 
     new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting && stage.dataset.result) {

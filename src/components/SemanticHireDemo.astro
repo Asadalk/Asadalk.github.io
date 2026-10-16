@@ -31,7 +31,7 @@ const examples = queries.map((q) => q.resume_text);
 
 <script>
   import { embed } from '../lib/embed-client';
-  import { api, hasApi, WAKING } from '../lib/api';
+  import { api, hasApi, wake, API_BASE, WAKING } from '../lib/api';
   import { dot } from '../lib/embed-math';
   import { MIN_RESUME_CHARS, cleanText, rankJobs, type Job, type MatchResult } from '../lib/matcher';
 
@@ -45,6 +45,10 @@ const examples = queries.map((q) => q.resume_text);
     const list = root.querySelector<HTMLOListElement>('[data-sh-list]')!;
     const examples: string[] = JSON.parse(root.querySelector('[data-sh-examples]')!.textContent || '[]');
     root.hidden = false;
+    // Wake the server when the card is opened or the visitor starts typing.
+    root.closest('details')?.addEventListener('toggle', (e) => (e.target as HTMLDetailsElement).open && wake(API_BASE));
+    for (const el of [text, run, example]) el.addEventListener('pointerdown', () => wake(API_BASE), { once: true });
+    text.addEventListener('focus', () => wake(API_BASE), { once: true });
 
     type StoredJob = Job & { vector: number[] };
     let jobs: Promise<StoredJob[]> | null = null;

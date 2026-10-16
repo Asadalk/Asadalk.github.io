@@ -36,13 +36,53 @@ image = (
 app = modal.App("portfolio-api")
 
 
-@app.function(image=image, cpu=2.0, memory=6144, timeout=300, scaledown_window=300)
-@modal.concurrent(max_inputs=4)
-@modal.asgi_app()
-def api():
+def _server(serve: str):
+    import os
     import sys
 
+    os.environ["SERVE"] = serve
     sys.path.insert(0, "/opt/app")
-    from server import app as fastapi_app
+    import server
 
-    return fastapi_app
+    return server
+
+
+# Two deployments of the same server.py. Search and the matcher need only the
+# small MiniLM model, so they get a light container that restores from its
+# memory snapshot in seconds. OCR (~4 GB of models) has its own.
+@app.cls(image=image, cpu=1.0, memory=2048, timeout=120, scaledown_window=300, enable_memory_snapshot=True)
+@modal.concurrent(max_inputs=8)
+class Light:
+    @modal.enter(snap=True)
+    def load(self) -> None:
+        server = _server("light")
+        server.retriever()
+        server.items()
+        self.app = server.app
+
+    @modal.asgi_app(label="portfolio-api")
+    def web(self):
+        return self.app
+
+
+@app.cls(image=image, cpu=2.0, memory=6144, timeout=300, scaledown_window=300, enable_memory_snapshot=True)
+@modal.concurrent(max_inputs=4)
+class Ocr:
+    """All OCR models load before Modal snapshots the container's memory."""
+
+    @modal.enter(snap=True)
+    def load(self) -> None:
+        server = _server("ocr")
+        server.ocr_engine()
+        self.app = server.app
+
+    @modal.enter(snap=False)
+    def after_restore(self) -> None:
+        # A restored snapshot can come back with torch limited to one thread.
+        import torch
+
+        torch.set_num_threads(2)
+
+    @modal.asgi_app(label="portfolio-ocr")
+    def web(self):
+        return self.app

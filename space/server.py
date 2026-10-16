@@ -42,7 +42,10 @@ app = FastAPI(title="Asadullah Faisal portfolio API", docs_url=None, redoc_url=N
 app.add_middleware(CORSMiddleware, allow_origins=ALLOWED_ORIGINS, allow_methods=["GET", "POST"], allow_headers=["*"])
 
 # ---------------------------------------------------------------- models ----
-_lock = threading.Lock()
+# Separate locks: the OCR stack takes ~30 s to load on a cold start, and search
+# and the matcher must not wait behind it.
+_ocr_lock = threading.Lock()
+_match_lock = threading.Lock()
 _ocr = None
 _retriever: JobRetriever | None = None
 _items: list[dict] | None = None
@@ -52,7 +55,7 @@ _item_matrix: np.ndarray | None = None
 def ocr_engine():
     """The fork's end-to-end pipeline: YOLO11n → EfficientNetV2-L script ID → PARSeq."""
     global _ocr
-    with _lock:
+    with _ocr_lock:
         if _ocr is None:
             from IndicPhotoOCR.ocr import OCR
 
@@ -77,7 +80,7 @@ def _warm_recognisers(engine) -> None:
 
 def retriever() -> JobRetriever:
     global _retriever
-    with _lock:
+    with _match_lock:
         if _retriever is None:
             cwd = os.getcwd()
             os.chdir(SEMANTIC_HIRE)
@@ -237,7 +240,11 @@ async def ocr(image: UploadFile = File(...)) -> dict:
 
 @app.on_event("startup")
 def warm() -> None:
-    """Load the light models at boot and the OCR stack in the background."""
-    retriever()
-    items()
-    threading.Thread(target=ocr_engine, daemon=True).start()
+    """Load what this deployment serves. SERVE=light (search + matcher) skips
+    the OCR stack entirely; SERVE=ocr loads only OCR; unset loads both."""
+    serve = os.getenv("SERVE", "all")
+    if serve in ("all", "light"):
+        retriever()
+        items()
+    if serve in ("all", "ocr"):
+        threading.Thread(target=ocr_engine, daemon=True).start()
