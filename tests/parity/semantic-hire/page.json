@@ -1,0 +1,206 @@
+{
+ "side": "page",
+ "browser": "desktop",
+ "queries": [
+  {
+   "query_id": "q1_nlp_search",
+   "top5": [
+    {
+     "job_id": "job-001",
+     "final": 0.8215
+    },
+    {
+     "job_id": "job-023",
+     "final": 0.7654
+    },
+    {
+     "job_id": "job-003",
+     "final": 0.7129
+    },
+    {
+     "job_id": "job-012",
+     "final": 0.642
+    },
+    {
+     "job_id": "job-020",
+     "final": 0.6419
+    }
+   ]
+  },
+  {
+   "query_id": "q2_recommendations",
+   "top5": [
+    {
+     "job_id": "job-002",
+     "final": 0.7688
+    },
+    {
+     "job_id": "job-015",
+     "final": 0.7546
+    },
+    {
+     "job_id": "job-006",
+     "final": 0.6122
+    },
+    {
+     "job_id": "job-001",
+     "final": 0.5425
+    },
+    {
+     "job_id": "job-003",
+     "final": 0.5253
+    }
+   ]
+  },
+  {
+   "query_id": "q3_backend_python",
+   "top5": [
+    {
+     "job_id": "job-007",
+     "final": 0.8746
+    },
+    {
+     "job_id": "job-022",
+     "final": 0.6192
+    },
+    {
+     "job_id": "job-014",
+     "final": 0.554
+    },
+    {
+     "job_id": "job-010",
+     "final": 0.5303
+    },
+    {
+     "job_id": "job-024",
+     "final": 0.4447
+    }
+   ]
+  },
+  {
+   "query_id": "q4_frontend",
+   "top5": [
+    {
+     "job_id": "job-009",
+     "final": 0.8614
+    },
+    {
+     "job_id": "job-024",
+     "final": 0.7223
+    },
+    {
+     "job_id": "job-010",
+     "final": 0.6537
+    },
+    {
+     "job_id": "job-017",
+     "final": 0.3031
+    },
+    {
+     "job_id": "job-004",
+     "final": 0.2973
+    }
+   ]
+  },
+  {
+   "query_id": "q5_vision",
+   "top5": [
+    {
+     "job_id": "job-005",
+     "final": 0.7805
+    },
+    {
+     "job_id": "job-019",
+     "final": 0.6251
+    },
+    {
+     "job_id": "job-015",
+     "final": 0.4996
+    },
+    {
+     "job_id": "job-012",
+     "final": 0.4523
+    },
+    {
+     "job_id": "job-002",
+     "final": 0.4161
+    }
+   ]
+  },
+  {
+   "query_id": "q6_data_engineering",
+   "top5": [
+    {
+     "job_id": "job-008",
+     "final": 0.7794
+    },
+    {
+     "job_id": "job-007",
+     "final": 0.664
+    },
+    {
+     "job_id": "job-011",
+     "final": 0.6022
+    },
+    {
+     "job_id": "job-006",
+     "final": 0.569
+    },
+    {
+     "job_id": "job-018",
+     "final": 0.556
+    }
+   ]
+  },
+  {
+   "query_id": "q7_llm_rag",
+   "top5": [
+    {
+     "job_id": "job-004",
+     "final": 0.7125
+    },
+    {
+     "job_id": "job-022",
+     "final": 0.6626
+    },
+    {
+     "job_id": "job-021",
+     "final": 0.6203
+    },
+    {
+     "job_id": "job-012",
+     "final": 0.4862
+    },
+    {
+     "job_id": "job-001",
+     "final": 0.4378
+    }
+   ]
+  },
+  {
+   "query_id": "q8_cloud",
+   "top5": [
+    {
+     "job_id": "job-016",
+     "final": 0.9443
+    },
+    {
+     "job_id": "job-011",
+     "final": 0.7041
+    },
+    {
+     "job_id": "job-008",
+     "final": 0.5797
+    },
+    {
+     "job_id": "job-007",
+     "final": 0.5088
+    },
+    {
+     "job_id": "job-002",
+     "final": 0.4499
+    }
+   ]
+  }
+ ]
+}

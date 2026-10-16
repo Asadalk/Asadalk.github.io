@@ -4,6 +4,7 @@ import ResearchCard from '../components/ResearchCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import Skills from '../components/Skills.astro';
 import Street from '../components/Street.astro';
+import AskAboutMe from '../components/AskAboutMe.astro';
 import { site, projects } from '../lib/content';
 
 // Owner's curated cold-start order. The brain (Phase 5) may reorder cards
@@ -33,6 +34,8 @@ const primaryEdu = site.education.find((e) => e.primary)!;
       {site.about.map((p) => <p>{p}</p>)}
     </section>
 
+    <AskAboutMe />
+
     <section id="research" aria-labelledby="research-h">
       <h2 id="research-h">Research</h2>
       <ResearchCard />
@@ -59,14 +62,14 @@ const primaryEdu = site.education.find((e) => e.primary)!;
 
     <section id="education" aria-labelledby="education-h">
       <h2 id="education-h">Education</h2>
-      <p>
+      <p id={primaryEdu.id}>
         <strong>{primaryEdu.degree}</strong><br />
         {primaryEdu.institution} <span class="mono muted dates">{primaryEdu.years}</span>
       </p>
       <p class="muted coursework">Coursework: {primaryEdu.coursework?.join(', ')}</p>
       <ul class="plain-list">
         {site.education.filter((e) => !e.primary).map((e) => (
-          <li>{e.degree}, {e.institution} <span class="mono muted dates">{e.years}</span></li>
+          <li id={e.id}>{e.degree}, {e.institution} <span class="mono muted dates">{e.years}</span></li>
         ))}
       </ul>
       <h3>Achievements</h3>

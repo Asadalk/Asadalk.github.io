@@ -5,6 +5,7 @@ import OpsPilotArchitecture from './demos/OpsPilotArchitecture.astro';
 import IncidentReplay from './demos/IncidentReplay.astro';
 import PolicyPlayground from './demos/PolicyPlayground.astro';
 import FollowThePacket from './demos/FollowThePacket.astro';
+import SemanticHireDemo from './SemanticHireDemo.astro';
 import type { Project } from '../lib/content';
 
 interface Props { project: Project }
@@ -61,6 +62,8 @@ const { project: p } = Astro.props;
       <Results table={p.results} />
     </>
   )}
+
+  {p.id === 'semantic-hire' && <SemanticHireDemo />}
 
   {p.statusNote && <p class="muted">{p.statusNote}</p>}
 

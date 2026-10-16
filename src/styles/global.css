@@ -183,3 +183,10 @@ th { font-weight: 700; }
 td.num, th.num { text-align: right; font-family: var(--font-mono); font-size: 0.82rem; white-space: nowrap; }
 
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* "Ask about me" match: a thin chartreuse bar just left of the item, with a
+   Kohl edge so it shows on the light background. Box-shadow, not border,
+   so nothing on the page moves. */
+.ask-hit {
+  box-shadow: -7px 0 0 -3px var(--detect), -8px 0 0 -3px var(--detect-edge);
+}
