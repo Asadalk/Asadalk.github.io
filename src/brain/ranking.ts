@@ -125,7 +125,10 @@ export function gate(c: Ranked, onScreen: Ranked[], cfg: RankConfig = DEFAULT_RA
   if (c.penalized) return { ok: false, reason: 'you dismissed that topic' };
   if (c.sim < cfg.gateAbs)
     return { ok: false, reason: `the best match is weak (${c.sim.toFixed(2)} < ${cfg.gateAbs})` };
-  const base = onScreen.length ? onScreen.reduce((s, r) => s + r.sim, 0) / onScreen.length : 0;
+  // Compare with what the visitor could read instead right now: on-screen
+  // items not already engaged with (the card just read is not an alternative).
+  const alt = onScreen.filter((r) => !r.engaged);
+  const base = alt.length ? alt.reduce((s, r) => s + r.sim, 0) / alt.length : 0;
   if (c.sim - base < cfg.gateMargin)
     return { ok: false, reason: `it is not clearly better than what is on screen (${c.sim.toFixed(2)} vs ${base.toFixed(2)})` };
   return { ok: true, reason: `it fits well (${c.sim.toFixed(2)}) and beats what is on screen (${base.toFixed(2)})` };

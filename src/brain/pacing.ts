@@ -257,7 +257,7 @@ export class Pacer {
     s.cooldownUntil = t + s.cooldownMs;
     s.mode = 'cooldown';
     const resolved = s.accepted + s.missed;
-    if (s.streak >= 2) this.goQuiet(`you skipped my last ${s.streak} suggestions`);
+    if (s.streak >= 2) this.goQuiet(`you skipped my last ${['', 'one', 'two', 'three'][s.streak] ?? s.streak} suggestions`);
     else if (resolved >= 2 && s.accepted === 0) this.goQuiet('none of my suggestions were useful');
     else if (s.budget <= 0) this.goQuiet('I have used up my suggestions for now');
   }
