@@ -1,5 +1,6 @@
 {
   "$comment": "Identity, contact, bio and adaptive headline variants. Never add a phone number, CGPA or placement details.",
+  "api": "",
   "name": "Asadullah Faisal",
   "tagline": "AI & Data Science · IIT Jodhpur",
   "bio": "I'm a final-year AI & Data Science student at IIT Jodhpur. I build machine learning systems and then measure where they break: a text detector for Indian street signs, an LLM agent that cannot act without permission, and the benchmarks that keep both honest.",

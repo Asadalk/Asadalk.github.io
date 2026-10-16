@@ -12,6 +12,7 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
 
 <div class="ask" role="search" aria-label="Ask about me" data-ask hidden>
   <label class="ask-label mono" for="ask-q">Ask about me</label>
+  <form class="ask-form" data-ask-form>
   <input
     id="ask-q"
     class="ask-input"
@@ -22,13 +23,16 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
     placeholder="e.g. object detection research"
     aria-describedby="ask-status"
   />
-  <p id="ask-status" class="ask-status muted" aria-live="polite">Searches by meaning, on your device. Nothing you type leaves this page.</p>
+  <button type="submit" class="button button--primary ask-go" data-ask-go>Ask</button>
+  </form>
+  <p id="ask-status" class="ask-status muted" aria-live="polite">Searches everything on this page by meaning. Press Ask or Enter.</p>
   <ol class="ask-results" data-ask-results></ol>
   <script type="application/json" data-ask-docs set:html={JSON.stringify(docs)} />
 </div>
 
 <script>
-  import { embed, onModelState, warm } from '../lib/embed-client';
+  import { embed, onModelState } from '../lib/embed-client';
+  import { api, hasApi, WAKING } from '../lib/api';
   import { topMatches, whyLine, type Doc } from '../lib/search';
 
   const root = document.querySelector<HTMLElement>('[data-ask]');
@@ -45,12 +49,6 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
     const loadVectors = () =>
       (vectors ??= import('../content/generated/embeddings.json').then((m) => m.default.items));
 
-    const start = () => {
-      void warm().catch(() => {});
-      void loadVectors();
-    };
-    input.addEventListener('focus', start, { once: true });
-    input.addEventListener('pointerdown', start, { once: true });
 
     let busy = false;
     onModelState((s) => {
@@ -61,24 +59,56 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
     const clearHits = () => document.querySelectorAll('.ask-hit').forEach((el) => el.classList.remove('ask-hit'));
 
     let seq = 0;
+    const go = root.querySelector<HTMLButtonElement>('[data-ask-go]')!;
+    const form = root.querySelector<HTMLFormElement>('[data-ask-form]')!;
+    const setBusy = (on: boolean) => {
+      go.disabled = on;
+      go.textContent = on ? 'Searching…' : 'Ask';
+      root.classList.toggle('ask-busy', on);
+    };
+
+    // The server runs the same MiniLM model over the same item vectors. If it
+    // can't be reached, fall back to running the model in this browser.
+    async function rank(query: string): Promise<{ ids: { id: string; score: number }[]; vector?: number[] }> {
+      if (hasApi()) {
+        try {
+          const r = await api<{ results: { id: string; score: number }[] }>(
+            '/search',
+            { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ query }) },
+            { onSlow: () => (status.textContent = WAKING) },
+          );
+          return { ids: r.results };
+        } catch {
+          status.textContent = 'Server unavailable, so searching on your device instead (downloads a 45 MB model once)…';
+        }
+      } else {
+        status.textContent = 'Loading the search model on your device (45 MB, first search only)…';
+      }
+      const [items, [vector]] = await Promise.all([loadVectors(), embed([query])]);
+      return { ids: topMatches(vector, items).map(({ item, score }) => ({ id: item.id, score })), vector: Array.from(vector) };
+    }
+
     async function search(raw: string) {
       const query = raw.trim();
       const mine = ++seq;
       if (query.length < 3) {
         list.replaceChildren();
         clearHits();
-        status.textContent = idle;
+        status.textContent = query ? 'Type a few more letters.' : idle;
         return;
       }
       busy = true;
+      setBusy(true);
+      status.textContent = 'Searching…';
       try {
-        const [items, [vector]] = await Promise.all([loadVectors(), embed([query])]);
+        const { ids, vector } = await rank(query);
         if (mine !== seq) return;
-        const top = topMatches(vector, items);
-        const results = top.map(({ item, score }) => {
-          const d = byId.get(item.id)!;
-          return { id: d.id, type: d.type, title: d.title, href: d.href, score: Number(score.toFixed(4)), why: whyLine(query, d.text) };
-        });
+        const results = ids
+          .filter((r) => byId.has(r.id))
+          .map(({ id, score }) => {
+            const d = byId.get(id)!;
+            return { id: d.id, type: d.type, title: d.title, href: d.href, score: Number(score.toFixed(4)), why: whyLine(query, d.text) };
+          });
         clearHits();
         list.replaceChildren(
           ...results.map((r) => {
@@ -95,27 +125,23 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
           }),
         );
         status.textContent = results.length
-          ? `${results.length} closest match${results.length > 1 ? 'es' : ''}, highlighted below.`
+          ? `Closest matches for "${query}". Tap one to jump there.`
           : 'Nothing close enough. Try other words.';
-        window.dispatchEvent(new CustomEvent('ask', { detail: { query, vector: Array.from(vector), results } }));
+        window.dispatchEvent(new CustomEvent('ask', { detail: { query, vector, results } }));
       } catch {
-        if (mine === seq) status.textContent = 'The search model could not load. Everything below still works.';
+        if (mine === seq) status.textContent = 'Search is unavailable right now. Everything below still works.';
       } finally {
         busy = false;
+        if (mine === seq) setBusy(false);
       }
     }
 
-    let timer = 0;
-    input.addEventListener('input', () => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(() => void search(input.value), 350);
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      void search(input.value);
     });
     input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        window.clearTimeout(timer);
-        void search(input.value);
-      } else if (e.key === 'Escape' && input.value) {
+      if (e.key === 'Escape' && input.value) {
         input.value = '';
         void search('');
       }
@@ -137,6 +163,10 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
     border-radius: var(--radius);
   }
   .ask-input::placeholder { color: var(--muted); opacity: 0.8; }
+  .ask-form { display: flex; gap: 0.5rem; }
+  .ask-form .ask-input { flex: 1; min-width: 0; }
+  .ask-go { flex: none; }
+  .ask-go:disabled { opacity: 0.7; cursor: progress; }
   .ask-status { font-size: 0.85rem; margin: 0.4rem 0 0; }
   .ask-results { margin: 0.6rem 0 0; padding-left: 1.4rem; }
   .ask-results:empty { display: none; }

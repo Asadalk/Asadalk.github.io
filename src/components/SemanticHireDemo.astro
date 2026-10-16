@@ -1,17 +1,16 @@
 ---
-// semantic-hire, running in the visitor's browser: the repo's 24 jobs, its
-// ranking (src/lib/matcher.ts) and the same embedding model. No server, no
-// Gemini. Hidden until its script runs, so the card is unchanged without JS.
+// semantic-hire live: the portfolio API runs the repo's real ranking code
+// (space/app.py). If the server can't be reached, the same ranking runs in the
+// browser (src/lib/matcher.ts, parity-tested). No Gemini. Hidden without JS.
 import queries from '../content/data/semantic-hire/queries.json';
 
 const examples = queries.map((q) => q.resume_text);
 ---
 
 <div class="sh" data-sh hidden>
-  <h4>Try it <span class="det-tag">Runs on your device</span></h4>
+  <h4>Try it</h4>
   <p class="sh-intro">
-    Paste a resume (or a few lines about your skills) to rank the repo's 24 synthetic job descriptions with the same model and scoring.
-    Nothing is sent anywhere.
+    Paste a resume (or a few lines about your skills) to rank the repo's 24 synthetic job descriptions with its real model and scoring.
   </p>
   <label class="sh-label mono" for="sh-resume">Resume text</label>
   <textarea id="sh-resume" class="sh-text" rows="5" spellcheck="false" aria-describedby="sh-status"></textarea>
@@ -31,7 +30,8 @@ const examples = queries.map((q) => q.resume_text);
 </div>
 
 <script>
-  import { embed, warm } from '../lib/embed-client';
+  import { embed } from '../lib/embed-client';
+  import { api, hasApi, WAKING } from '../lib/api';
   import { dot } from '../lib/embed-math';
   import { MIN_RESUME_CHARS, cleanText, rankJobs, type Job, type MatchResult } from '../lib/matcher';
 
@@ -49,14 +49,6 @@ const examples = queries.map((q) => q.resume_text);
     type StoredJob = Job & { vector: number[] };
     let jobs: Promise<StoredJob[]> | null = null;
     const loadJobs = () => (jobs ??= import('../content/generated/jobs.json').then((m) => m.default.jobs as StoredJob[]));
-    const start = () => {
-      void warm().catch(() => {});
-      void loadJobs();
-    };
-    for (const el of [text, run, example]) {
-      el.addEventListener('focus', start, { once: true });
-      el.addEventListener('pointerdown', start, { once: true });
-    }
 
     const fmt = (x: number) => x.toFixed(2);
     const el = <K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, txt?: string) => {
@@ -110,17 +102,48 @@ const examples = queries.map((q) => q.resume_text);
         return;
       }
       run.disabled = true;
-      status.textContent = 'Loading the model if needed, then ranking…';
+      run.textContent = 'Ranking…';
+      status.textContent = 'Ranking the 24 jobs…';
+      type Remote = { job_id: string; title: string; company: string; location: string; semantic_score: number; skill_overlap_score: number; final_score: number; matched_skills: string[]; missing_skills: string[] };
       try {
-        const [all, [v]] = await Promise.all([loadJobs(), embed([resume])]);
-        const results = rankJobs(resume, all, all.map((j) => dot(v, j.vector)));
+        let results: MatchResult[] | null = null;
+        let where = 'on the server, with the repo\'s own code';
+        if (hasApi()) {
+          try {
+            const r = await api<{ results: Remote[] }>(
+              '/match',
+              { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ resume: resume.slice(0, 20000), top_k: 5 }) },
+              { onSlow: () => (status.textContent = WAKING) },
+            );
+            results = r.results.map((x) => ({
+              jobId: x.job_id,
+              title: x.title,
+              company: x.company,
+              location: x.location,
+              semanticScore: x.semantic_score,
+              skillOverlapScore: x.skill_overlap_score,
+              finalScore: x.final_score,
+              matchedSkills: x.matched_skills,
+              missingSkills: x.missing_skills,
+            }));
+          } catch {
+            status.textContent = 'Server unavailable, so ranking on your device instead (downloads a 45 MB model once)…';
+          }
+        }
+        if (!results) {
+          where = 'on your device';
+          const [all, [v]] = await Promise.all([loadJobs(), embed([resume])]);
+          results = rankJobs(resume, all, all.map((j) => dot(v, j.vector)));
+        }
         render(results);
         out.hidden = false;
-        status.textContent = `Top ${results.length} of ${all.length} jobs, ranked on this device.`;
+        status.textContent = `Top ${results.length} of 24 jobs, ranked ${where}.`;
+        window.dispatchEvent(new CustomEvent('demo', { detail: { id: 'semantic-hire', action: 'used' } }));
       } catch {
-        status.textContent = 'The model could not load in this browser. The results table above shows how the ranker scores.';
+        status.textContent = 'Ranking is unavailable right now. The results table above shows how the ranker scores.';
       } finally {
         run.disabled = false;
+        run.textContent = 'Rank the jobs';
       }
     }
 

@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import sample from '../../src/content/data/scan-sample.json' with { type: 'json' };
 
 test('the sample photo runs through the real model in the browser', async ({ page }) => {
   test.setTimeout(180_000);
@@ -26,7 +27,9 @@ test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
   test('shows the precomputed result instead of a dead control', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('[data-overlay] rect.hit')).toHaveCount(44);
+    // Precomputed full OCR (space/server.py) for the sample: boxes plus text lines.
+    await expect(page.locator('[data-overlay] rect.hit')).toHaveCount(sample.words.length);
+    await expect(page.locator('[data-lines] li')).toHaveCount(sample.lines.length);
     await expect(page.locator('[data-controls]')).toBeHidden();
     await expect(page.locator('[data-status]')).toContainText('Turn on JavaScript');
   });

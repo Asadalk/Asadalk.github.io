@@ -51,7 +51,6 @@ test('the semantic-hire matcher ranks jobs on the device exactly like the Python
   await page.locator('#semantic-hire summary').click();
   const demo = page.locator('[data-sh]');
   await expect(demo).toBeVisible();
-  await expect(demo).toContainText('Runs on your device');
 
   const example = demo.getByRole('button', { name: 'Try an example resume' });
   const items = demo.locator('[data-sh-list] > li');
@@ -59,7 +58,7 @@ test('the semantic-hire matcher ranks jobs on the device exactly like the Python
   // The example button walks through the repo's 8 evaluation queries in order.
   for (const q of python.queries) {
     await example.click();
-    await expect(demo.locator('#sh-status')).toContainText('ranked on this device', { timeout: 60_000 });
+    await expect(demo.locator('#sh-status')).toContainText('ranked on your device', { timeout: 60_000 });
     await expect(items).toHaveCount(5);
     const rows = await items.evaluateAll((els) =>
       els.map((e) => ({ job_id: (e as HTMLElement).dataset.jobId, final: Number((e as HTMLElement).dataset.final) })),

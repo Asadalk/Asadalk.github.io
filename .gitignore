@@ -19,3 +19,6 @@ public/ort-embed/
 # (scripts/download-model.mjs). The browser uses the committed fp16 file.
 public/models/all-MiniLM-L6-v2/onnx/model.onnx
 public/models/all-MiniLM-L6-v2/onnx/model_quantized.onnx
+
+# Generated copy for the Space build (scripts/deploy-space.sh)
+space/embeddings.json
