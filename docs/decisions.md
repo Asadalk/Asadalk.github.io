@@ -29,3 +29,15 @@
 - **The haze is a fixed level with an honest note under the scene.** It switches to real PM2.5 when SmokeTrail has data.
 - **The "Scan a photo with my model" button waits for Phase 3**, when the demo exists. Until then the first hero button is "See the research".
 - **Playwright e2e tests** (hero navigation, keyboard, reduced motion, no-JS, résumé) run in CI on a phone and a desktop profile.
+
+## 2026-10-16 · Phase 3
+
+- **Model:** the released `yolo11n-bstd-v1.0` weights (SHA-256 checked against the fork) exported to ONNX at a fixed 1280 × 1280 input, opset 17, fp32 (10.6 MB). fp16 would halve the download but needs its own parity run, so it waits.
+- **Runtime:** onnxruntime-web 1.30.0 in a Web Worker. WebGPU when an adapter exists, otherwise single-threaded WebAssembly (GitHub Pages cannot send the COOP/COEP headers needed for threads). The runtime files are self-hosted in `/ort/`; nothing loads from a CDN.
+- **Preprocessing is a bit-exact port of OpenCV**, not canvas `drawImage`. Canvas resizing antialiases, and even a plain float bilinear port was off by a grey level on ~10% of pixels, enough to flip borderline boxes. See `tests/parity/yolo/README.md`.
+- **Parity reference is Ultralytics running the ONNX file**, not the `.pt`: `.pt` predictions use rectangular padding, ONNX uses the full square, and the browser runs the ONNX.
+- **Test photos come from Wikimedia Commons** (CC BY / CC BY-SA). Only one (Paharganj Main Bazaar, CC BY 4.0) ships on the site, resized to 2400 px and credited under the demo.
+- **Fallback:** without JavaScript, or if the model can't load, the demo shows the sample photo with boxes precomputed by Python from the same model.
+- **A service worker caches models, the ONNX runtime and samples after first use.** It ignores every other request.
+- **`[hidden]` now always wins over component display rules.** A no-JS e2e test caught the demo's buttons showing despite `hidden`.
+- **Recognition (script ID + PARSeq) is not in the browser.** It needs the server planned for Phase 7.

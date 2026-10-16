@@ -38,8 +38,8 @@ const px = (initial.word * MODEL) / initial.side;
   </svg>
 
   <p class="readout" aria-live="polite" data-readout>
-    At the model's input this word is <strong class="mono">{px.toFixed(1)} px</strong> tall: about
-    {(px / 8).toFixed(1)} cells of the finest grid (stride 8), {(px / 16).toFixed(1)} of the next, {(px / 32).toFixed(2)} of the coarsest.
+    At the model's input this word is <strong class="mono">{px.toFixed(1)} px</strong> tall:{' '}
+    {`about ${(px / 8).toFixed(1)} cells of the finest grid (stride 8), ${(px / 16).toFixed(1)} of the next, ${(px / 32).toFixed(2)} of the coarsest.`}
   </p>
   <p class="muted note">
     The square shows one 32 px cell of the coarsest grid, split into the 16 px and 8 px cells of the finer ones. The

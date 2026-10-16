@@ -73,5 +73,9 @@ const personLd = {
     </main>
     <Footer plain={plain} />
     {!plain && <MiniBar />}
+    <script is:inline>
+      // Cache model files after first use (see public/sw.js). Harmless if unsupported.
+      if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+    </script>
   </body>
 </html>

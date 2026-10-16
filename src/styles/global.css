@@ -4,6 +4,11 @@
   box-sizing: border-box;
 }
 
+/* Component display rules must never resurrect hidden elements. */
+[hidden] {
+  display: none !important;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   scroll-padding-top: 4.5rem;

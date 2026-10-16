@@ -32,3 +32,23 @@ Plain-language explanations of each piece of the site, so every part can be defe
 **Lock-on without breaking links.** The signboards are ordinary `<a href="#research">` links. JavaScript intercepts the click, thickens the chosen box and dims the rest for about a quarter of a second, then smooth-scrolls to the section and moves keyboard focus there. If JS is off, the plain link behaviour takes over; under reduced motion the jump is instant.
 
 **Parallax.** The far skyline moves at 14% of scroll speed and the wires at 5%, applied with `transform` inside `requestAnimationFrame`. Transforms don't trigger layout, so there is no layout shift (CLS). The effect only runs while the hero is visible.
+
+## Phase 3: running the detector in the browser
+
+**From PyTorch to the browser.** The fine-tuned YOLO11n is exported to ONNX, a portable model format. In the browser, onnxruntime-web runs it inside a Web Worker, a background thread, so the page stays responsive. It uses the GPU through WebGPU when available, and the CPU through WebAssembly otherwise.
+
+**What the model actually outputs.** One tensor of shape `[1, 5, 33600]`. For each of 33,600 candidate positions (from three grids with cell sizes 8, 16 and 32 pixels over a 1280 × 1280 input) it gives a box centre, width, height and a "text" score. Turning that into boxes means:
+1. keep candidates scoring above 0.25;
+2. greedy non-maximum suppression: take the best box, drop any other box overlapping it with IoU above 0.7, repeat;
+3. undo the letterbox to get back to photo pixels.
+
+**Letterboxing.** The photo is scaled so its long side is 1280 pixels, then padded to a square with grey (114). The scaling must be done exactly as in training. That is the lesson from the research too: a model is only as good as the match between its training and inference preprocessing.
+
+**The parity test, and the bug it caught.** The same nine photos go through Python and through the real web page, and every box must overlap its partner by IoU ≥ 0.95. The first run failed on four boxes. Ruling out causes one at a time:
+- JPEG decoding was identical.
+- The ONNX runtime was innocent: Python reproduced the failure when given the browser's input.
+- The resize was the cause. OpenCV uses fixed-point arithmetic, so a mathematically "correct" bilinear resize lands one grey level away on about 10% of pixels. That was enough to push two boxes scoring 0.251–0.254 under the 0.25 threshold.
+
+Porting OpenCV's integer arithmetic made the inputs identical, and the test passed.
+
+**Why small text gets missed.** A 20-pixel word in a 3,200-pixel photo becomes 8 pixels at 1280: one cell of the finest grid. The explainer under the demo lets you change the numbers.
