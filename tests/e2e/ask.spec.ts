@@ -55,15 +55,23 @@ test('the semantic-hire matcher ranks jobs on the device exactly like the Python
 
   const example = demo.getByRole('button', { name: 'Try an example resume' });
   const items = demo.locator('[data-sh-list] > li');
+  const seen: { query_id: string; top5: { job_id?: string; final: number }[] }[] = [];
   // The example button walks through the repo's 8 evaluation queries in order.
   for (const q of python.queries) {
     await example.click();
     await expect(demo.locator('#sh-status')).toContainText('ranked on this device', { timeout: 60_000 });
     await expect(items).toHaveCount(5);
-    const ids = await items.evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.jobId));
-    expect(ids, q.query_id).toEqual(q.top5.map((r) => r.job_id));
-    const finals = await items.evaluateAll((els) => els.map((e) => Number((e as HTMLElement).dataset.final)));
-    finals.forEach((f, i) => expect(Math.abs(f - q.top5[i].final), q.query_id).toBeLessThanOrEqual(0.0005));
+    const rows = await items.evaluateAll((els) =>
+      els.map((e) => ({ job_id: (e as HTMLElement).dataset.jobId, final: Number((e as HTMLElement).dataset.final) })),
+    );
+    seen.push({ query_id: q.query_id, top5: rows });
+    expect(rows.map((r) => r.job_id), q.query_id).toEqual(q.top5.map((r) => r.job_id));
+    rows.forEach((r, i) => expect(Math.abs(r.final - q.top5[i].final), q.query_id).toBeLessThanOrEqual(0.0005));
+  }
+  // PARITY_OUT=path records what the real page showed, for the parity report.
+  if (process.env.PARITY_OUT) {
+    const { writeFileSync } = await import('node:fs');
+    writeFileSync(process.env.PARITY_OUT, JSON.stringify({ side: 'page', browser: test.info().project.name, queries: seen }, null, 1) + '\n');
   }
   await expect(items.first().locator('.sh-bar')).toHaveAttribute('aria-label', /from meaning/);
   expect(foreign).toEqual([]);
