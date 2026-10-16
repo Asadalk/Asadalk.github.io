@@ -90,18 +90,14 @@ export class VisitorModel {
     this.state = state ?? emptyModel();
   }
 
-  /** True when the item vectors are just the 5 axes (no embeddings). */
-  get axisSpace(): boolean {
-    return (this.items[0]?.vector.length ?? 5) === AXES.length;
-  }
-
   stats(id: string): ItemStats {
     return (this.state.items[id] ??= { shown: 0, engaged: 0, dwell: 0 });
   }
 
   /** Map an axis direction into the item-vector space. */
   axesToVector(axes: Vec): Vec {
-    if (this.axisSpace) return axes;
+    // A blend of the items that match the direction, so the result sits among
+    // real items (a bare boost like [1, 0.6, 0, 0, 0] matches none of them well).
     const ws = this.items.map((i) => Math.max(0, cosine(axes, i.axes)) ** 4);
     return normalize(weightedMean(this.items.map((i) => i.vector), ws));
   }

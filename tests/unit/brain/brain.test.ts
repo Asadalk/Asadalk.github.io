@@ -48,6 +48,22 @@ describe('real content', () => {
     expect(b.log.recent(1)[0].text).toBe('Moved semantic-hire up because you picked "Hiring for ML".');
   });
 
+  test('the opener order is robust to Thompson sampling noise', () => {
+    const chips = site.openerChips;
+    const tally: Record<string, Record<string, number>> = {};
+    for (let seed = 1; seed <= 100; seed++) {
+      for (const c of chips.slice(0, 3)) {
+        const b = new Brain({ items: inputs, curated, wall: () => 0, rng: seeded(seed), local: null, session: null });
+        b.signal({ kind: 'opener', label: c.label, axesBoost: c.boost });
+        const top = b.planReorder(['opspilot', 'semantic-hire', 'cellular', 'smoketrail'], 0).order[0];
+        (tally[c.label] ??= {})[top] = (tally[c.label][top] ?? 0) + 1;
+      }
+    }
+    expect(tally['Hiring for ML']['semantic-hire']).toBeGreaterThanOrEqual(90);
+    expect((tally['Software']['opspilot'] ?? 0) + (tally['Software']['cellular'] ?? 0)).toBeGreaterThanOrEqual(90);
+    expect(tally['Data']['smoketrail']).toBeGreaterThanOrEqual(90);
+  });
+
   test('"Software" puts a systems project first; on-screen cards never move', () => {
     const b = make();
     b.signal({ kind: 'opener', label: 'Software', axesBoost: { software: 1 } });

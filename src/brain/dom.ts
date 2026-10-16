@@ -4,10 +4,11 @@
 // applies its decisions under the stability rule: nothing on screen or above
 // it ever moves, hides or resizes. Only cards below the fold are reordered.
 //
-// Test hook: ?brain-test=1 shortens every timer by 10× and exposes
-// window.__brain, so Playwright can check behaviour in seconds.
+// Test hook: ?brain-test=1 shortens every timer by 10×, seeds the random
+// numbers and exposes window.__brain, so Playwright can check behaviour in seconds.
 import { Brain, AXES, AXIS_SHORT, type Axis, type ItemInput, type Moment, type Vec } from './index';
 import { OPENER_KEY } from './persist';
+import { seeded } from './rng';
 import type { KV } from './types';
 
 interface BrainData {
@@ -94,7 +95,7 @@ export async function startBrain(): Promise<void> {
     curated: data.curated,
     headlines: data.headlines,
     wall: () => performance.now(),
-    rng: Math.random,
+    rng: test ? seeded(1) : Math.random, // seeded in the test hook so e2e runs repeat
     local,
     session,
     idleAfterMs: 30_000 * k,
@@ -476,7 +477,7 @@ export async function startBrain(): Promise<void> {
       const x = t.closest('[data-opener-dismiss]');
       if (!btn && !x) return;
       // Freeze the line's height so swapping its content never moves the page.
-      opener.style.minHeight = `${opener.offsetHeight}px`;
+      opener.style.minHeight = `${opener.getBoundingClientRect().height}px`;
       markOpenerDone();
       if (x) {
         opener.style.visibility = 'hidden';
