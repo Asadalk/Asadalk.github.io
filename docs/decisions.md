@@ -106,11 +106,12 @@
 
 ## 2026-10-16 · Phase 7: the portfolio API
 
-- **The owner chose speed and full output over on-device privacy.** After testing on his phone, "Ask about me" and the matcher looked broken: they silently downloaded a 45 MB model first. He asked for server-side processing and full OCR output. A Hugging Face Space (Docker, free CPU tier) now runs:
+- **The owner chose speed and full output over on-device privacy.** After testing on his phone, "Ask about me" and the matcher looked broken: they silently downloaded a 45 MB model first. He asked for server-side processing and full OCR output. A small FastAPI server (`space/server.py`) now runs:
   - `/ocr`: his IndicPhotoOCR fork end to end (YOLO11n → EfficientNetV2-L script ID → PARSeq), returning words, scripts and lines.
   - `/match`: semantic-hire's own code at a pinned commit.
   - `/search`: the same MiniLM model over the site's item vectors.
 - **The in-browser models stay as fallbacks.** If the Space is asleep or down, the scan demo draws boxes with YOLO11n on the device, and search and the matcher run the parity-tested in-browser ports. The page never dead-ends.
-- **Every action has a visible state.** The Ask box has a button and a "Searching…" state, the matcher button reads "Ranking…", and a slow first request says the server is waking up (free Spaces sleep after inactivity).
+- **Every action has a visible state.** The Ask box has a button and a "Searching…" state, the matcher button reads "Ranking…", and a slow first request says the server is waking up (the server scales to zero when idle).
 - **Uploaded photos are resized to at most 2,400 px on the phone, processed, and deleted** in the request's `finally` block. Nothing is logged or stored.
 - **The fork is installed editable from a clone.** Its `setup.py` uses `find_packages()`, which skips folders without `__init__.py` (for example `detection/east`), so a plain `pip install git+…` is incomplete.
+- **Hosted on Modal, not Hugging Face.** Hugging Face now requires a PRO subscription for Docker and Gradio Spaces, even on the basic CPU tier. Modal's monthly free credit covers a portfolio's traffic. It runs CPU only (2 cores, 6 GB), scales to zero 5 minutes after the last request, and has every OCR weight baked into the image, so a cold start only loads models from disk. Deploy with `scripts/deploy-api.sh` (`space/modal_app.py`). The Hugging Face `Dockerfile` is kept in case of a later switch.

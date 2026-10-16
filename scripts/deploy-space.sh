@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 NAME="${1:-portfolio-api}"
-USER_NAME="$(hf auth whoami | head -1 | sed 's/^user: *//')"
+USER_NAME="$(hf auth whoami | head -1 | sed -E 's/^(user[:=] *)//I')"
 REPO="$USER_NAME/$NAME"
 cp src/content/generated/embeddings.json space/embeddings.json
 hf repos create "$REPO" --type space --sdk docker --exist-ok >/dev/null

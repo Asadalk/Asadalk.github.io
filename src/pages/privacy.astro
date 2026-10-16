@@ -13,13 +13,12 @@ import Base from '../layouts/Base.astro';
       learned".
     </p>
     <p>
-      The photo demo and "Ask about me" run their models on your device. Your photos and questions are never
-      uploaded. The model files are downloaded from this site the first time you use them and then kept in your
-      browser's cache.
+      The photo demo, "Ask about me" and the job matcher send what you give them (a photo, a question or resume
+      text) to my small API server so it can run the models quickly. Photos are shrunk on your phone first, read,
+      and deleted as soon as the answer is sent back. Nothing you send is stored or logged.
     </p>
     <p class="muted">
-      Recognizing the words inside a detected box would need a server. That is not part of the site yet; if it is
-      added, the site will ask before sending a photo, and the server will not store it.
+      If the server can't be reached, the same models run in your browser instead and nothing leaves your device.
     </p>
     <p><a href="/">← Back</a></p>
   </div>

@@ -1,16 +1,24 @@
 import { expect, test, type Page } from '@playwright/test';
 import python from '../parity/semantic-hire/python.json' with { type: 'json' };
+import site from '../../src/content/site.json' with { type: 'json' };
+
+// The portfolio API is the one allowed foreign origin. Tests block it so the
+// in-browser fallback (the parity-tested path) runs, deterministically and offline.
+const API = site.api ? new URL(site.api).origin : null;
+test.beforeEach(async ({ page }) => {
+  if (API) await page.route(`${API}/**`, (r) => r.abort());
+});
 
 // Loading the 45 MB model from the local preview server takes a few seconds.
 test.setTimeout(90_000);
 
-/** Fails the test if the page talks to any origin other than its own. */
+/** Fails the test if the page talks to any origin other than its own (or the API). */
 function sameOriginOnly(page: Page, baseURL: string | undefined) {
   const origin = new URL(baseURL ?? 'http://localhost').origin;
   const foreign: string[] = [];
   page.on('request', (r) => {
     const u = new URL(r.url());
-    if (!['data:', 'blob:'].includes(u.protocol) && u.origin !== origin) foreign.push(r.url());
+    if (!['data:', 'blob:'].includes(u.protocol) && u.origin !== origin && u.origin !== API) foreign.push(r.url());
   });
   return foreign;
 }

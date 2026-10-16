@@ -53,3 +53,7 @@ Data used by the demos:
 
 - Tower data: OpenCellID, CC BY-SA 4.0, via a Kaggle sample (the 49-row `dataset/tower_sample.csv` from the Cellular repo).
 - India outline: [Natural Earth](https://www.naturalearthdata.com/) 1:10m admin-0, India point of view, public domain; built by `scripts/build-india-outline.py`.
+
+## The API (`space/`)
+
+Full OCR, search and the semantic-hire matcher run on a small FastAPI server (`space/server.py`) deployed to Modal (`space/modal_app.py`). Deploy with `scripts/deploy-api.sh` after `modal setup`. The site's `src/content/site.json` → `api` holds its URL. If the API is unreachable, the site falls back to the in-browser models.

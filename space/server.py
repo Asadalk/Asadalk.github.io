@@ -57,7 +57,22 @@ def ocr_engine():
             from IndicPhotoOCR.ocr import OCR
 
             _ocr = OCR(device="cpu", detector="yolo", identifier_lang="auto", identifier_type="efficientnet")
+            _warm_recognisers(_ocr)
     return _ocr
+
+
+def _warm_recognisers(engine) -> None:
+    """Load every PARSeq language model now (the fork loads them lazily, which
+    added ~17 s to the first busy photo). Same calls as its recognise()."""
+    import torch
+    from IndicPhotoOCR.recognition.parseq_recogniser import model_info
+
+    rec = engine.recogniser
+    for lang in model_info:
+        if lang not in rec._model_cache:
+            rec._model_cache[lang] = rec.load_model(engine._torch_device, rec.ensure_model(lang))
+    if "english" not in rec._model_cache:
+        rec._model_cache["english"] = torch.hub.load("baudm/parseq", "parseq", pretrained=True, verbose=False).eval().to(engine._torch_device)
 
 
 def retriever() -> JobRetriever:
