@@ -1,0 +1,131 @@
+---
+// "What this site learned": a slide-up panel opened from the mini-bar.
+// Filled and kept live by src/brain/dom.ts. Without JS it is never opened;
+// the mini-bar link goes to /privacy/ instead.
+import { AXES, AXIS_SHORT } from '../brain/types';
+
+// Radar geometry (viewBox 0 0 240 200, centre 120,100, radius 70).
+const cx = 120;
+const cy = 100;
+const R = 70;
+const angle = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / AXES.length;
+const pt = (i: number, r: number) => [cx + r * Math.cos(angle(i)), cy + r * Math.sin(angle(i))];
+const ring = (f: number) => AXES.map((_, i) => pt(i, R * f).map((v) => v.toFixed(1)).join(',')).join(' ');
+const labels = AXES.map((a, i) => {
+  const [x, y] = pt(i, R + 16);
+  const anchor = Math.abs(x - cx) < 4 ? 'middle' : x > cx ? 'start' : 'end';
+  return { a, x: x.toFixed(1), y: (y + 4).toFixed(1), anchor, text: AXIS_SHORT[a] };
+});
+---
+
+<dialog class="brain-panel" data-brain-panel aria-labelledby="brain-h">
+  <div class="sheet">
+    <header class="head">
+      <h2 id="brain-h">What this site learned</h2>
+      <button type="button" class="close" data-brain-close aria-label="Close">
+        <svg viewBox="0 0 12 12" width="14" height="14" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
+      </button>
+    </header>
+
+    <figure class="radar-fig">
+      <svg class="radar" viewBox="0 0 240 200" role="img" aria-labelledby="brain-radar-desc" data-brain-radar>
+        <desc id="brain-radar-desc" data-brain-radar-desc>Your interests across five areas.</desc>
+        <g class="grid" aria-hidden="true">
+          {[1 / 3, 2 / 3, 1].map((f) => <polygon points={ring(f)} />)}
+          {AXES.map((_, i) => {
+            const [x, y] = pt(i, R);
+            return <line x1={cx} y1={cy} x2={x.toFixed(1)} y2={y.toFixed(1)} />;
+          })}
+        </g>
+        <polygon class="shape" data-brain-shape points={ring(0)} />
+        <g class="labels" aria-hidden="true">
+          {labels.map((l) => <text x={l.x} y={l.y} text-anchor={l.anchor}>{l.text}</text>)}
+        </g>
+      </svg>
+      <figcaption class="muted small" data-brain-caption>Nothing learned yet. The shape grows as you read.</figcaption>
+    </figure>
+
+    <h3 class="sub mono">Recent decisions</h3>
+    <ol class="decisions" data-brain-decisions>
+      <li class="muted">None yet.</li>
+    </ol>
+
+    <p class="state small" data-brain-state></p>
+
+    <div class="foot">
+      <button type="button" class="button button--ghost reset" data-brain-reset>Reset what this site learned</button>
+      <p class="muted small" data-brain-reset-note aria-live="polite"></p>
+      <p class="muted small">Everything stays on this device. <a href="/privacy/">Privacy</a></p>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .brain-panel {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    max-width: 30rem;
+    max-height: min(85vh, 44rem);
+    margin: 0 auto;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-bottom: 0;
+    border-radius: var(--radius) var(--radius) 0 0;
+    background: var(--bg);
+    color: var(--text);
+    overflow-y: auto;
+  }
+  .brain-panel[open] { animation: slide-up var(--dur) var(--ease); }
+  .brain-panel::backdrop { background: color-mix(in srgb, var(--text) 25%, transparent); }
+  @keyframes slide-up {
+    from { transform: translateY(1.5rem); opacity: 0; }
+    to { transform: none; opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .brain-panel[open] { animation: none; }
+  }
+  .sheet { padding: 1rem var(--gutter) calc(1.25rem + env(safe-area-inset-bottom)); }
+  .head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .head h2 { font-size: 1.25rem; margin: 0; }
+  .close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .close:hover { color: var(--text); }
+  .radar-fig { margin: 0.5rem 0 0.75rem; text-align: center; }
+  .radar { width: 100%; max-width: 17rem; height: auto; overflow: visible; }
+  .grid polygon,
+  .grid line { fill: none; stroke: var(--border); stroke-width: 1; }
+  .shape {
+    fill: color-mix(in srgb, var(--accent) 18%, transparent);
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    transition: all var(--dur) var(--ease);
+  }
+  .labels text { font-family: var(--font-mono); font-size: 9px; fill: var(--muted); }
+  .small { font-size: 0.85rem; }
+  .sub {
+    margin: 1rem 0 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .decisions { margin: 0; padding-left: 1.1rem; font-size: 0.9rem; }
+  .decisions li { margin-bottom: 0.35rem; }
+  .state { margin: 0.9rem 0 0; }
+  .foot { margin-top: 1rem; border-top: 1px dashed var(--border); padding-top: 1rem; }
+  .reset { font-size: 0.9rem; }
+  .foot p { margin: 0.6rem 0 0; }
+</style>

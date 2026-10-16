@@ -9,7 +9,7 @@ import type { KV } from '../../../src/brain/types';
 import { projects, research, site } from '../../../src/lib/content';
 import { FakeWall, makeFixture } from '../fixtures/items';
 
-const inputs = [research, ...projects].map((p) => ({ id: p.id, type: p.type, title: p.short ?? p.title, axes: p.axes }));
+const inputs = [research, ...projects].map((p) => ({ id: p.id, type: p.type, title: (p as { short?: string }).short ?? p.title, axes: p.axes }));
 const curated = ['research-bstd', 'opspilot', 'semantic-hire', 'cellular', 'smoketrail'];
 
 const make = (local: KV | null = memoryKV(), session: KV | null = memoryKV(), wall = new FakeWall()) =>

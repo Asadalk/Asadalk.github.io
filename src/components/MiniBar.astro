@@ -1,6 +1,7 @@
 ---
-// The fixed escape hatch: bottom on mobile, top on desktop. Spec allows exactly
-// four items; the brain panel (fourth) arrives with the brain in Phase 5.
+// The fixed escape hatch: bottom on mobile, top on desktop. Exactly four items.
+// The fourth, "Brain", opens the brain panel on the home page (dom.ts). Without
+// JS, or on other pages, it is a plain link to the privacy page, which explains it.
 const items = [
   { href: '/resume/', label: 'Résumé view' },
   { href: '/#education', label: 'Education' },
@@ -11,6 +12,18 @@ const items = [
 <nav class="minibar" aria-label="Quick links">
   <ul>
     {items.map((i) => <li><a href={i.href}>{i.label}</a></li>)}
+    <li>
+      <a href="/privacy/" data-brain-open aria-haspopup="dialog">
+        <svg class="icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <circle cx="8" cy="8" r="2" fill="currentColor" />
+          <circle cx="3" cy="4" r="1.3" fill="currentColor" />
+          <circle cx="13" cy="4" r="1.3" fill="currentColor" />
+          <circle cx="8" cy="14" r="1.3" fill="currentColor" />
+          <path d="M3 4l5 4 5-4M8 8v6" fill="none" stroke="currentColor" stroke-width="1" />
+        </svg>
+        Brain
+      </a>
+    </li>
   </ul>
 </nav>
 
@@ -43,9 +56,11 @@ const items = [
     color: var(--text);
     font-family: var(--font-mono);
     font-size: 0.72rem;
+    gap: 0.35rem;
     text-decoration: none;
     text-align: center;
   }
+  .icon { flex: none; color: var(--accent-ink); }
   a:hover { color: var(--accent-ink); text-decoration: underline; }
   @media (min-width: 48rem) {
     .minibar {
