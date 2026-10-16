@@ -1,0 +1,172 @@
+{
+  "$comment": "Identity, contact, bio and adaptive headline variants. Never add a phone number, CGPA or placement details.",
+  "name": "Asadullah Faisal",
+  "tagline": "AI & Data Science · IIT Jodhpur",
+  "bio": "I'm a final-year AI & Data Science student at IIT Jodhpur. I build machine learning systems and then measure where they break: a text detector for Indian street signs, an LLM agent that cannot act without permission, and the benchmarks that keep both honest.",
+  "about": [
+    "My research, under Prof. Anand Mishra, is on finding text in photos of Indian streets. The result I am proudest of so far came from an audit, not a new model: the detector was skipping the normalization it was trained with, and fixing that one step raised recall without any retraining.",
+    "On the software side I like systems where the model is powerful but not trusted: OpsPilot lets an LLM investigate production incidents, while a server-side policy engine, a human reviewer and a verification step decide what actually happens.",
+    "I care about evaluation as much as building. Every project here comes with its numbers, including the ones that did not go my way."
+  ],
+  "education": [
+    {
+      "id": "education-iitj",
+      "degree": "B.Tech, Artificial Intelligence & Data Science",
+      "institution": "Indian Institute of Technology Jodhpur",
+      "years": "2023–2027",
+      "primary": true,
+      "coursework": [
+        "Machine Learning",
+        "Deep Learning",
+        "Computer Vision",
+        "Pattern Recognition and Machine Learning",
+        "Natural Language Understanding",
+        "Artificial Intelligence",
+        "Probability & Statistics",
+        "Data Structures & Algorithms",
+        "Database Management Systems",
+        "Operating Systems",
+        "Computer Networks"
+      ],
+      "axes": {
+        "ml": 0.5,
+        "dl": 0.5,
+        "software": 0.4,
+        "data": 0.5,
+        "research": 0.4
+      }
+    },
+    {
+      "id": "education-12",
+      "degree": "Senior Secondary (BSEB)",
+      "institution": "Mirza Ghalib College, Gaya",
+      "years": "2023"
+    },
+    {
+      "id": "education-10",
+      "degree": "Secondary (CBSE)",
+      "institution": "GBRC, Gaya",
+      "years": "2021"
+    }
+  ],
+  "experience": [
+    {
+      "id": "experience-research",
+      "role": "B.Tech research project",
+      "org": "IIT Jodhpur · advisor Prof. Anand Mishra",
+      "dates": "Aug 2026 – present",
+      "refersTo": "research-bstd",
+      "axes": {
+        "ml": 0.6,
+        "dl": 1.0,
+        "software": 0.3,
+        "data": 0.4,
+        "research": 1.0
+      }
+    },
+    {
+      "id": "experience-raid",
+      "role": "Member",
+      "org": "RAID (Realm of AI and Data) club, IIT Jodhpur",
+      "dates": "Jun 2024 – Apr 2025",
+      "axes": {
+        "ml": 0.6,
+        "dl": 0.4,
+        "software": 0.3,
+        "data": 0.6,
+        "research": 0.3
+      }
+    }
+  ],
+  "achievements": [
+    {
+      "id": "jee-advanced-2023",
+      "text": "JEE Advanced 2023: Common Rank List (CRL) 3,077, top ~0.2% of candidates",
+      "axes": {
+        "ml": 0.2,
+        "dl": 0.2,
+        "software": 0.2,
+        "data": 0.2,
+        "research": 0.2
+      }
+    },
+    {
+      "id": "jee-main-2023",
+      "text": "JEE Main 2023: Common Rank List (CRL) ~8,000, top 0.7% of ~1.5 million applicants",
+      "axes": {
+        "ml": 0.2,
+        "dl": 0.2,
+        "software": 0.2,
+        "data": 0.2,
+        "research": 0.2
+      }
+    }
+  ],
+  "contact": {
+    "email": "asadullah.faisal@proton.me",
+    "linkedin": "https://linkedin.com/in/faizal-iitj",
+    "github": "https://github.com/Asadalk",
+    "leetcode": "https://leetcode.com/u/asad08/"
+  },
+  "headlines": {
+    "$comment": "Picked by the visitor's dominant axis (Phase 5). 'default' is the cold-start headline and the one used without JavaScript.",
+    "default": "I build ML systems, then measure where they break.",
+    "ml": "ML engineer who ships real software.",
+    "dl": "Deep learning, down to the preprocessing bug.",
+    "software": "Software engineer who builds real ML.",
+    "data": "Data person who reads the error logs.",
+    "research": "Finding small text in Indian street photos."
+  },
+  "openerChips": [
+    {
+      "label": "Hiring for ML",
+      "boost": {
+        "ml": 1,
+        "dl": 0.6
+      }
+    },
+    {
+      "label": "Software",
+      "boost": {
+        "software": 1
+      }
+    },
+    {
+      "label": "Data",
+      "boost": {
+        "data": 1
+      }
+    },
+    {
+      "label": "Just exploring",
+      "boost": {}
+    }
+  ],
+  "signboards": [
+    {
+      "en": "About",
+      "hi": "परिचय",
+      "target": "about"
+    },
+    {
+      "en": "Research",
+      "hi": "शोध",
+      "target": "research"
+    },
+    {
+      "en": "Projects",
+      "hi": "प्रोजेक्ट्स",
+      "target": "projects"
+    },
+    {
+      "en": "Experience",
+      "hi": "अनुभव",
+      "target": "experience"
+    },
+    {
+      "en": "Contact",
+      "hi": "संपर्क",
+      "target": "contact"
+    }
+  ]
+}

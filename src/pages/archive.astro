@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import { archive } from '../lib/content';
+---
+
+<Base title="Archive: smaller projects · Asadullah Faisal" description="Smaller projects and coursework by Asadullah Faisal.">
+  <div class="wrap page">
+    <h1>Archive</h1>
+    <p>Smaller projects and coursework. Team projects say which part was mine.</p>
+    <ul class="list">
+      {archive.map((a) => (
+        <li id={a.id}>
+          <a href={a.repo} class="name">{a.repo.split('/').pop()}</a>
+          <p>{a.line}</p>
+          <p class="mono muted ctx">{a.context}</p>
+        </li>
+      ))}
+    </ul>
+    <p><a href="/">← Back</a></p>
+  </div>
+</Base>
+
+<style>
+  .page { padding-top: 3rem; }
+  @media (min-width: 48rem) { .page { padding-top: 5rem; } }
+  .list { list-style: none; padding: 0; }
+  .list li { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .name { font-family: var(--font-display); font-size: 1.15rem; }
+  .list p { margin: 0.3rem 0 0; }
+  .ctx { font-size: 0.72rem; }
+</style>

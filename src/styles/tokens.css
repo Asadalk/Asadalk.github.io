@@ -1,0 +1,66 @@
+/* "Smog & Signboard" palette. Every color in the site comes from here.
+   Contrast (WCAG): text pairs checked in docs/decisions.md. */
+:root {
+  color-scheme: light;
+  --bg: #ece6d8;            /* Lime-wash */
+  --surface: #e1d9c6;       /* Plaster */
+  --text: #221e1c;          /* Kohl */
+  --muted: #5e5468;         /* Smog Mauve */
+  --accent: #a9462d;        /* Brick Kiln: buttons, link text on --bg */
+  --accent-ink: #963b24;    /* deeper brick so links pass 4.5:1 on --surface */
+  --on-accent: #ece6d8;
+  --detect: #c8e64a;        /* Detector Chartreuse: boxes, focus, chips. Never body text. */
+  --detect-edge: #221e1c;   /* Kohl outline that keeps chartreuse visible on light bg */
+  --ok: #4e5b31;            /* Neem */
+  --border: color-mix(in srgb, var(--muted) 35%, transparent);
+  --grain-opacity: 0.06;
+
+  --font-display: 'Young Serif', Georgia, serif;
+  --font-deva: 'Tiro Devanagari Hindi', 'Noto Serif Devanagari', serif;
+  --font-body: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-mono: 'Martian Mono', ui-monospace, monospace;
+
+  --radius: 6px;
+  --gutter: 16px;
+  --measure: 68ch;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur: 280ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #1d1a21;          /* Night Smog */
+    --surface: #29252e;
+    --text: #ece6d8;
+    --muted: #b3a8be;
+    --accent: #e07a58;
+    --accent-ink: #e07a58;
+    --on-accent: #1d1a21;
+    --detect: #d3ee55;
+    --detect-edge: #1d1a21;
+    --ok: #9db06a;
+    --grain-opacity: 0;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #1d1a21;
+  --surface: #29252e;
+  --text: #ece6d8;
+  --muted: #b3a8be;
+  --accent: #e07a58;
+  --accent-ink: #e07a58;
+  --on-accent: #1d1a21;
+  --detect: #d3ee55;
+  --detect-edge: #1d1a21;
+  --ok: #9db06a;
+  --grain-opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur: 0ms;
+  }
+}

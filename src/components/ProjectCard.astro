@@ -1,0 +1,87 @@
+---
+import FeedCard from './FeedCard.astro';
+import Results from './Results.astro';
+import type { Project } from '../lib/content';
+
+interface Props { project: Project }
+const { project: p } = Astro.props;
+---
+
+<FeedCard
+  id={p.id}
+  kind="project"
+  title={p.title}
+  summary={p.summary}
+  tags={p.tags}
+  status={p.status === 'in-progress' ? 'in progress' : undefined}
+>
+  <h4>Problem</h4>
+  <p>{p.problem}</p>
+
+  {p.built && (
+    <>
+      <h4>What I built</h4>
+      <ul>{p.built.map((b) => <li>{b}</li>)}</ul>
+    </>
+  )}
+
+  {p.plannedMethod && (
+    <>
+      <h4>Plan</h4>
+      <ul>{p.plannedMethod.map((b) => <li>{b}</li>)}</ul>
+    </>
+  )}
+
+  {p.focus && <p class="muted">{p.focus}</p>}
+
+  {p.timeline && (
+    <>
+      <h4>How it evolved</h4>
+      <ol class="timeline">
+        {p.timeline.map((t) => <li><span class="mono">{t.date}</span> {t.text}</li>)}
+      </ol>
+      {p.evolvedFrom && <p>Started as <a href={p.evolvedFrom}>ops-assistant</a>.</p>}
+    </>
+  )}
+
+  {p.results && (
+    <>
+      <h4>Results</h4>
+      <Results table={p.results} />
+    </>
+  )}
+
+  {p.statusNote && <p class="muted">{p.statusNote}</p>}
+
+  {p.media && (
+    <>
+      <h4>Demo</h4>
+      <figure class="media">
+        <video controls preload="none" playsinline poster={p.media.poster} width="378" height="850">
+          <source src={p.media.video} type="video/mp4" />
+          <a href={p.media.video}>Download the demo video</a>
+        </video>
+        <figcaption class="muted">{p.media.caption}</figcaption>
+      </figure>
+    </>
+  )}
+
+  {p.stack && <p class="stack mono muted">{p.stack.join(' · ')}</p>}
+  {p.repo && <p><a href={p.repo}>Source on GitHub</a></p>}
+</FeedCard>
+
+<style>
+  .timeline { padding-left: 1.1rem; }
+  .timeline .mono { font-size: 0.75rem; color: var(--muted); margin-right: 0.4rem; }
+  .media { margin: 0 0 1rem; }
+  .media video {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+  }
+  .media figcaption { font-size: 0.9rem; margin-top: 0.4rem; max-width: 40ch; }
+  .stack { font-size: 0.72rem; margin-top: 1rem; }
+</style>

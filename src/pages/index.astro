@@ -1,0 +1,144 @@
+---
+import Base from '../layouts/Base.astro';
+import ResearchCard from '../components/ResearchCard.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import Skills from '../components/Skills.astro';
+import { site, projects } from '../lib/content';
+
+// Owner's curated cold-start order. The brain (Phase 5) may reorder cards
+// below the fold; it never hides any.
+const projectOrder = ['opspilot', 'semantic-hire', 'cellular', 'smoketrail'];
+const ordered = projectOrder.map((id) => projects.find((p) => p.id === id)!);
+const primaryEdu = site.education.find((e) => e.primary)!;
+---
+
+<Base>
+  <header class="hero" slot="header">
+    <div class="wrap">
+      <p class="eyebrow mono">{site.name} · {site.tagline}</p>
+      <h1 data-headline>{site.headlines.default}</h1>
+      <p class="lede">{site.bio}</p>
+      <div class="actions">
+        <a class="button button--primary" href="#research">See the research</a>
+        <a class="button button--ghost" href="/resume/">Plain résumé view</a>
+      </div>
+      <nav class="signs" aria-label="Sections">
+        <ul>
+          {site.signboards.map((s) => (
+            <li>
+              <a href={`#${s.target}`}>
+                <span class="en">{s.en}</span>
+                <span class="hi" lang="hi">{s.hi}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap feed">
+    <section id="about" aria-labelledby="about-h">
+      <h2 id="about-h">About</h2>
+      {site.about.map((p) => <p>{p}</p>)}
+    </section>
+
+    <section id="research" aria-labelledby="research-h">
+      <h2 id="research-h">Research</h2>
+      <ResearchCard />
+    </section>
+
+    <section id="projects" aria-labelledby="projects-h">
+      <h2 id="projects-h">Projects</h2>
+      {ordered.map((p) => <ProjectCard project={p} />)}
+      <p><a href="/archive/">Smaller projects and coursework →</a></p>
+    </section>
+
+    <section id="experience" aria-labelledby="experience-h">
+      <h2 id="experience-h">Experience</h2>
+      <ul class="plain-list">
+        {site.experience.map((x) => (
+          <li id={x.id}>
+            <strong>{x.role}</strong>, {x.org}
+            <span class="mono muted dates">{x.dates}</span>
+            {x.refersTo && <a href={`#${x.refersTo}`}>details above</a>}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section id="education" aria-labelledby="education-h">
+      <h2 id="education-h">Education</h2>
+      <p>
+        <strong>{primaryEdu.degree}</strong><br />
+        {primaryEdu.institution} <span class="mono muted dates">{primaryEdu.years}</span>
+      </p>
+      <p class="muted coursework">Coursework: {primaryEdu.coursework?.join(', ')}</p>
+      <ul class="plain-list">
+        {site.education.filter((e) => !e.primary).map((e) => (
+          <li>{e.degree}, {e.institution} <span class="mono muted dates">{e.years}</span></li>
+        ))}
+      </ul>
+      <h3>Achievements</h3>
+      <ul class="plain-list">
+        {site.achievements.map((a) => <li id={a.id}>{a.text}</li>)}
+      </ul>
+    </section>
+
+    <section id="skills" aria-labelledby="skills-h">
+      <h2 id="skills-h">Skills</h2>
+      <p class="muted">Each skill links to the work that uses it.</p>
+      <Skills />
+    </section>
+
+    <section id="contact" aria-labelledby="contact-h">
+      <h2 id="contact-h">Contact</h2>
+      <p>The fastest way to reach me is email.</p>
+      <ul class="contact">
+        <li><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
+        <li><a href={site.contact.linkedin} rel="me">LinkedIn</a></li>
+        <li><a href={site.contact.github} rel="me">GitHub</a></li>
+      </ul>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .hero { padding: 3rem 0 2rem; }
+  @media (min-width: 48rem) { .hero { padding-top: 5.5rem; } }
+  .eyebrow { font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; }
+  .lede { font-size: 1.15rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 2rem; }
+  .signs ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .signs a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 6.5rem;
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    text-decoration: none;
+    line-height: 1.25;
+  }
+  .signs a:hover { border-color: var(--accent); }
+  .signs .en { font-family: var(--font-display); }
+  .signs .hi { font-family: var(--font-deva); font-size: 0.95rem; color: var(--muted); }
+  .feed section { padding-top: 2.5rem; }
+  .plain-list { padding-left: 1.1rem; }
+  .plain-list li { margin-bottom: 0.5rem; }
+  .dates { font-size: 0.75rem; margin: 0 0.5rem; white-space: nowrap; }
+  .coursework { font-size: 0.95rem; }
+  .contact { list-style: none; padding: 0; font-size: 1.1rem; }
+  .contact li { margin-bottom: 0.4rem; }
+</style>

@@ -1,0 +1,37 @@
+---
+import FeedCard from './FeedCard.astro';
+import Results from './Results.astro';
+import { research as r } from '../lib/content';
+---
+
+<FeedCard id={r.id} kind="research" title={r.title} summary={r.summary} tags={r.tags} status="ongoing" open>
+  <p class="meta mono">{r.role} · {r.supervisor} · Aug 2026 – present</p>
+
+  <h4>Problem</h4>
+  <p>{r.problem}</p>
+
+  <h4>What I did</h4>
+  <ul>
+    {r.contributions.map((c) => <li><strong>{c.title}.</strong> {c.text}</li>)}
+  </ul>
+  <p class="muted">{r.ongoing}</p>
+
+  <h4>Results</h4>
+  {r.results.map((t) => <Results table={t} />)}
+
+  <h4>Credit</h4>
+  <p class="credit">
+    {r.credit.text} The toolkit: <a href={r.credit.toolkit}>Bhashini-IITJ/IndicPhotoOCR</a>.
+    Paper: {r.credit.citation} <a href={r.credit.doi}>doi</a>.
+  </p>
+
+  <h4>Code</h4>
+  <p><a href={r.repo}>My fork with the fine-tuned YOLO detector</a></p>
+  <p class="stack mono muted">{r.stack.join(' · ')}</p>
+</FeedCard>
+
+<style>
+  .meta { font-size: 0.75rem; color: var(--muted); }
+  .credit { font-size: 0.95rem; }
+  .stack { font-size: 0.72rem; }
+</style>

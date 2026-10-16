@@ -1,0 +1,116 @@
+---
+// Plain résumé view: everything on one page, no animation, no
+// personalization, no JavaScript needed, prints cleanly. The guaranteed fallback.
+import Base from '../layouts/Base.astro';
+import { site, research as r, projects, skillGroups, archive } from '../lib/content';
+
+const order = ['opspilot', 'semantic-hire', 'cellular', 'smoketrail'];
+const ps = order.map((id) => projects.find((p) => p.id === id)!);
+const primary = site.education.find((e) => e.primary)!;
+---
+
+<Base title={`${site.name}: résumé`} plain>
+  <article class="wrap resume">
+    <header>
+      <h1>{site.name}</h1>
+      <p>B.Tech, Artificial Intelligence & Data Science · Indian Institute of Technology Jodhpur</p>
+      <p class="mono contact">
+        <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a> ·
+        <a href={site.contact.linkedin}>linkedin.com/in/faizal-iitj</a> ·
+        <a href={site.contact.github}>github.com/Asadalk</a>
+      </p>
+      <p class="noprint"><a href="/">← Back to the interactive site</a></p>
+    </header>
+
+    <section>
+      <h2>Education</h2>
+      <ul>
+        {site.education.map((e) => (
+          <li><strong>{e.degree}</strong>, {e.institution} <span class="when">{e.years}</span></li>
+        ))}
+      </ul>
+      <p class="small">Coursework: {primary.coursework?.join(', ')}</p>
+    </section>
+
+    <section>
+      <h2>Research</h2>
+      <h3>{r.title} <span class="when">Aug 2026 – present</span></h3>
+      <p class="small">{r.role}, advisor {r.supervisor}. {r.stack.join(', ')}.</p>
+      <ul>{r.contributions.map((c) => <li>{c.text}</li>)}</ul>
+      <p class="small">{r.ongoing} {r.credit.text} <a href={r.repo}>{r.repo.replace('https://', '')}</a></p>
+    </section>
+
+    <section>
+      <h2>Projects</h2>
+      {ps.map((p) => (
+        <div class="project">
+          <h3>
+            {p.title}
+            {p.status === 'in-progress' && <span class="when">in progress</span>}
+          </h3>
+          <p>{p.summary}</p>
+          {p.built && <ul>{p.built.map((b) => <li>{b}</li>)}</ul>}
+          {p.results && (
+            <p class="small">
+              {p.results.caption}: {p.results.rows.map((row) => row.join(' ')).join('; ')}.
+            </p>
+          )}
+          {p.stack && <p class="small">{p.stack.join(', ')}</p>}
+          {p.repo && <p class="small"><a href={p.repo}>{p.repo.replace('https://', '')}</a></p>}
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+      <ul>
+        {site.experience.map((x) => <li><strong>{x.role}</strong>, {x.org} <span class="when">{x.dates}</span></li>)}
+      </ul>
+    </section>
+
+    <section>
+      <h2>Skills</h2>
+      <ul>
+        {skillGroups.map((g) => <li><strong>{g.name}:</strong> {g.skills.map((s) => s.name).join(', ')}</li>)}
+      </ul>
+    </section>
+
+    <section>
+      <h2>Achievements</h2>
+      <ul>{site.achievements.map((a) => <li>{a.text}</li>)}</ul>
+    </section>
+
+    <section>
+      <h2>Smaller projects</h2>
+      <ul>{archive.map((a) => <li><a href={a.repo}>{a.repo.split('/').pop()}</a>: {a.line}</li>)}</ul>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .resume { max-width: 52rem; padding-top: 2rem; }
+  .resume h1 { font-size: 2.25rem; margin-bottom: 0.25rem; }
+  .resume h2 {
+    font-size: 1.25rem;
+    margin: 1.75rem 0 0.5rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .resume h3 { font-family: var(--font-body); font-weight: 700; font-size: 1.05rem; margin: 0.9rem 0 0.25rem; }
+  .resume p, .resume li { max-width: none; }
+  .resume ul { padding-left: 1.1rem; margin: 0.25rem 0 0.5rem; }
+  .resume li { margin-bottom: 0.25rem; }
+  .contact { font-size: 0.78rem; }
+  .small { font-size: 0.92rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .when { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 400; color: var(--muted); margin-left: 0.5rem; }
+  @media print {
+    :global(body) { background: #fff; color: #000; font-size: 10.5pt; }
+    :global(body::before) { display: none; }
+    .noprint { display: none; }
+    .resume { padding: 0; max-width: none; }
+    .resume a { color: #000; text-decoration: none; }
+    .small, .when { color: #333; }
+    .resume h2 { break-after: avoid; }
+    .project { break-inside: avoid; }
+  }
+</style>

@@ -1,0 +1,92 @@
+{
+  "$comment": "Source of truth: owner's résumé (Oct 2026) and, for the YOLO11n release facts, the public fork. Owner approved making these results public and hosting the model (2026-10-16). Do not add numbers from any other source.",
+  "id": "research-bstd",
+  "type": "research",
+  "title": "Scene text detection in Indian languages",
+  "summary": "B.Tech research on finding text in Indian street photos: auditing the TextBPN++ detector, fixing a preprocessing mismatch, and fine-tuning faster detectors on the Bharat Scene Text Dataset.",
+  "role": "B.Tech Project",
+  "supervisor": "Prof. Anand Mishra, IIT Jodhpur",
+  "start": "2026-08",
+  "end": null,
+  "repo": "https://github.com/Asadalk/IndicPhotoOCR",
+  "stack": ["PyTorch", "Ultralytics YOLO", "Detectron2", "docTR", "OpenCV", "Shapely", "CUDA (RTX A6000)"],
+  "tags": ["Computer vision", "Text detection", "PyTorch", "YOLO"],
+  "axes": { "ml": 0.6, "dl": 1.0, "software": 0.3, "data": 0.4, "research": 1.0 },
+  "credit": {
+    "text": "IndicPhotoOCR, its paper and the Bharat Scene Text Dataset belong to the Bhashini / VL2G lab at IIT Jodhpur. Only the work listed here is mine.",
+    "toolkit": "https://github.com/Bhashini-IITJ/IndicPhotoOCR",
+    "citation": "De, Penamakuri, Yadav, Rathore, Shah, Sharma, Agarwal, Kumar, Mishra. Bharat Scene Text: A Novel Comprehensive Dataset and Benchmark for Indian Language Scene Text Understanding. IJDAR, 2026.",
+    "doi": "https://doi.org/10.1007/s10032-026-00583-9"
+  },
+  "problem": "The Bharat Scene Text Dataset's 1,319 test images are high resolution. Once resized for a detector, small words shrink to a few pixels and get missed, and very large words break the detector too.",
+  "contributions": [
+    {
+      "id": "audit",
+      "title": "Audit",
+      "text": "Reproduced and audited the TextBPN++ detector on all 1,319 test images. Built a polygon-IoU evaluation harness with per-image error logs and text-size stratification, which exposed a recall collapse on small text (under 20 px: recall 0.35) and on very large text (over 320 px)."
+    },
+    {
+      "id": "norm-fix",
+      "title": "Preprocessing fix",
+      "text": "Traced a train/inference preprocessing mismatch: inference skipped the mean/std normalization the model was trained with. Fixing it raised detection recall from 0.621 to 0.670 and F1 from 0.656 to 0.675, without retraining."
+    },
+    {
+      "id": "scale",
+      "title": "Small text",
+      "text": "Scale-aware 1.5× upscaling lifted small-text F1 from 0.47 to 0.59. Tiled inference was tested and rejected: it added 67 false positives for 4 true positives."
+    },
+    {
+      "id": "finetune",
+      "title": "Fine-tuning",
+      "text": "Fine-tuned YOLO11, docTR FAST and DPText-DETR on 4.7K training images, with polygon-to-box conversion, EXIF and coordinate correction, and a leak-free 90/10 split (test set held out). The fine-tuned YOLO raised end-to-end OCR word recall from 50.7% to 54.3% and F1 from 51.0% to 53.8%. It is now the toolkit fork's default detector (5.5 MB, release yolo11n-bstd-v1.0)."
+    },
+    {
+      "id": "benchmark",
+      "title": "Benchmark",
+      "text": "Benchmarked 10 text detectors (EAST, CRAFT, DBNet++ and others) and IoU-based polygon-fusion ensembles to map the precision–recall trade-off. A 5-model ensemble reached recall 56.7% but precision only 40.3%."
+    }
+  ],
+  "results": [
+    {
+      "id": "detection",
+      "caption": "TextBPN++ detection on the BSTD test set, before and after fixing the preprocessing mismatch (no retraining)",
+      "columns": ["Setup", "Recall", "F1"],
+      "rows": [
+        ["As shipped", "0.621", "0.656"],
+        ["Normalization fixed", "0.670", "0.675"]
+      ]
+    },
+    {
+      "id": "small-text",
+      "caption": "Small-text F1",
+      "columns": ["Setup", "Small-text F1"],
+      "rows": [
+        ["Baseline", "0.47"],
+        ["Scale-aware 1.5× upscaling", "0.59"]
+      ],
+      "notes": ["Tiled inference was rejected: +67 false positives for +4 true positives."]
+    },
+    {
+      "id": "end-to-end",
+      "caption": "End-to-end OCR (detection → script identification → PARSeq recognition)",
+      "columns": ["Detector", "Word recall", "F1"],
+      "rows": [
+        ["Before fine-tuning", "50.7%", "51.0%"],
+        ["Fine-tuned YOLO", "54.3%", "53.8%"]
+      ]
+    },
+    {
+      "id": "ensemble",
+      "caption": "Precision–recall trade-off of a 5-model polygon-fusion ensemble",
+      "columns": ["Setup", "Recall", "Precision"],
+      "rows": [["5-model ensemble", "56.7%", "40.3%"]],
+      "notes": ["Ensembling buys recall at a steep cost in precision."]
+    }
+  ],
+  "ongoing": "Working on a YOLO training recipe built around small-word crops.",
+  "demo": {
+    "label": "Scan a photo with my model",
+    "runsOn": "device",
+    "phase": 3
+  }
+}

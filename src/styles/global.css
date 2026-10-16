@@ -1,0 +1,180 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 4.5rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Plaster grain: SVG fractal noise at very low opacity, light mode only. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 0.5em;
+  text-wrap: balance;
+}
+
+h1 { font-size: clamp(2rem, 6vw, 3.25rem); }
+h2 { font-size: clamp(1.5rem, 4vw, 2rem); }
+h3 { font-size: 1.25rem; }
+
+p { margin: 0 0 1em; max-width: var(--measure); }
+
+a {
+  color: var(--accent-ink);
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+a:hover { text-decoration-thickness: 2px; }
+
+/* Chartreuse focus ring with a Kohl edge, so it reads on any background. */
+:focus-visible {
+  outline: 3px solid var(--detect);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--detect-edge);
+  border-radius: 2px;
+}
+
+code,
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  letter-spacing: -0.01em;
+}
+
+img,
+video { max-width: 100%; height: auto; }
+
+.wrap {
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.muted { color: var(--muted); }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: -3rem;
+  z-index: 100;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.skip-link:focus { top: 0.5rem; }
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 44px;
+  padding: 0.55rem 1.1rem;
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.button--primary { background: var(--accent); color: var(--on-accent); }
+.button--primary:hover { background: color-mix(in srgb, var(--accent) 88%, var(--text)); }
+.button--ghost { background: transparent; color: var(--accent-ink); }
+.button--ghost:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
+/* Detector-style tag: Kohl text on chartreuse, mono. Used for labels and scores. */
+.det-tag {
+  display: inline-block;
+  padding: 0.1em 0.45em;
+  background: var(--detect);
+  color: #221e1c;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  border: 1px solid #221e1c;
+  white-space: nowrap;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.1em 0.55em;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+caption {
+  text-align: left;
+  font-size: 0.9rem;
+  color: var(--muted);
+  padding-bottom: 0.4rem;
+  caption-side: top;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+th { font-weight: 700; }
+td.num, th.num { text-align: right; font-family: var(--font-mono); font-size: 0.82rem; white-space: nowrap; }
+
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }

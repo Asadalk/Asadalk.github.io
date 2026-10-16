@@ -1,0 +1,1237 @@
+{
+  "slug": "approval-rejected",
+  "title": "Payments pool exhaustion: restart requires approval, admin rejects, nothing executes",
+  "scenario": "Simulator world 'payments_pool' (OpsBench v2). Request text is OpsBench scenario OPSB2-085's input (category approval_rejection), operator role; admin rejection through POST /approvals/{id}/reject.",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "providerNote": "LLM_PROVIDER=groq, model openai/gpt-oss-120b (the provider/model OpsBench measured), running in the OpsPilot backend container; decisions are live model output.",
+  "exportedAt": "2026-10-16T06:15:25+00:00",
+  "run": {
+    "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+    "user_request": "payments-api latency is high. Investigate and fix it.",
+    "service": "payments-api",
+    "severity": "high",
+    "evidence": [
+      {
+        "knowledge": [
+          {
+            "chunk": 1,
+            "source": "architecture/payments-dependency-boundary.md",
+            "content": "# Payments Dependency Boundary payments-api owns request handling for payment records but depends on a database connection pool. Latency can increase before the service becomes failed. Database timeout logs and high request-latency metrics together are stronger evidence than either signal alone. The simulator separates service facts from dependency evidence. Use the service id and trace id to correlate records, and keep operational knowledge as supporting context rather than replacing observed runtime data.",
+            "document": "Payments Dependency Boundary",
+            "similarity": 0.569742
+          },
+          {
+            "chunk": 1,
+            "source": "runbooks/payment-latency.md",
+            "content": "# Payment Latency Runbook Use this runbook when payments-api latency rises above the simulator baseline. For incident PAY-442 on payments-api after version v3.8.2, confirm service health and request latency first. Compare the timestamp with the latest deployment and inspect database timeout logs. A database timeout is evidence of a dependency problem, not proof that the application code is defective. For a controlled response, preserve evidence, compare the deployment version with the previous known-good version, and check database pool saturation. Recommend rollback only when deployment timing and application evidence agree. Rollback is an approved action, never an automatic command.",
+            "document": "Payment Latency",
+            "similarity": 0.551619
+          },
+          {
+            "chunk": 1,
+            "source": "runbooks/deployment-rollback.md",
+            "content": "# Deployment Rollback Runbook A rollback is considered only after a deployment is correlated with a new error or latency signal and the prior version is known. Confirm health, metrics, logs, and deployment history before proposing it. This document describes a recommendation procedure, not an execution authority. A human approval is required before any rollback. Capture the current version, target version, evidence timestamps, expected verification signal, and a safe stop condition.",
+            "document": "Deployment Rollback",
+            "similarity": 0.476669
+          }
+        ],
+        "retrieval_status": "ok"
+      },
+      {
+        "tool": "get_service_health",
+        "result": {
+          "name": "payments-api",
+          "state": "degraded",
+          "repository": "github.com/opspilot/payments-api",
+          "service_id": 1,
+          "environment": "production"
+        }
+      },
+      {
+        "tool": "get_metrics",
+        "result": {
+          "metrics": [
+            {
+              "id": 1,
+              "value": 1842.0,
+              "service": "payments-api",
+              "timestamp": "2026-10-16T06:11:32.353670Z",
+              "metric_name": "http_request_latency_ms"
+            }
+          ],
+          "service": "payments-api"
+        }
+      },
+      {
+        "tool": "search_logs",
+        "result": {
+          "logs": [
+            {
+              "id": 1,
+              "level": "error",
+              "message": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)",
+              "service": "payments-api",
+              "trace_id": "trace-payments_pool-0",
+              "timestamp": "2026-10-16T06:10:32.353670Z"
+            }
+          ],
+          "service": "payments-api"
+        }
+      },
+      {
+        "tool": "get_recent_deployments",
+        "result": {
+          "service": "payments-api",
+          "deployments": [
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "payments-api",
+              "version": "2026.10.07.2",
+              "service_id": 1,
+              "deployed_at": "2026-10-13T06:14:32.353670Z",
+              "deployment_id": 1
+            },
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "payments-api",
+              "version": "2026.09.30.1",
+              "service_id": 1,
+              "deployed_at": "2026-10-06T06:14:32.353670Z",
+              "deployment_id": 2
+            }
+          ]
+        }
+      }
+    ],
+    "hypotheses": [
+      {
+        "score": 0.85,
+        "hypothesis": "Database connection pool saturation causing request latency",
+        "supporting_evidence": [
+          {
+            "source": "get_metrics",
+            "observation": "http_request_latency_ms = 1842 ms"
+          },
+          {
+            "source": "search_logs",
+            "observation": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)"
+          },
+          {
+            "source": "get_service_health",
+            "observation": "service health state = degraded"
+          }
+        ],
+        "contradicting_evidence": []
+      },
+      {
+        "score": 0.15,
+        "hypothesis": "Recent deployment introduced latency bug",
+        "supporting_evidence": [
+          {
+            "source": "get_recent_deployments",
+            "observation": "latest deployment version 2026.10.07.2 deployed on 2026-10-13, no newer deployments"
+          }
+        ],
+        "contradicting_evidence": [
+          {
+            "source": "get_recent_deployments",
+            "observation": "No new deployment coinciding with latency spike"
+          }
+        ]
+      }
+    ],
+    "diagnosis": "Payments API latency is elevated (1842 ms) and the service is degraded, accompanied by DB_TIMEOUT errors indicating the database connection pool is exhausted. No recent deployment correlates with the issue, suggesting a runtime dependency problem rather than a code regression.\n\nSources:\n[1] architecture/payments-dependency-boundary.md\n[2] runbooks/payment-latency.md\n[3] runbooks/deployment-rollback.md\n\nHuman approval rejected; action was not executed.",
+    "proposed_action": "Restarting the service can reset the exhausted DB connection pool and often resolves latency caused by pool saturation.",
+    "status": "completed",
+    "created_at": "2026-10-16T06:14:32.505023+00:00",
+    "completed_at": "2026-10-16T06:14:44.227677+00:00",
+    "knowledge_citations": [
+      {
+        "chunk": 1,
+        "source": "architecture/payments-dependency-boundary.md",
+        "content": "# Payments Dependency Boundary payments-api owns request handling for payment records but depends on a database connection pool. Latency can increase before the service becomes failed. Database timeout logs and high request-latency metrics together are stronger evidence than either signal alone. The simulator separates service facts from dependency evidence. Use the service id and trace id to correlate records, and keep operational knowledge as supporting context rather than replacing observed runtime data.",
+        "document": "Payments Dependency Boundary",
+        "similarity": 0.569742
+      },
+      {
+        "chunk": 1,
+        "source": "runbooks/payment-latency.md",
+        "content": "# Payment Latency Runbook Use this runbook when payments-api latency rises above the simulator baseline. For incident PAY-442 on payments-api after version v3.8.2, confirm service health and request latency first. Compare the timestamp with the latest deployment and inspect database timeout logs. A database timeout is evidence of a dependency problem, not proof that the application code is defective. For a controlled response, preserve evidence, compare the deployment version with the previous known-good version, and check database pool saturation. Recommend rollback only when deployment timing and application evidence agree. Rollback is an approved action, never an automatic command.",
+        "document": "Payment Latency",
+        "similarity": 0.551619
+      },
+      {
+        "chunk": 1,
+        "source": "runbooks/deployment-rollback.md",
+        "content": "# Deployment Rollback Runbook A rollback is considered only after a deployment is correlated with a new error or latency signal and the prior version is known. Confirm health, metrics, logs, and deployment history before proposing it. This document describes a recommendation procedure, not an execution authority. A human approval is required before any rollback. Capture the current version, target version, evidence timestamps, expected verification signal, and a safe stop condition.",
+        "document": "Deployment Rollback",
+        "similarity": 0.476669
+      }
+    ],
+    "hypothesis_history": [
+      [
+        {
+          "score": 0.85,
+          "hypothesis": "Database connection pool saturation causing request latency",
+          "supporting_evidence": [
+            {
+              "source": "get_metrics",
+              "observation": "http_request_latency_ms = 1842 ms"
+            },
+            {
+              "source": "search_logs",
+              "observation": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)"
+            },
+            {
+              "source": "get_service_health",
+              "observation": "service health state = degraded"
+            }
+          ],
+          "contradicting_evidence": []
+        },
+        {
+          "score": 0.15,
+          "hypothesis": "Recent deployment introduced latency bug",
+          "supporting_evidence": [
+            {
+              "source": "get_recent_deployments",
+              "observation": "latest deployment version 2026.10.07.2 deployed on 2026-10-13, no newer deployments"
+            }
+          ],
+          "contradicting_evidence": [
+            {
+              "source": "get_recent_deployments",
+              "observation": "No new deployment coinciding with latency spike"
+            }
+          ]
+        }
+      ]
+    ],
+    "action_proposal": {
+      "reason": "Restarting the service can reset the exhausted DB connection pool and often resolves latency caused by pool saturation.",
+      "status": "approval_required",
+      "target": "payments-api",
+      "evidence": [
+        {
+          "source": "search_logs",
+          "observation": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)"
+        },
+        {
+          "source": "get_metrics",
+          "observation": "High request latency metric (1842 ms)"
+        }
+      ],
+      "risk_level": "HIGH",
+      "action_type": "restart_service"
+    },
+    "policy_decision": {
+      "role": "operator",
+      "reason": "operator policy evaluated restart_service in production as HIGH risk.",
+      "outcome": "require_approval",
+      "username": "operator",
+      "risk_level": "HIGH",
+      "action_type": "restart_service",
+      "environment": "production"
+    }
+  },
+  "incident": {
+    "id": 1,
+    "service": "payments-api",
+    "title": "Payments latency spike",
+    "severity": "sev2",
+    "status": "investigating",
+    "_source": "OpsBench v2 world 'payments_pool' definition (backend/benchmarks/opsbench/v2/scenarios.json). The live incidents row was replaced by a later simulator reset (load_world truncates services/incidents); state shown is as seeded, before the run."
+  },
+  "agentEvents": [
+    {
+      "event_id": 175,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "run.started",
+      "occurred_at": "2026-10-16T06:14:32.506527+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": null,
+      "status": "started",
+      "error": null,
+      "details": {
+        "actor": "operator"
+      }
+    },
+    {
+      "event_id": 176,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "retrieval",
+      "occurred_at": "2026-10-16T06:14:32.544865+00:00",
+      "duration_ms": 24,
+      "model": null,
+      "tool": null,
+      "status": "ok",
+      "error": null,
+      "details": {
+        "mode": "hybrid",
+        "citation_count": 3
+      }
+    },
+    {
+      "event_id": 177,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "classify",
+      "occurred_at": "2026-10-16T06:14:33.433968+00:00",
+      "duration_ms": 850,
+      "model": "openai/gpt-oss-120b",
+      "tool": "get_service_health",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": null,
+        "attempts": 1,
+        "input_tokens": 2022,
+        "total_tokens": 2089,
+        "output_tokens": 67,
+        "decision_action": "call_tool"
+      }
+    },
+    {
+      "event_id": 178,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "health",
+      "occurred_at": "2026-10-16T06:14:33.489874+00:00",
+      "duration_ms": 34,
+      "model": null,
+      "tool": "get_service_health",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "result": {
+          "name": "payments-api",
+          "state": "degraded",
+          "repository": "github.com/opspilot/payments-api",
+          "service_id": 1,
+          "environment": "production"
+        },
+        "arguments": {
+          "service": "payments-api"
+        },
+        "call_index": 0
+      }
+    },
+    {
+      "event_id": 179,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "planning",
+      "occurred_at": "2026-10-16T06:14:34.022421+00:00",
+      "duration_ms": 492,
+      "model": "openai/gpt-oss-120b",
+      "tool": "get_metrics",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": null,
+        "attempts": 1,
+        "input_tokens": 2060,
+        "total_tokens": 2144,
+        "output_tokens": 84,
+        "decision_action": "call_tool"
+      }
+    },
+    {
+      "event_id": 180,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "metrics",
+      "occurred_at": "2026-10-16T06:14:34.091971+00:00",
+      "duration_ms": 51,
+      "model": null,
+      "tool": "get_metrics",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "result": {
+          "metrics": [
+            {
+              "id": 1,
+              "value": 1842.0,
+              "service": "payments-api",
+              "timestamp": "2026-10-16T06:11:32.353670Z",
+              "metric_name": "http_request_latency_ms"
+            }
+          ],
+          "service": "payments-api"
+        },
+        "arguments": {
+          "limit": 10,
+          "service": "payments-api",
+          "metric_name": "latency"
+        },
+        "call_index": 1
+      }
+    },
+    {
+      "event_id": 181,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "planning",
+      "occurred_at": "2026-10-16T06:14:37.298239+00:00",
+      "duration_ms": 3193,
+      "model": "openai/gpt-oss-120b",
+      "tool": "search_logs",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": null,
+        "attempts": 1,
+        "input_tokens": 2120,
+        "total_tokens": 2225,
+        "output_tokens": 105,
+        "decision_action": "call_tool"
+      }
+    },
+    {
+      "event_id": 182,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "logs",
+      "occurred_at": "2026-10-16T06:14:37.349319+00:00",
+      "duration_ms": 28,
+      "model": null,
+      "tool": "search_logs",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "result": {
+          "logs": [
+            {
+              "id": 1,
+              "level": "error",
+              "message": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)",
+              "service": "payments-api",
+              "trace_id": "trace-payments_pool-0",
+              "timestamp": "2026-10-16T06:10:32.353670Z"
+            }
+          ],
+          "service": "payments-api"
+        },
+        "arguments": {
+          "level": "error",
+          "limit": 20,
+          "query": "timeout",
+          "service": "payments-api"
+        },
+        "call_index": 2
+      }
+    },
+    {
+      "event_id": 183,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "planning",
+      "occurred_at": "2026-10-16T06:14:42.302751+00:00",
+      "duration_ms": 4920,
+      "model": "openai/gpt-oss-120b",
+      "tool": "get_recent_deployments",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": null,
+        "attempts": 1,
+        "input_tokens": 2201,
+        "total_tokens": 2331,
+        "output_tokens": 130,
+        "decision_action": "call_tool"
+      }
+    },
+    {
+      "event_id": 184,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "deployment",
+      "occurred_at": "2026-10-16T06:14:42.343363+00:00",
+      "duration_ms": 24,
+      "model": null,
+      "tool": "get_recent_deployments",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "result": {
+          "service": "payments-api",
+          "deployments": [
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "payments-api",
+              "version": "2026.10.07.2",
+              "service_id": 1,
+              "deployed_at": "2026-10-13T06:14:32.353670Z",
+              "deployment_id": 1
+            },
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "payments-api",
+              "version": "2026.09.30.1",
+              "service_id": 1,
+              "deployed_at": "2026-10-06T06:14:32.353670Z",
+              "deployment_id": 2
+            }
+          ]
+        },
+        "arguments": {
+          "limit": 5,
+          "service": "payments-api"
+        },
+        "call_index": 3
+      }
+    },
+    {
+      "event_id": 185,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "diagnosis",
+      "occurred_at": "2026-10-16T06:14:44.086308+00:00",
+      "duration_ms": 1702,
+      "model": "openai/gpt-oss-120b",
+      "tool": null,
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": "payments-api",
+        "attempts": 1,
+        "input_tokens": 2338,
+        "total_tokens": 2886,
+        "output_tokens": 548,
+        "decision_action": "diagnose"
+      }
+    },
+    {
+      "event_id": 186,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "action_proposed",
+      "occurred_at": "2026-10-16T06:14:44.125049+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": "restart_service",
+      "status": "proposed",
+      "error": null,
+      "details": {
+        "reason": "Restarting the service can reset the exhausted DB connection pool and often resolves latency caused by pool saturation.",
+        "status": "proposed",
+        "target": "payments-api",
+        "evidence": [
+          {
+            "source": "search_logs",
+            "observation": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)"
+          },
+          {
+            "source": "get_metrics",
+            "observation": "High request latency metric (1842 ms)"
+          }
+        ],
+        "risk_level": "MEDIUM",
+        "action_type": "restart_service"
+      }
+    },
+    {
+      "event_id": 187,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "policy",
+      "occurred_at": "2026-10-16T06:14:44.167022+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": "restart_service",
+      "status": "require_approval",
+      "error": null,
+      "details": {
+        "decision": {
+          "role": "operator",
+          "reason": "operator policy evaluated restart_service in production as HIGH risk.",
+          "outcome": "require_approval",
+          "username": "operator",
+          "risk_level": "HIGH",
+          "action_type": "restart_service",
+          "environment": "production"
+        }
+      }
+    },
+    {
+      "event_id": 188,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "approval",
+      "occurred_at": "2026-10-16T06:14:44.184258+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": "restart_service",
+      "status": "pending",
+      "error": null,
+      "details": {
+        "action_id": "ed634607-af89-4b1d-89b5-4ddeb8bbb207",
+        "expires_at": "2026-10-16T07:14:44.170195+00:00",
+        "approval_id": 5,
+        "requested_by": "operator"
+      }
+    },
+    {
+      "event_id": 189,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "run.paused",
+      "occurred_at": "2026-10-16T06:14:44.198875+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": null,
+      "status": "paused",
+      "error": null,
+      "details": {
+        "service": "payments-api",
+        "severity": "high",
+        "diagnosis": "Payments API latency is elevated (1842 ms) and the service is degraded, accompanied by DB_TIMEOUT errors indicating the database connection pool is exhausted. No recent deployment correlates with the issue, suggesting a runtime dependency problem rather than a code regression.\n\nSources:\n[1] architecture/payments-dependency-boundary.md\n[2] runbooks/payment-latency.md\n[3] runbooks/deployment-rollback.md"
+      }
+    },
+    {
+      "event_id": 190,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "approval",
+      "occurred_at": "2026-10-16T06:14:44.239347+00:00",
+      "duration_ms": 48,
+      "model": null,
+      "tool": "restart_service",
+      "status": "rejected",
+      "error": null,
+      "details": {
+        "reason": "Rejected: restart during peak traffic; scale the pool via change request instead.",
+        "action_id": "ed634607-af89-4b1d-89b5-4ddeb8bbb207",
+        "decided_by": "admin",
+        "approval_id": 5
+      }
+    },
+    {
+      "event_id": 191,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "event_type": "run.completed",
+      "occurred_at": "2026-10-16T06:14:44.240516+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": null,
+      "status": "completed",
+      "error": null,
+      "details": {
+        "approval_id": 5,
+        "approval_decision": "rejected"
+      }
+    }
+  ],
+  "auditEvents": [
+    {
+      "event_id": 147,
+      "occurred_at": "2026-10-16T06:14:32.491079+00:00",
+      "actor": "operator",
+      "event_type": "auth.login",
+      "entity_type": "user",
+      "entity_id": "operator",
+      "run_id": null,
+      "reason": "Authentication succeeded.",
+      "result": {
+        "role": "operator",
+        "status": "success"
+      },
+      "details": {}
+    },
+    {
+      "event_id": 148,
+      "occurred_at": "2026-10-16T06:14:32.505023+00:00",
+      "actor": "operator",
+      "event_type": "agent.started",
+      "entity_type": "run",
+      "entity_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": "payments-api latency is high. Investigate and fix it.",
+      "result": {
+        "status": "investigating"
+      },
+      "details": {}
+    },
+    {
+      "event_id": 149,
+      "occurred_at": "2026-10-16T06:14:33.486351+00:00",
+      "actor": "operator",
+      "event_type": "tool.called",
+      "entity_type": "run",
+      "entity_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": null,
+      "result": {
+        "error": null,
+        "success": true
+      },
+      "details": {
+        "tool": "get_service_health",
+        "result": {
+          "name": "payments-api",
+          "state": "degraded",
+          "repository": "github.com/opspilot/payments-api",
+          "service_id": 1,
+          "environment": "production"
+        },
+        "arguments": {
+          "service": "payments-api"
+        },
+        "call_index": 0,
+        "started_at": "2026-10-16T06:14:33.438131+00:00",
+        "finished_at": "2026-10-16T06:14:33.472866+00:00"
+      }
+    },
+    {
+      "event_id": 150,
+      "occurred_at": "2026-10-16T06:14:34.089836+00:00",
+      "actor": "operator",
+      "event_type": "tool.called",
+      "entity_type": "run",
+      "entity_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": null,
+      "result": {
+        "error": null,
+        "success": true
+      },
+      "details": {
+        "tool": "get_metrics",
+        "result": {
+          "metrics": [
+            {
+              "id": 1,
+              "value": 1842.0,
+              "service": "payments-api",
+              "timestamp": "2026-10-16T06:11:32.353670Z",
+              "metric_name": "http_request_latency_ms"
+            }
+          ],
+          "service": "payments-api"
+        },
+        "arguments": {
+          "limit": 10,
+          "service": "payments-api",
+          "metric_name": "latency"
+        },
+        "call_index": 1,
+        "started_at": "2026-10-16T06:14:34.028456+00:00",
+        "finished_at": "2026-10-16T06:14:34.079505+00:00"
+      }
+    },
+    {
+      "event_id": 151,
+      "occurred_at": "2026-10-16T06:14:37.347086+00:00",
+      "actor": "operator",
+      "event_type": "tool.called",
+      "entity_type": "run",
+      "entity_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": null,
+      "result": {
+        "error": null,
+        "success": true
+      },
+      "details": {
+        "tool": "search_logs",
+        "result": {
+          "logs": [
+            {
+              "id": 1,
+              "level": "error",
+              "message": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)",
+              "service": "payments-api",
+              "trace_id": "trace-payments_pool-0",
+              "timestamp": "2026-10-16T06:10:32.353670Z"
+            }
+          ],
+          "service": "payments-api"
+        },
+        "arguments": {
+          "level": "error",
+          "limit": 20,
+          "query": "timeout",
+          "service": "payments-api"
+        },
+        "call_index": 2,
+        "started_at": "2026-10-16T06:14:37.308716+00:00",
+        "finished_at": "2026-10-16T06:14:37.337604+00:00"
+      }
+    },
+    {
+      "event_id": 152,
+      "occurred_at": "2026-10-16T06:14:42.340662+00:00",
+      "actor": "operator",
+      "event_type": "tool.called",
+      "entity_type": "run",
+      "entity_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": null,
+      "result": {
+        "error": null,
+        "success": true
+      },
+      "details": {
+        "tool": "get_recent_deployments",
+        "result": {
+          "service": "payments-api",
+          "deployments": [
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "payments-api",
+              "version": "2026.10.07.2",
+              "service_id": 1,
+              "deployed_at": "2026-10-13T06:14:32.353670Z",
+              "deployment_id": 1
+            },
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "payments-api",
+              "version": "2026.09.30.1",
+              "service_id": 1,
+              "deployed_at": "2026-10-06T06:14:32.353670Z",
+              "deployment_id": 2
+            }
+          ]
+        },
+        "arguments": {
+          "limit": 5,
+          "service": "payments-api"
+        },
+        "call_index": 3,
+        "started_at": "2026-10-16T06:14:42.306766+00:00",
+        "finished_at": "2026-10-16T06:14:42.331219+00:00"
+      }
+    },
+    {
+      "event_id": 153,
+      "occurred_at": "2026-10-16T06:14:44.179511+00:00",
+      "actor": "operator",
+      "event_type": "action.proposed",
+      "entity_type": "action",
+      "entity_id": "ed634607-af89-4b1d-89b5-4ddeb8bbb207",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": "Restarting the service can reset the exhausted DB connection pool and often resolves latency caused by pool saturation.",
+      "result": {
+        "status": "approval_required"
+      },
+      "details": {
+        "reason": "Restarting the service can reset the exhausted DB connection pool and often resolves latency caused by pool saturation.",
+        "status": "approval_required",
+        "target": "payments-api",
+        "evidence": [
+          {
+            "source": "search_logs",
+            "observation": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)"
+          },
+          {
+            "source": "get_metrics",
+            "observation": "High request latency metric (1842 ms)"
+          }
+        ],
+        "risk_level": "HIGH",
+        "action_type": "restart_service"
+      }
+    },
+    {
+      "event_id": 154,
+      "occurred_at": "2026-10-16T06:14:44.179511+00:00",
+      "actor": "operator",
+      "event_type": "policy.evaluated",
+      "entity_type": "action",
+      "entity_id": "ed634607-af89-4b1d-89b5-4ddeb8bbb207",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": null,
+      "result": {
+        "role": "operator",
+        "reason": "operator policy evaluated restart_service in production as HIGH risk.",
+        "outcome": "require_approval",
+        "username": "operator",
+        "risk_level": "HIGH",
+        "action_type": "restart_service",
+        "environment": "production"
+      },
+      "details": {
+        "action_type": "restart_service"
+      }
+    },
+    {
+      "event_id": 155,
+      "occurred_at": "2026-10-16T06:14:44.179511+00:00",
+      "actor": "operator",
+      "event_type": "approval.requested",
+      "entity_type": "approval",
+      "entity_id": "5",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": "Restarting the service can reset the exhausted DB connection pool and often resolves latency caused by pool saturation.",
+      "result": {
+        "decision": "pending"
+      },
+      "details": {
+        "proposal": {
+          "reason": "Restarting the service can reset the exhausted DB connection pool and often resolves latency caused by pool saturation.",
+          "status": "approval_required",
+          "target": "payments-api",
+          "evidence": [
+            {
+              "source": "search_logs",
+              "observation": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)"
+            },
+            {
+              "source": "get_metrics",
+              "observation": "High request latency metric (1842 ms)"
+            }
+          ],
+          "risk_level": "HIGH",
+          "action_type": "restart_service"
+        },
+        "action_id": "ed634607-af89-4b1d-89b5-4ddeb8bbb207",
+        "expires_at": "2026-10-16T07:14:44.170195+00:00"
+      }
+    },
+    {
+      "event_id": 156,
+      "occurred_at": "2026-10-16T06:14:44.195367+00:00",
+      "actor": "operator",
+      "event_type": "incident.investigation_linked",
+      "entity_type": "incident",
+      "entity_id": "1",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": "Agent investigated the incident service.",
+      "result": {
+        "status": "paused"
+      },
+      "details": {
+        "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+        "service": "payments-api"
+      }
+    },
+    {
+      "event_id": 157,
+      "occurred_at": "2026-10-16T06:14:44.195367+00:00",
+      "actor": "operator",
+      "event_type": "agent.paused",
+      "entity_type": "run",
+      "entity_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": "Payments API latency is elevated (1842 ms) and the service is degraded, accompanied by DB_TIMEOUT errors indicating the database connection pool is exhausted. No recent deployment correlates with the issue, suggesting a runtime dependency problem rather than a code regression.\n\nSources:\n[1] architecture/payments-dependency-boundary.md\n[2] runbooks/payment-latency.md\n[3] runbooks/deployment-rollback.md",
+      "result": {
+        "status": "paused"
+      },
+      "details": {
+        "service": "payments-api",
+        "severity": "high"
+      }
+    },
+    {
+      "event_id": 158,
+      "occurred_at": "2026-10-16T06:14:44.21219+00:00",
+      "actor": "admin",
+      "event_type": "auth.login",
+      "entity_type": "user",
+      "entity_id": "admin",
+      "run_id": null,
+      "reason": "Authentication succeeded.",
+      "result": {
+        "role": "admin",
+        "status": "success"
+      },
+      "details": {}
+    },
+    {
+      "event_id": 159,
+      "occurred_at": "2026-10-16T06:14:44.236345+00:00",
+      "actor": "admin",
+      "event_type": "approval.rejected",
+      "entity_type": "approval",
+      "entity_id": "5",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": "Rejected: restart during peak traffic; scale the pool via change request instead.",
+      "result": {
+        "decision": "rejected"
+      },
+      "details": {
+        "action_id": "ed634607-af89-4b1d-89b5-4ddeb8bbb207"
+      }
+    },
+    {
+      "event_id": 160,
+      "occurred_at": "2026-10-16T06:14:44.236345+00:00",
+      "actor": "admin",
+      "event_type": "agent.completed",
+      "entity_type": "run",
+      "entity_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "reason": "Human approval rejected; action was not executed.",
+      "result": {
+        "status": "completed"
+      },
+      "details": {
+        "approval_id": 5
+      }
+    }
+  ],
+  "toolCalls": [
+    {
+      "id": 41,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "call_index": 0,
+      "tool": "get_service_health",
+      "arguments": {
+        "service": "payments-api"
+      },
+      "start_time": "2026-10-16T06:14:33.438131+00:00",
+      "end_time": "2026-10-16T06:14:33.472866+00:00",
+      "result": {
+        "name": "payments-api",
+        "state": "degraded",
+        "repository": "github.com/opspilot/payments-api",
+        "service_id": 1,
+        "environment": "production"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": 42,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "call_index": 1,
+      "tool": "get_metrics",
+      "arguments": {
+        "limit": 10,
+        "service": "payments-api",
+        "metric_name": "latency"
+      },
+      "start_time": "2026-10-16T06:14:34.028456+00:00",
+      "end_time": "2026-10-16T06:14:34.079505+00:00",
+      "result": {
+        "metrics": [
+          {
+            "id": 1,
+            "value": 1842.0,
+            "service": "payments-api",
+            "timestamp": "2026-10-16T06:11:32.353670Z",
+            "metric_name": "http_request_latency_ms"
+          }
+        ],
+        "service": "payments-api"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": 43,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "call_index": 2,
+      "tool": "search_logs",
+      "arguments": {
+        "level": "error",
+        "limit": 20,
+        "query": "timeout",
+        "service": "payments-api"
+      },
+      "start_time": "2026-10-16T06:14:37.308716+00:00",
+      "end_time": "2026-10-16T06:14:37.337604+00:00",
+      "result": {
+        "logs": [
+          {
+            "id": 1,
+            "level": "error",
+            "message": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)",
+            "service": "payments-api",
+            "trace_id": "trace-payments_pool-0",
+            "timestamp": "2026-10-16T06:10:32.353670Z"
+          }
+        ],
+        "service": "payments-api"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": 44,
+      "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+      "call_index": 3,
+      "tool": "get_recent_deployments",
+      "arguments": {
+        "limit": 5,
+        "service": "payments-api"
+      },
+      "start_time": "2026-10-16T06:14:42.306766+00:00",
+      "end_time": "2026-10-16T06:14:42.331219+00:00",
+      "result": {
+        "service": "payments-api",
+        "deployments": [
+          {
+            "author": "simulator@example.com",
+            "status": "success",
+            "service": "payments-api",
+            "version": "2026.10.07.2",
+            "service_id": 1,
+            "deployed_at": "2026-10-13T06:14:32.353670Z",
+            "deployment_id": 1
+          },
+          {
+            "author": "simulator@example.com",
+            "status": "success",
+            "service": "payments-api",
+            "version": "2026.09.30.1",
+            "service_id": 1,
+            "deployed_at": "2026-10-06T06:14:32.353670Z",
+            "deployment_id": 2
+          }
+        ]
+      },
+      "success": true,
+      "error": null
+    }
+  ],
+  "hypotheses": [
+    {
+      "score": 0.85,
+      "hypothesis": "Database connection pool saturation causing request latency",
+      "supporting_evidence": [
+        {
+          "source": "get_metrics",
+          "observation": "http_request_latency_ms = 1842 ms"
+        },
+        {
+          "source": "search_logs",
+          "observation": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)"
+        },
+        {
+          "source": "get_service_health",
+          "observation": "service health state = degraded"
+        }
+      ],
+      "contradicting_evidence": []
+    },
+    {
+      "score": 0.15,
+      "hypothesis": "Recent deployment introduced latency bug",
+      "supporting_evidence": [
+        {
+          "source": "get_recent_deployments",
+          "observation": "latest deployment version 2026.10.07.2 deployed on 2026-10-13, no newer deployments"
+        }
+      ],
+      "contradicting_evidence": [
+        {
+          "source": "get_recent_deployments",
+          "observation": "No new deployment coinciding with latency spike"
+        }
+      ]
+    }
+  ],
+  "hypothesisHistory": [
+    [
+      {
+        "score": 0.85,
+        "hypothesis": "Database connection pool saturation causing request latency",
+        "supporting_evidence": [
+          {
+            "source": "get_metrics",
+            "observation": "http_request_latency_ms = 1842 ms"
+          },
+          {
+            "source": "search_logs",
+            "observation": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)"
+          },
+          {
+            "source": "get_service_health",
+            "observation": "service health state = degraded"
+          }
+        ],
+        "contradicting_evidence": []
+      },
+      {
+        "score": 0.15,
+        "hypothesis": "Recent deployment introduced latency bug",
+        "supporting_evidence": [
+          {
+            "source": "get_recent_deployments",
+            "observation": "latest deployment version 2026.10.07.2 deployed on 2026-10-13, no newer deployments"
+          }
+        ],
+        "contradicting_evidence": [
+          {
+            "source": "get_recent_deployments",
+            "observation": "No new deployment coinciding with latency spike"
+          }
+        ]
+      }
+    ]
+  ],
+  "proposal": {
+    "reason": "Restarting the service can reset the exhausted DB connection pool and often resolves latency caused by pool saturation.",
+    "status": "approval_required",
+    "target": "payments-api",
+    "evidence": [
+      {
+        "source": "search_logs",
+        "observation": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)"
+      },
+      {
+        "source": "get_metrics",
+        "observation": "High request latency metric (1842 ms)"
+      }
+    ],
+    "risk_level": "HIGH",
+    "action_type": "restart_service"
+  },
+  "action": {
+    "action_id": "ed634607-af89-4b1d-89b5-4ddeb8bbb207",
+    "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+    "proposal": {
+      "reason": "Restarting the service can reset the exhausted DB connection pool and often resolves latency caused by pool saturation.",
+      "status": "approval_required",
+      "target": "payments-api",
+      "evidence": [
+        {
+          "source": "search_logs",
+          "observation": "DB_TIMEOUT acquiring connection from pool after 5000ms (active=50/50)"
+        },
+        {
+          "source": "get_metrics",
+          "observation": "High request latency metric (1842 ms)"
+        }
+      ],
+      "risk_level": "HIGH",
+      "action_type": "restart_service"
+    },
+    "status": "rejected",
+    "result": null,
+    "created_at": "2026-10-16T06:14:44.179511+00:00",
+    "executed_at": null,
+    "idempotency_key": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb:restart_service:payments-api"
+  },
+  "policy": {
+    "role": "operator",
+    "reason": "operator policy evaluated restart_service in production as HIGH risk.",
+    "outcome": "require_approval",
+    "username": "operator",
+    "risk_level": "HIGH",
+    "action_type": "restart_service",
+    "environment": "production"
+  },
+  "approval": {
+    "id": 5,
+    "run_id": "e2113ee3-5fb9-47ea-8a40-6f5c5439f2fb",
+    "action_id": "ed634607-af89-4b1d-89b5-4ddeb8bbb207",
+    "requested_at": "2026-10-16T06:14:44.179511+00:00",
+    "expires_at": "2026-10-16T07:14:44.170195+00:00",
+    "decided_at": "2026-10-16T06:14:44.227677+00:00",
+    "decision": "rejected",
+    "decided_by": "admin",
+    "reason": "Rejected: restart during peak traffic; scale the pool via change request instead.",
+    "requested_by": "operator"
+  },
+  "verification": null,
+  "apiResponses": null,
+  "redactions": {
+    "scanned_for": [
+      "jwt",
+      "groq_api_key",
+      "password_hash",
+      "ipv4",
+      "generic_secret"
+    ],
+    "found": [],
+    "note": "No JWTs, API keys, password hashes or IPs are stored in these rows; access tokens used by the driver were never written to the export."
+  }
+}

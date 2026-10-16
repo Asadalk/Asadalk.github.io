@@ -1,0 +1,50 @@
+{
+  "$comment": "Smaller repos shown on /archive. Curated by Claude for the owner (2026-10-16): only repos with real owner work and runnable code are shown; team work states the owner's part.",
+  "items": [
+    {
+      "id": "archive-nlu-assignment-2",
+      "repo": "https://github.com/Asadalk/NLU-Assignment-2",
+      "line": "Word2Vec (CBOW and skip-gram) trained from scratch in PyTorch and with gensim on text scraped from IIT Jodhpur web pages, plus character-level name generation with RNN, BLSTM and attention models.",
+      "context": "Course assignment (NLU), solo",
+      "caution": "Training names are synthetic syllable combinations, and the BLSTM sees future characters, so its near-zero loss is leakage. Do not quote its loss as a result.",
+      "show": true
+    },
+    {
+      "id": "archive-dl-phase-ii",
+      "repo": "https://github.com/Asadalk/DL-PhaseII",
+      "line": "Zero-shot comparison of SAM ViT-H, SAM ViT-B and MobileSAM on 10 COCO images: Dice, speed and encoder size.",
+      "context": "Course project, team of 3 (pipeline, COCO integration and analysis were mine)",
+      "caution": "n = 10. The README's LiTS numbers have no code in the repo, so leave them out.",
+      "show": true
+    },
+    {
+      "id": "archive-sports-or-politics",
+      "repo": "https://github.com/Asadalk/Sports-Or-Politics",
+      "line": "BBC news sports-vs-politics classification comparing bag-of-words, TF-IDF and bigram features with Naive Bayes, logistic regression and linear SVM.",
+      "context": "Course assignment, solo",
+      "caution": "Near-perfect accuracy reflects an easy task; no claims beyond the comparison.",
+      "show": true
+    },
+    {
+      "id": "archive-socket-programming",
+      "repo": "https://github.com/Asadalk/Socket_Programming",
+      "line": "C TCP server and client serving a menu of terminal games and equation solvers.",
+      "context": "Course project, team of 4 (Maze Escape game, merging into one server-client, README were mine)",
+      "show": true
+    },
+    {
+      "id": "archive-csl1010",
+      "repo": "https://github.com/Asadalk/Project-CSL1010",
+      "line": "Text-based maze escape game in C with random obstacles, traps and seven levels.",
+      "context": "First-year programming course project, solo",
+      "show": true
+    },
+    {
+      "id": "archive-product-recommendation",
+      "repo": "https://github.com/Asadalk/Product-Recomendation-System",
+      "line": "E-commerce demo with React, Express and C++ recommendation routines; I built login/signup, purchase logging and the Python user-similarity recommender.",
+      "context": "Team of 3, fork of a teammate's repo",
+      "show": true
+    }
+  ]
+}

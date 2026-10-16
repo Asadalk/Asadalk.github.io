@@ -1,0 +1,76 @@
+---
+import { site } from '../lib/content';
+
+interface Props { plain?: boolean }
+const { plain = false } = Astro.props;
+---
+
+<footer class:list={['footer', { 'footer--plain': plain }]}>
+  <div class="wrap">
+    <p class="links mono">
+      <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
+      <a href={site.contact.github} rel="me">GitHub</a>
+      <a href={site.contact.linkedin} rel="me">LinkedIn</a>
+    </p>
+    <p class="meta muted">
+      <a href="/archive/">Archive</a> · <a href="/privacy/">Privacy</a> · <a href="https://github.com/Asadalk/Asadalk.github.io">Source</a>
+      <button type="button" class="theme-toggle" data-theme-toggle hidden aria-live="polite">Theme: system</button>
+    </p>
+  </div>
+</footer>
+
+<script>
+  // Cycle system → light → dark. Without JS the button stays hidden and the
+  // site simply follows the system setting.
+  const root = document.documentElement;
+  const order = ['system', 'light', 'dark'] as const;
+  type Mode = (typeof order)[number];
+  const read = (): Mode => {
+    try {
+      const t = localStorage.getItem('theme');
+      return t === 'light' || t === 'dark' ? t : 'system';
+    } catch {
+      return 'system';
+    }
+  };
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
+    let mode = read();
+    const render = () => (btn.textContent = `Theme: ${mode}`);
+    btn.hidden = false;
+    render();
+    btn.addEventListener('click', () => {
+      mode = order[(order.indexOf(mode) + 1) % order.length];
+      if (mode === 'system') delete root.dataset.theme;
+      else root.dataset.theme = mode;
+      try {
+        if (mode === 'system') localStorage.removeItem('theme');
+        else localStorage.setItem('theme', mode);
+      } catch {}
+      render();
+    });
+  }
+</script>
+
+<style>
+  .footer {
+    margin-top: 4rem;
+    padding: 2rem 0 6rem;
+    border-top: 1px solid var(--border);
+  }
+  .footer--plain { padding-bottom: 2rem; }
+  .links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin-bottom: 0.5rem; }
+  .meta { font-size: 0.9rem; }
+  .theme-toggle {
+    margin-left: 0.75rem;
+    min-height: 44px;
+    padding: 0 0.75rem;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    cursor: pointer;
+  }
+  @media print { .meta { display: none; } }
+</style>

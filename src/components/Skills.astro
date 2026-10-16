@@ -1,0 +1,40 @@
+---
+import { skillGroups, proofLink } from '../lib/content';
+---
+
+<div class="skills">
+  {skillGroups.map((g) => (
+    <section class="group" id={g.id} aria-labelledby={`${g.id}-h`}>
+      <h3 id={`${g.id}-h`}>{g.name}</h3>
+      <dl>
+        {g.skills.map((s) => (
+          <div class="row">
+            <dt>{s.name}{s.inProgress && <span class="mono muted"> (in progress)</span>}</dt>
+            <dd>
+              {s.proof.map((p, i) => {
+                const l = proofLink(p, s.proofLabel);
+                return <>{i > 0 && ', '}<a href={l.href}>{l.text}</a></>;
+              })}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  ))}
+</div>
+
+<style>
+  .skills { display: grid; gap: 1.5rem; }
+  @media (min-width: 48rem) { .skills { grid-template-columns: 1fr 1fr; } }
+  dl { margin: 0; }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 1rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  dd { margin: 0; font-size: 0.9rem; text-align: right; }
+  dt .mono { font-size: 0.7rem; }
+</style>

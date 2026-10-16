@@ -1,0 +1,63 @@
+---
+// The fixed escape hatch: bottom on mobile, top on desktop. Spec allows exactly
+// four items; the brain panel (fourth) arrives with the brain in Phase 5.
+const items = [
+  { href: '/resume/', label: 'Résumé view' },
+  { href: '/#education', label: 'Education' },
+  { href: '/#contact', label: 'Contact' },
+];
+---
+
+<nav class="minibar" aria-label="Quick links">
+  <ul>
+    {items.map((i) => <li><a href={i.href}>{i.label}</a></li>)}
+  </ul>
+</nav>
+
+<style>
+  .minibar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  ul {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+    max-width: 64rem;
+    list-style: none;
+  }
+  li { flex: 1 1 0; max-width: 11rem; }
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-decoration: none;
+    text-align: center;
+  }
+  a:hover { color: var(--accent-ink); text-decoration: underline; }
+  @media (min-width: 48rem) {
+    .minibar {
+      top: 0;
+      bottom: auto;
+      border-top: 0;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+    }
+    ul { justify-content: flex-end; }
+    li { flex: 0 0 auto; }
+    a { padding: 0 0.75rem; min-height: 44px; }
+  }
+  @media print { .minibar { display: none; } }
+</style>

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.claude/
+test-results/
+playwright-report/
+.env
+.env.*
+
+# Owner-only planning docs (kept local, not published)
+PORTFOLIO_SPEC.md
+docs/phase0-checkpoint.md

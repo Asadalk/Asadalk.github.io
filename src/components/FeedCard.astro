@@ -1,0 +1,82 @@
+---
+// One item in the feed. Collapsed: title, one line, tags, badges.
+// Expanded (native <details>, so it works without JS): the body slot, which
+// callers fill in the fixed order problem → built → how → results → demo → repo.
+interface Props {
+  id: string;
+  kind: string;
+  title: string;
+  summary: string;
+  tags?: string[];
+  status?: string;
+  open?: boolean;
+}
+const { id, kind, title, summary, tags = [], status, open = false } = Astro.props;
+---
+
+<article class="card" id={id} data-item={id}>
+  <details open={open}>
+    <summary>
+      <span class="kind det-tag">{kind}</span>
+      {status && <span class="status mono">{status}</span>}
+      <h3 class="title">{title}</h3>
+      <p class="summary">{summary}</p>
+      {tags.length > 0 && (
+        <ul class="tags" aria-label="Tags">{tags.slice(0, 3).map((t) => <li class="tag">{t}</li>)}</ul>
+      )}
+      <span class="toggle mono" aria-hidden="true"></span>
+    </summary>
+    <div class="body">
+      <slot />
+    </div>
+  </details>
+</article>
+
+<style>
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+  }
+  summary {
+    position: relative;
+    display: block;
+    padding: 1.1rem 1.1rem 1rem;
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  .title { margin: 0.55rem 0 0.35rem; }
+  .summary { margin: 0 0 0.7rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+  .status { margin-left: 0.5rem; font-size: 0.72rem; color: var(--muted); }
+  .toggle {
+    display: block;
+    margin-top: 0.75rem;
+    font-size: 0.72rem;
+    color: var(--accent-ink);
+  }
+  .toggle::before { content: 'Read more ↓'; }
+  details[open] .toggle::before { content: 'Collapse ↑'; }
+  .body {
+    padding: 0 1.1rem 1.25rem;
+    border-top: 1px dashed var(--border);
+    padding-top: 1rem;
+  }
+  .body :global(h4) {
+    margin: 1.25rem 0 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .body :global(h4:first-child) { margin-top: 0; }
+  .body :global(ul) { padding-left: 1.1rem; }
+  .body :global(li) { margin-bottom: 0.35rem; max-width: var(--measure); }
+  @media print {
+    .toggle { display: none; }
+  }
+</style>

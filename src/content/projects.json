@@ -1,0 +1,256 @@
+[
+  {
+    "id": "opspilot",
+    "type": "project",
+    "title": "OpsPilot",
+    "summary": "An AI operations assistant that investigates incidents with evidence, but can only act through a server-side policy engine, human approval and verified execution.",
+    "repo": "https://github.com/Asadalk/OpsPilot",
+    "tags": [
+      "LLM agents",
+      "FastAPI",
+      "PostgreSQL + pgvector",
+      "Next.js"
+    ],
+    "axes": {
+      "ml": 0.6,
+      "dl": 0.1,
+      "software": 1.0,
+      "data": 0.3,
+      "research": 0.4
+    },
+    "problem": "An LLM agent that can restart services or roll back deployments is dangerous if the model decides what is safe. OpsPilot keeps the model in charge of investigating and the server in charge of permission.",
+    "built": [
+      "An agent loop with 6 typed, read-only tools (service health, metrics, log search, recent deployments, incident history, runbook search) over a simulated production environment. The model chooses which tools to call; the tools themselves are deterministic.",
+      "Hybrid retrieval over runbooks and postmortems in PostgreSQL + pgvector: 128-dimension hashed bag-of-words vectors plus a keyword score. No learned embedding model, by design (ADR-0002).",
+      "Competing hypotheses, each with supporting and contradicting evidence, before a fix is proposed.",
+      "A server-side policy engine (role × risk × environment). Risk comes from a server table, never from the model, so a spoofed 'LOW risk' claim cannot bypass it.",
+      "Durable human approval, simulator execution, a verification step (SUCCESS / FAILED / INCONCLUSIVE), and append-only audit and agent-event tables enforced by database triggers.",
+      "116 pytest tests, including prompt-injection and approval-bypass suites.",
+      "OpsBench 2.0.0: 100 scenarios across 12 categories, including prompt injection, misleading evidence and permission violations."
+    ],
+    "stack": [
+      "Next.js 14",
+      "TypeScript",
+      "FastAPI",
+      "PostgreSQL 16 + pgvector",
+      "Groq (openai/gpt-oss-120b)",
+      "Gemini (supported, not benchmarked)",
+      "JWT",
+      "Docker",
+      "pytest"
+    ],
+    "results": {
+      "caption": "OpsBench 2.0.0, Groq openai/gpt-oss-120b, temperature 0. Source: backend/benchmarks/opsbench/v2/results/summary.md",
+      "columns": [
+        "System",
+        "Task success",
+        "Diagnosis",
+        "Safety"
+      ],
+      "rows": [
+        [
+          "Plain LLM baseline",
+          "24%",
+          "3%",
+          "26%"
+        ],
+        [
+          "OpsPilot (run 1)",
+          "69%",
+          "69%",
+          "86%"
+        ],
+        [
+          "OpsPilot (run 2)",
+          "71%",
+          "72%",
+          "86%"
+        ]
+      ],
+      "findings": [
+        "Removing verification: 17 incidents marked resolved while the fault remained (0 with it).",
+        "Removing retrieval: diagnosis fell from 69% to 44%.",
+        "A fixed investigation plan beat free planning: 81% task success and 97% safety with about 4× fewer tokens.",
+        "Misleading-evidence scenarios: 0/8. The agent still falls for planted evidence."
+      ],
+      "caveats": [
+        "I wrote both the scenarios and the labels.",
+        "Diagnosis and grounding are scored by term matching.",
+        "The simulated reviewer approves unless a scenario says to reject.",
+        "One scenario per run was rerun after network errors."
+      ]
+    },
+    "timeline": [
+      {
+        "date": "2026-03-31",
+        "text": "ops-assistant v1.0.0: turns meeting notes and emails into structured tasks with Gemini, Pydantic and a Kanban board."
+      },
+      {
+        "date": "2026-10-07",
+        "text": "Phases 02–16: agent loop, READ tools, retrieval, policy, approval, simulator, audit trail."
+      },
+      {
+        "date": "2026-10-11",
+        "text": "OpsBench 2.0.0 frozen and measured; hardening and docs."
+      }
+    ],
+    "evolvedFrom": "https://github.com/Asadalk/ops-assistant",
+    "demo": {
+      "label": "Replay a real incident · Policy playground",
+      "runsOn": "device",
+      "phase": 6,
+      "traces": [
+        "trace-happy-path-rollback",
+        "trace-viewer-injection-denied",
+        "trace-approval-rejected"
+      ]
+    }
+  },
+  {
+    "id": "semantic-hire",
+    "type": "project",
+    "title": "semantic-hire",
+    "summary": "Ranks job descriptions against a resume by meaning plus verified skill overlap, with an LLM allowed to explain results but never to rank them.",
+    "repo": "https://github.com/Asadalk/semantic-hire",
+    "tags": [
+      "Embeddings",
+      "FAISS",
+      "Information retrieval",
+      "FastAPI"
+    ],
+    "axes": {
+      "ml": 0.9,
+      "dl": 0.3,
+      "software": 0.6,
+      "data": 0.6,
+      "research": 0.3
+    },
+    "problem": "Keyword matching misses resumes that describe the right work in different words; pure embeddings ignore hard skill requirements.",
+    "built": [
+      "Embeds jobs (title + description + skills) and resumes with all-MiniLM-L6-v2, normalized, retrieved with an exact FAISS IndexFlatIP.",
+      "Re-ranks the retrieved jobs by 0.7 × semantic score + 0.3 × skill overlap, where overlap is the share of the job's skills found in the resume.",
+      "Dictionary-based skill extraction (49 skills) with boundary-aware matching, so 'Java' does not match inside 'JavaScript'.",
+      "Optional Gemini explanation after ranking, validated so it can only cite skills the matcher actually verified. If Gemini fails, ranked results still return.",
+      "Evaluation with Precision@K, Recall@K, MRR and NDCG@K on a hand-labelled query set."
+    ],
+    "stack": [
+      "Python",
+      "sentence-transformers",
+      "FAISS",
+      "FastAPI",
+      "Gemini (google-genai)",
+      "Docker",
+      "pytest"
+    ],
+    "results": {
+      "caption": "8 hand-labelled queries over 24 synthetic job descriptions, K = 5. Source: evaluation/results.json",
+      "columns": [
+        "Precision@5",
+        "Recall@5",
+        "MRR",
+        "NDCG@5"
+      ],
+      "rows": [
+        [
+          "0.650",
+          "0.881",
+          "1.000",
+          "0.901"
+        ]
+      ],
+      "caveats": [
+        "A demonstration benchmark, not an estimate of production quality: 24 jobs and 8 queries, all written by me.",
+        "Three queries have only 3 relevant jobs, so their Precision@5 cannot exceed 0.6."
+      ]
+    },
+    "demo": {
+      "label": "Paste a resume, rank 24 jobs in your browser",
+      "runsOn": "device",
+      "phase": 4
+    }
+  },
+  {
+    "id": "smoketrail",
+    "type": "project",
+    "status": "in-progress",
+    "title": "SmokeTrail",
+    "summary": "Do upwind crop fires in Punjab and Haryana show up in Delhi's air the next day? A classical data science study, no LLMs.",
+    "repo": null,
+    "tags": [
+      "Regression",
+      "Time series",
+      "LightGBM",
+      "Geospatial"
+    ],
+    "axes": {
+      "ml": 0.5,
+      "dl": 0.0,
+      "software": 0.3,
+      "data": 1.0,
+      "research": 0.6
+    },
+    "problem": "Every autumn, crop-residue fires in Punjab and Haryana coincide with Delhi's worst air. The question: how much higher is Delhi's daily PM2.5 on days with heavy upwind burning, after adjusting for weather, and can today's fires predict tomorrow's air?",
+    "plannedMethod": [
+      "Data: Kaggle 'Air Quality Data in India' (city_day), NASA FIRMS VIIRS fire detections, Open-Meteo historical weather. Sep 15 – Dec 15, 2015–2019.",
+      "Upwind-fire feature: fires inside a ±30° cone around the wind direction, 1–3 day lags, fires within 50 km of Delhi excluded.",
+      "OLS with robustness checks and a placebo test; LightGBM + SHAP forecasting with train 2015–17 / validate 2018 / test 2019.",
+      "Dashboard: Streamlit + pydeck (planned)."
+    ],
+    "results": null,
+    "demo": {
+      "label": "Scrub through Delhi's air",
+      "phase": 6,
+      "blockedOn": "results"
+    },
+    "statusNote": "Project setup is done; data collection and modelling are under way. Results will appear here only once the code produces them."
+  },
+  {
+    "id": "cellular",
+    "type": "project",
+    "title": "Cellular Network Metadata Processing System",
+    "summary": "An Android app reads the phone's serving cell (LTE or 5G NR), a FastAPI service looks it up in PostgreSQL, and the tower location appears on an OpenStreetMap map.",
+    "repo": "https://github.com/Asadalk/Cellular-Network-Metadata-Processing-System",
+    "tags": [
+      "Android",
+      "Kotlin",
+      "FastAPI",
+      "PostgreSQL",
+      "System design"
+    ],
+    "axes": {
+      "ml": 0.0,
+      "dl": 0.0,
+      "software": 1.0,
+      "data": 0.4,
+      "research": 0.1
+    },
+    "problem": "Show, end to end and explainably, how a phone's cell identity (MCC, MNC, TAC, CID) becomes an approximate location, without pretending to more precision than the data allows.",
+    "built": [
+      "Kotlin Android client that reads the registered serving cell for LTE (CellInfoLte) and 5G NR (CellInfoNr, NCI as cell ID), handling Android API-level differences.",
+      "Retrofit 2.9 client posting the cell identity to a FastAPI /locate endpoint.",
+      "Exact-match lookup in PostgreSQL over Indian tower data (MCC 404/405) from a Kaggle dataset derived from OpenCellID.",
+      "osmdroid map with a marker and a fixed 1,000 m circle, deliberately not triangulated, to avoid false precision."
+    ],
+    "stack": [
+      "Kotlin",
+      "Android",
+      "Retrofit",
+      "osmdroid",
+      "FastAPI",
+      "PostgreSQL"
+    ],
+    "focus": "System design, data-flow correctness and explainability, not production accuracy.",
+    "demo": {
+      "label": "Follow the packet",
+      "runsOn": "device",
+      "phase": 6
+    },
+    "media": {
+      "video": "/media/cellular-demo.mp4",
+      "poster": "/media/cellular-demo-poster.jpg",
+      "caption": "The Android app reading the serving cell and showing the tower's location with a fixed 1 km radius.",
+      "source": "Demo video from the project README"
+    },
+    "short": "Cellular system"
+  }
+]

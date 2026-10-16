@@ -1,0 +1,1990 @@
+{
+  "slug": "happy-path-rollback",
+  "title": "Checkout 500 spike: rollback approved by admin, verified, incident resolved",
+  "scenario": "Simulator world 'checkout_bad_deploy' (OpsBench v2; same world and request as backend/app/demo/flagship.py). Operator request through POST /agent/investigate; admin approval through POST /approvals/{id}/approve.",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "providerNote": "LLM_PROVIDER=groq, model openai/gpt-oss-120b (the provider/model OpsBench measured), running in the OpsPilot backend container; decisions are live model output.",
+  "exportedAt": "2026-10-16T06:15:25+00:00",
+  "run": {
+    "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+    "user_request": "Checkout failures increased after the latest deployment of checkout-api. Investigate and remediate if the evidence supports it.",
+    "service": "checkout-api",
+    "severity": null,
+    "evidence": [
+      {
+        "knowledge": [
+          {
+            "chunk": 1,
+            "source": "postmortems/checkout-configuration-mismatch.md",
+            "content": "# Checkout Configuration Mismatch Postmortem The checkout-api 500 spike for incident PAY-451 followed deployment v3.8.2, which carried a different PAYMENT_GATEWAY_URL from the production baseline. The strongest evidence was the CONFIG_MISMATCH log aligned with the deployment timestamp and increased 5xx rate. The corrective procedure is to compare rendered configuration with the approved baseline, identify the configuration owner, and verify the next deployment in the simulator. Do not infer a code regression from a 500 spike until configuration and dependency evidence have been checked.",
+            "document": "Checkout Configuration Mismatch",
+            "similarity": 0.533985
+          },
+          {
+            "chunk": 1,
+            "source": "runbooks/payment-latency.md",
+            "content": "# Payment Latency Runbook Use this runbook when payments-api latency rises above the simulator baseline. For incident PAY-442 on payments-api after version v3.8.2, confirm service health and request latency first. Compare the timestamp with the latest deployment and inspect database timeout logs. A database timeout is evidence of a dependency problem, not proof that the application code is defective. For a controlled response, preserve evidence, compare the deployment version with the previous known-good version, and check database pool saturation. Recommend rollback only when deployment timing and application evidence agree. Rollback is an approved action, never an automatic command.",
+            "document": "Payment Latency",
+            "similarity": 0.525477
+          },
+          {
+            "chunk": 1,
+            "source": "runbooks/deployment-rollback.md",
+            "content": "# Deployment Rollback Runbook A rollback is considered only after a deployment is correlated with a new error or latency signal and the prior version is known. Confirm health, metrics, logs, and deployment history before proposing it. This document describes a recommendation procedure, not an execution authority. A human approval is required before any rollback. Capture the current version, target version, evidence timestamps, expected verification signal, and a safe stop condition.",
+            "document": "Deployment Rollback",
+            "similarity": 0.46814
+          }
+        ],
+        "retrieval_status": "ok"
+      },
+      {
+        "tool": "get_recent_deployments",
+        "result": {
+          "service": "checkout-api",
+          "deployments": [
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "checkout-api",
+              "version": "2026.10.10.3",
+              "service_id": 1,
+              "deployed_at": "2026-10-16T06:02:51.388764Z",
+              "deployment_id": 1
+            },
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "checkout-api",
+              "version": "2026.10.09.7",
+              "service_id": 1,
+              "deployed_at": "2026-10-15T06:14:51.388764Z",
+              "deployment_id": 2
+            }
+          ]
+        }
+      },
+      {
+        "tool": "search_logs",
+        "result": {
+          "logs": [],
+          "service": "checkout-api"
+        }
+      },
+      {
+        "evidence_warning": "Tool search_logs returned empty records; no matching data does not establish healthy state."
+      },
+      {
+        "tool": "get_service_health",
+        "result": {
+          "name": "checkout-api",
+          "state": "degraded",
+          "repository": "github.com/opspilot/checkout-api",
+          "service_id": 1,
+          "environment": "production"
+        }
+      },
+      {
+        "tool": "get_metrics",
+        "result": {
+          "metrics": [
+            {
+              "id": 1,
+              "value": 18.4,
+              "service": "checkout-api",
+              "timestamp": "2026-10-16T06:12:51.388764Z",
+              "metric_name": "http_5xx_rate"
+            },
+            {
+              "id": 2,
+              "value": 320.0,
+              "service": "checkout-api",
+              "timestamp": "2026-10-16T06:12:51.388764Z",
+              "metric_name": "http_request_latency_ms"
+            }
+          ],
+          "service": "checkout-api"
+        }
+      },
+      {
+        "tool": "get_incident_history",
+        "result": {
+          "service": "checkout-api",
+          "incidents": [
+            {
+              "id": 1,
+              "title": "Checkout 500 spike",
+              "status": "investigating",
+              "service": "checkout-api",
+              "severity": "sev1",
+              "created_at": "2026-10-16T06:14:51.388764Z",
+              "service_id": 1,
+              "updated_at": "2026-10-16T06:14:51.388764Z"
+            }
+          ]
+        }
+      },
+      {
+        "tool": "search_logs",
+        "result": {
+          "logs": [
+            {
+              "id": 1,
+              "level": "error",
+              "message": "CONFIG_MISMATCH: PAYMENT_GATEWAY_URL differs from production baseline after release 2026.10.10.3",
+              "service": "checkout-api",
+              "trace_id": "trace-checkout_bad_deploy-0",
+              "timestamp": "2026-10-16T06:05:51.388764Z"
+            }
+          ],
+          "service": "checkout-api"
+        }
+      }
+    ],
+    "hypotheses": [
+      {
+        "score": 0.92,
+        "hypothesis": "Configuration mismatch in latest deployment caused the 5xx spike.",
+        "supporting_evidence": [
+          {
+            "source": "search_logs",
+            "observation": "CONFIG_MISMATCH: PAYMENT_GATEWAY_URL differs from production baseline after release 2026.10.10.3"
+          },
+          {
+            "source": "get_service_health",
+            "observation": "Service health state is degraded"
+          },
+          {
+            "source": "get_metrics",
+            "observation": "http_5xx_rate = 18.4 (high)"
+          },
+          {
+            "source": "postmortems/checkout-configuration-mismatch.md",
+            "observation": "Postmortem knowledge indicates similar failures were due to config mismatches after deployments"
+          }
+        ],
+        "contradicting_evidence": []
+      },
+      {
+        "score": 0.28,
+        "hypothesis": "Transient dependency issue unrelated to deployment.",
+        "supporting_evidence": [],
+        "contradicting_evidence": [
+          {
+            "source": "search_logs",
+            "observation": "No database timeout or latency logs present; only config mismatch error observed."
+          }
+        ]
+      }
+    ],
+    "diagnosis": "Unverified model output: The increased checkout failures are caused by a configuration mismatch (PAYMENT_GATEWAY_URL) introduced in the latest deployment (version 2026.10.10.3) of checkout‑api, as evidenced by the CONFIG_MISMATCH error log, degraded service health, and elevated 5xx rate.\n\nSources:\n[1] postmortems/checkout-configuration-mismatch.md\n[2] runbooks/payment-latency.md\n[3] runbooks/deployment-rollback.md\n\nUncertainty: Tool search_logs returned empty records; no matching data does not establish healthy state. Missing or unavailable evidence is not evidence of healthy state.\n\nHuman approval granted; verification SUCCESS; resolved incidents: [1].",
+    "proposed_action": "Rollback to the previous known‑good version (2026.10.09.7) to restore correct PAYMENT_GATEWAY_URL configuration and stop the 5xx spike.",
+    "status": "completed",
+    "created_at": "2026-10-16T06:14:51.546053+00:00",
+    "completed_at": "2026-10-16T06:15:04.891716+00:00",
+    "knowledge_citations": [
+      {
+        "chunk": 1,
+        "source": "postmortems/checkout-configuration-mismatch.md",
+        "content": "# Checkout Configuration Mismatch Postmortem The checkout-api 500 spike for incident PAY-451 followed deployment v3.8.2, which carried a different PAYMENT_GATEWAY_URL from the production baseline. The strongest evidence was the CONFIG_MISMATCH log aligned with the deployment timestamp and increased 5xx rate. The corrective procedure is to compare rendered configuration with the approved baseline, identify the configuration owner, and verify the next deployment in the simulator. Do not infer a code regression from a 500 spike until configuration and dependency evidence have been checked.",
+        "document": "Checkout Configuration Mismatch",
+        "similarity": 0.533985
+      },
+      {
+        "chunk": 1,
+        "source": "runbooks/payment-latency.md",
+        "content": "# Payment Latency Runbook Use this runbook when payments-api latency rises above the simulator baseline. For incident PAY-442 on payments-api after version v3.8.2, confirm service health and request latency first. Compare the timestamp with the latest deployment and inspect database timeout logs. A database timeout is evidence of a dependency problem, not proof that the application code is defective. For a controlled response, preserve evidence, compare the deployment version with the previous known-good version, and check database pool saturation. Recommend rollback only when deployment timing and application evidence agree. Rollback is an approved action, never an automatic command.",
+        "document": "Payment Latency",
+        "similarity": 0.525477
+      },
+      {
+        "chunk": 1,
+        "source": "runbooks/deployment-rollback.md",
+        "content": "# Deployment Rollback Runbook A rollback is considered only after a deployment is correlated with a new error or latency signal and the prior version is known. Confirm health, metrics, logs, and deployment history before proposing it. This document describes a recommendation procedure, not an execution authority. A human approval is required before any rollback. Capture the current version, target version, evidence timestamps, expected verification signal, and a safe stop condition.",
+        "document": "Deployment Rollback",
+        "similarity": 0.46814
+      }
+    ],
+    "hypothesis_history": [
+      [
+        {
+          "score": 0.92,
+          "hypothesis": "Configuration mismatch in latest deployment caused the 5xx spike.",
+          "supporting_evidence": [
+            {
+              "source": "search_logs",
+              "observation": "CONFIG_MISMATCH: PAYMENT_GATEWAY_URL differs from production baseline after release 2026.10.10.3"
+            },
+            {
+              "source": "get_service_health",
+              "observation": "Service health state is degraded"
+            },
+            {
+              "source": "get_metrics",
+              "observation": "http_5xx_rate = 18.4 (high)"
+            },
+            {
+              "source": "postmortems/checkout-configuration-mismatch.md",
+              "observation": "Postmortem knowledge indicates similar failures were due to config mismatches after deployments"
+            }
+          ],
+          "contradicting_evidence": []
+        },
+        {
+          "score": 0.28,
+          "hypothesis": "Transient dependency issue unrelated to deployment.",
+          "supporting_evidence": [],
+          "contradicting_evidence": [
+            {
+              "source": "search_logs",
+              "observation": "No database timeout or latency logs present; only config mismatch error observed."
+            }
+          ]
+        }
+      ]
+    ],
+    "action_proposal": {
+      "reason": "Rollback to the previous known‑good version (2026.10.09.7) to restore correct PAYMENT_GATEWAY_URL configuration and stop the 5xx spike.",
+      "status": "approval_required",
+      "target": "checkout-api",
+      "evidence": [
+        {
+          "source": "search_logs",
+          "observation": "CONFIG_MISMATCH error after latest deployment"
+        },
+        {
+          "source": "get_service_health",
+          "observation": "Degraded health and high 5xx rate"
+        },
+        {
+          "source": "get_recent_deployments",
+          "observation": "Previous deployment (2026.10.09.7) had no reported issues"
+        }
+      ],
+      "risk_level": "HIGH",
+      "action_type": "rollback_deployment"
+    },
+    "policy_decision": {
+      "role": "operator",
+      "reason": "operator policy evaluated rollback_deployment in production as HIGH risk.",
+      "outcome": "require_approval",
+      "username": "operator",
+      "risk_level": "HIGH",
+      "action_type": "rollback_deployment",
+      "environment": "production"
+    }
+  },
+  "incident": {
+    "id": 1,
+    "title": "Checkout 500 spike",
+    "severity": "sev1",
+    "status": "resolved",
+    "service_id": 1,
+    "created_at": "2026-10-16T06:14:51.388764+00:00",
+    "updated_at": "2026-10-16T06:15:04.90058+00:00",
+    "service": {
+      "id": 1,
+      "name": "checkout-api",
+      "environment": "production",
+      "repository": "github.com/opspilot/checkout-api",
+      "current_state": "healthy"
+    },
+    "_source": "incidents row (live, read after the run)"
+  },
+  "agentEvents": [
+    {
+      "event_id": 192,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "run.started",
+      "occurred_at": "2026-10-16T06:14:51.547855+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": null,
+      "status": "started",
+      "error": null,
+      "details": {
+        "actor": "operator"
+      }
+    },
+    {
+      "event_id": 193,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "retrieval",
+      "occurred_at": "2026-10-16T06:14:51.586984+00:00",
+      "duration_ms": 26,
+      "model": null,
+      "tool": null,
+      "status": "ok",
+      "error": null,
+      "details": {
+        "mode": "hybrid",
+        "citation_count": 3
+      }
+    },
+    {
+      "event_id": 194,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "classify",
+      "occurred_at": "2026-10-16T06:14:54.39979+00:00",
+      "duration_ms": 2799,
+      "model": "openai/gpt-oss-120b",
+      "tool": "get_recent_deployments",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": null,
+        "attempts": 1,
+        "input_tokens": 2073,
+        "total_tokens": 2167,
+        "output_tokens": 94,
+        "decision_action": "call_tool"
+      }
+    },
+    {
+      "event_id": 195,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "deployment",
+      "occurred_at": "2026-10-16T06:14:54.436182+00:00",
+      "duration_ms": 22,
+      "model": null,
+      "tool": "get_recent_deployments",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "result": {
+          "service": "checkout-api",
+          "deployments": [
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "checkout-api",
+              "version": "2026.10.10.3",
+              "service_id": 1,
+              "deployed_at": "2026-10-16T06:02:51.388764Z",
+              "deployment_id": 1
+            },
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "checkout-api",
+              "version": "2026.10.09.7",
+              "service_id": 1,
+              "deployed_at": "2026-10-15T06:14:51.388764Z",
+              "deployment_id": 2
+            }
+          ]
+        },
+        "arguments": {
+          "limit": 5,
+          "service": "checkout-api"
+        },
+        "call_index": 0
+      }
+    },
+    {
+      "event_id": 196,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "planning",
+      "occurred_at": "2026-10-16T06:14:56.756025+00:00",
+      "duration_ms": 2306,
+      "model": "openai/gpt-oss-120b",
+      "tool": "search_logs",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": null,
+        "attempts": 1,
+        "input_tokens": 2210,
+        "total_tokens": 2309,
+        "output_tokens": 99,
+        "decision_action": "call_tool"
+      }
+    },
+    {
+      "event_id": 197,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "logs",
+      "occurred_at": "2026-10-16T06:14:56.790667+00:00",
+      "duration_ms": 20,
+      "model": null,
+      "tool": "search_logs",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "result": {
+          "logs": [],
+          "service": "checkout-api"
+        },
+        "arguments": {
+          "level": "error",
+          "limit": 20,
+          "query": "error",
+          "service": "checkout-api"
+        },
+        "call_index": 1
+      }
+    },
+    {
+      "event_id": 198,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "planning",
+      "occurred_at": "2026-10-16T06:14:57.330381+00:00",
+      "duration_ms": 499,
+      "model": "openai/gpt-oss-120b",
+      "tool": "get_service_health",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": null,
+        "attempts": 1,
+        "input_tokens": 2264,
+        "total_tokens": 2357,
+        "output_tokens": 93,
+        "decision_action": "call_tool"
+      }
+    },
+    {
+      "event_id": 199,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "health",
+      "occurred_at": "2026-10-16T06:14:57.418692+00:00",
+      "duration_ms": 52,
+      "model": null,
+      "tool": "get_service_health",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "result": {
+          "name": "checkout-api",
+          "state": "degraded",
+          "repository": "github.com/opspilot/checkout-api",
+          "service_id": 1,
+          "environment": "production"
+        },
+        "arguments": {
+          "service": "checkout-api"
+        },
+        "call_index": 2
+      }
+    },
+    {
+      "event_id": 200,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "planning",
+      "occurred_at": "2026-10-16T06:14:59.492265+00:00",
+      "duration_ms": 2033,
+      "model": "openai/gpt-oss-120b",
+      "tool": "get_metrics",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": null,
+        "attempts": 1,
+        "input_tokens": 2302,
+        "total_tokens": 2395,
+        "output_tokens": 93,
+        "decision_action": "call_tool"
+      }
+    },
+    {
+      "event_id": 201,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "metrics",
+      "occurred_at": "2026-10-16T06:14:59.567075+00:00",
+      "duration_ms": 55,
+      "model": null,
+      "tool": "get_metrics",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "result": {
+          "metrics": [
+            {
+              "id": 1,
+              "value": 18.4,
+              "service": "checkout-api",
+              "timestamp": "2026-10-16T06:12:51.388764Z",
+              "metric_name": "http_5xx_rate"
+            },
+            {
+              "id": 2,
+              "value": 320.0,
+              "service": "checkout-api",
+              "timestamp": "2026-10-16T06:12:51.388764Z",
+              "metric_name": "http_request_latency_ms"
+            }
+          ],
+          "service": "checkout-api"
+        },
+        "arguments": {
+          "limit": 10,
+          "service": "checkout-api"
+        },
+        "call_index": 3
+      }
+    },
+    {
+      "event_id": 202,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "planning",
+      "occurred_at": "2026-10-16T06:15:01.297123+00:00",
+      "duration_ms": 1710,
+      "model": "openai/gpt-oss-120b",
+      "tool": "get_incident_history",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": null,
+        "attempts": 1,
+        "input_tokens": 2404,
+        "total_tokens": 2510,
+        "output_tokens": 106,
+        "decision_action": "call_tool"
+      }
+    },
+    {
+      "event_id": 203,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "incident_history",
+      "occurred_at": "2026-10-16T06:15:01.377001+00:00",
+      "duration_ms": 48,
+      "model": null,
+      "tool": "get_incident_history",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "result": {
+          "service": "checkout-api",
+          "incidents": [
+            {
+              "id": 1,
+              "title": "Checkout 500 spike",
+              "status": "investigating",
+              "service": "checkout-api",
+              "severity": "sev1",
+              "created_at": "2026-10-16T06:14:51.388764Z",
+              "service_id": 1,
+              "updated_at": "2026-10-16T06:14:51.388764Z"
+            }
+          ]
+        },
+        "arguments": {
+          "limit": 5,
+          "service": "checkout-api"
+        },
+        "call_index": 4
+      }
+    },
+    {
+      "event_id": 204,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "planning",
+      "occurred_at": "2026-10-16T06:15:02.918503+00:00",
+      "duration_ms": 1524,
+      "model": "openai/gpt-oss-120b",
+      "tool": "search_logs",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": null,
+        "attempts": 1,
+        "input_tokens": 2497,
+        "total_tokens": 2635,
+        "output_tokens": 138,
+        "decision_action": "call_tool"
+      }
+    },
+    {
+      "event_id": 205,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "logs",
+      "occurred_at": "2026-10-16T06:15:02.951415+00:00",
+      "duration_ms": 20,
+      "model": null,
+      "tool": "search_logs",
+      "status": "completed",
+      "error": null,
+      "details": {
+        "result": {
+          "logs": [
+            {
+              "id": 1,
+              "level": "error",
+              "message": "CONFIG_MISMATCH: PAYMENT_GATEWAY_URL differs from production baseline after release 2026.10.10.3",
+              "service": "checkout-api",
+              "trace_id": "trace-checkout_bad_deploy-0",
+              "timestamp": "2026-10-16T06:05:51.388764Z"
+            }
+          ],
+          "service": "checkout-api"
+        },
+        "arguments": {
+          "level": "error",
+          "limit": 20,
+          "query": "CONFIG_MISMATCH",
+          "service": "checkout-api"
+        },
+        "call_index": 5
+      }
+    },
+    {
+      "event_id": 206,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "diagnosis",
+      "occurred_at": "2026-10-16T06:15:04.768715+00:00",
+      "duration_ms": 1802,
+      "model": "openai/gpt-oss-120b",
+      "tool": null,
+      "status": "completed",
+      "error": null,
+      "details": {
+        "service": null,
+        "attempts": 1,
+        "input_tokens": 2585,
+        "total_tokens": 3202,
+        "output_tokens": 617,
+        "decision_action": "diagnose"
+      }
+    },
+    {
+      "event_id": 207,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "action_proposed",
+      "occurred_at": "2026-10-16T06:15:04.784298+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": "rollback_deployment",
+      "status": "proposed",
+      "error": null,
+      "details": {
+        "reason": "Rollback to the previous known‑good version (2026.10.09.7) to restore correct PAYMENT_GATEWAY_URL configuration and stop the 5xx spike.",
+        "status": "proposed",
+        "target": "checkout-api",
+        "evidence": [
+          {
+            "source": "search_logs",
+            "observation": "CONFIG_MISMATCH error after latest deployment"
+          },
+          {
+            "source": "get_service_health",
+            "observation": "Degraded health and high 5xx rate"
+          },
+          {
+            "source": "get_recent_deployments",
+            "observation": "Previous deployment (2026.10.09.7) had no reported issues"
+          }
+        ],
+        "risk_level": "MEDIUM",
+        "action_type": "rollback_deployment"
+      }
+    },
+    {
+      "event_id": 208,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "policy",
+      "occurred_at": "2026-10-16T06:15:04.820208+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": "rollback_deployment",
+      "status": "require_approval",
+      "error": null,
+      "details": {
+        "decision": {
+          "role": "operator",
+          "reason": "operator policy evaluated rollback_deployment in production as HIGH risk.",
+          "outcome": "require_approval",
+          "username": "operator",
+          "risk_level": "HIGH",
+          "action_type": "rollback_deployment",
+          "environment": "production"
+        }
+      }
+    },
+    {
+      "event_id": 209,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "approval",
+      "occurred_at": "2026-10-16T06:15:04.83599+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": "rollback_deployment",
+      "status": "pending",
+      "error": null,
+      "details": {
+        "action_id": "36e82124-1944-4d52-b9c0-d1991caac67b",
+        "expires_at": "2026-10-16T07:15:04.823358+00:00",
+        "approval_id": 6,
+        "requested_by": "operator"
+      }
+    },
+    {
+      "event_id": 210,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "run.paused",
+      "occurred_at": "2026-10-16T06:15:04.850519+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": null,
+      "status": "paused",
+      "error": null,
+      "details": {
+        "service": "checkout-api",
+        "severity": null,
+        "diagnosis": "Unverified model output: The increased checkout failures are caused by a configuration mismatch (PAYMENT_GATEWAY_URL) introduced in the latest deployment (version 2026.10.10.3) of checkout‑api, as evidenced by the CONFIG_MISMATCH error log, degraded service health, and elevated 5xx rate.\n\nSources:\n[1] postmortems/checkout-configuration-mismatch.md\n[2] runbooks/payment-latency.md\n[3] runbooks/deployment-rollback.md\n\nUncertainty: Tool search_logs returned empty records; no matching data does not establish healthy state. Missing or unavailable evidence is not evidence of healthy state."
+      }
+    },
+    {
+      "event_id": 211,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "approval",
+      "occurred_at": "2026-10-16T06:15:04.910373+00:00",
+      "duration_ms": 59,
+      "model": null,
+      "tool": "rollback_deployment",
+      "status": "approved",
+      "error": null,
+      "details": {
+        "reason": "Evidence reviewed: 500s began with release 2026.10.10.3; approve rollback.",
+        "action_id": "36e82124-1944-4d52-b9c0-d1991caac67b",
+        "decided_by": "admin",
+        "approval_id": 6
+      }
+    },
+    {
+      "event_id": 212,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "execution",
+      "occurred_at": "2026-10-16T06:15:04.910992+00:00",
+      "duration_ms": 6,
+      "model": null,
+      "tool": "rollback_deployment",
+      "status": "simulated",
+      "error": null,
+      "details": {
+        "result": {
+          "status": "simulated",
+          "target": "checkout-api",
+          "message": "No real infrastructure was changed.",
+          "action_type": "rollback_deployment",
+          "verification": {
+            "reason": "Service health or recorded metrics improved after the action.",
+            "status": "SUCCESS",
+            "attempts": [
+              {
+                "after": {
+                  "state": "healthy",
+                  "metrics": {
+                    "http_5xx_rate": 4.6,
+                    "http_request_latency_ms": 80.0
+                  },
+                  "service": "checkout-api",
+                  "latest_deployment": {
+                    "status": "rolled_back",
+                    "version": "2026.10.10.3"
+                  }
+                },
+                "before": {
+                  "state": "degraded",
+                  "metrics": {
+                    "http_5xx_rate": 18.4,
+                    "http_request_latency_ms": 320.0
+                  },
+                  "service": "checkout-api",
+                  "latest_deployment": {
+                    "status": "success",
+                    "version": "2026.10.10.3"
+                  }
+                },
+                "reason": "Service health or recorded metrics improved after the action.",
+                "attempt": 1,
+                "execution": {
+                  "applied": true,
+                  "operation": "rollback_deployment",
+                  "fault_cleared": true,
+                  "restored_version": "2026.10.09.7",
+                  "rolled_back_version": "2026.10.10.3"
+                },
+                "verification": "SUCCESS",
+                "reinvestigation": null
+              }
+            ],
+            "escalated": false,
+            "attempt_count": 1,
+            "max_automatic_attempts": 2
+          },
+          "pre_action_state": {
+            "state": "degraded",
+            "metrics": {
+              "http_5xx_rate": 18.4,
+              "http_request_latency_ms": 320.0
+            },
+            "service": "checkout-api",
+            "latest_deployment": {
+              "status": "success",
+              "version": "2026.10.10.3"
+            }
+          },
+          "post_action_state": {
+            "state": "healthy",
+            "metrics": {
+              "http_5xx_rate": 4.6,
+              "http_request_latency_ms": 80.0
+            },
+            "service": "checkout-api",
+            "latest_deployment": {
+              "status": "rolled_back",
+              "version": "2026.10.10.3"
+            }
+          },
+          "resolved_incident_ids": [
+            1
+          ]
+        },
+        "action_id": "36e82124-1944-4d52-b9c0-d1991caac67b"
+      }
+    },
+    {
+      "event_id": 213,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "verification",
+      "occurred_at": "2026-10-16T06:15:04.91129+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": "rollback_deployment",
+      "status": "SUCCESS",
+      "error": null,
+      "details": {
+        "attempt_count": 1,
+        "resolved_incident_ids": [
+          1
+        ]
+      }
+    },
+    {
+      "event_id": 214,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "event_type": "run.completed",
+      "occurred_at": "2026-10-16T06:15:04.913504+00:00",
+      "duration_ms": null,
+      "model": null,
+      "tool": null,
+      "status": "completed",
+      "error": null,
+      "details": {
+        "approval_id": 6,
+        "approval_decision": "approved"
+      }
+    }
+  ],
+  "auditEvents": [
+    {
+      "event_id": 161,
+      "occurred_at": "2026-10-16T06:14:51.532109+00:00",
+      "actor": "operator",
+      "event_type": "auth.login",
+      "entity_type": "user",
+      "entity_id": "operator",
+      "run_id": null,
+      "reason": "Authentication succeeded.",
+      "result": {
+        "role": "operator",
+        "status": "success"
+      },
+      "details": {}
+    },
+    {
+      "event_id": 162,
+      "occurred_at": "2026-10-16T06:14:51.546053+00:00",
+      "actor": "operator",
+      "event_type": "agent.started",
+      "entity_type": "run",
+      "entity_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": "Checkout failures increased after the latest deployment of checkout-api. Investigate and remediate if the evidence supports it.",
+      "result": {
+        "status": "investigating"
+      },
+      "details": {}
+    },
+    {
+      "event_id": 163,
+      "occurred_at": "2026-10-16T06:14:54.433887+00:00",
+      "actor": "operator",
+      "event_type": "tool.called",
+      "entity_type": "run",
+      "entity_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": null,
+      "result": {
+        "error": null,
+        "success": true
+      },
+      "details": {
+        "tool": "get_recent_deployments",
+        "result": {
+          "service": "checkout-api",
+          "deployments": [
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "checkout-api",
+              "version": "2026.10.10.3",
+              "service_id": 1,
+              "deployed_at": "2026-10-16T06:02:51.388764Z",
+              "deployment_id": 1
+            },
+            {
+              "author": "simulator@example.com",
+              "status": "success",
+              "service": "checkout-api",
+              "version": "2026.10.09.7",
+              "service_id": 1,
+              "deployed_at": "2026-10-15T06:14:51.388764Z",
+              "deployment_id": 2
+            }
+          ]
+        },
+        "arguments": {
+          "limit": 5,
+          "service": "checkout-api"
+        },
+        "call_index": 0,
+        "started_at": "2026-10-16T06:14:54.402856+00:00",
+        "finished_at": "2026-10-16T06:14:54.425062+00:00"
+      }
+    },
+    {
+      "event_id": 164,
+      "occurred_at": "2026-10-16T06:14:56.788544+00:00",
+      "actor": "operator",
+      "event_type": "tool.called",
+      "entity_type": "run",
+      "entity_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": null,
+      "result": {
+        "error": null,
+        "success": true
+      },
+      "details": {
+        "tool": "search_logs",
+        "result": {
+          "logs": [],
+          "service": "checkout-api"
+        },
+        "arguments": {
+          "level": "error",
+          "limit": 20,
+          "query": "error",
+          "service": "checkout-api"
+        },
+        "call_index": 1,
+        "started_at": "2026-10-16T06:14:56.759297+00:00",
+        "finished_at": "2026-10-16T06:14:56.779845+00:00"
+      }
+    },
+    {
+      "event_id": 165,
+      "occurred_at": "2026-10-16T06:14:57.413437+00:00",
+      "actor": "operator",
+      "event_type": "tool.called",
+      "entity_type": "run",
+      "entity_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": null,
+      "result": {
+        "error": null,
+        "success": true
+      },
+      "details": {
+        "tool": "get_service_health",
+        "result": {
+          "name": "checkout-api",
+          "state": "degraded",
+          "repository": "github.com/opspilot/checkout-api",
+          "service_id": 1,
+          "environment": "production"
+        },
+        "arguments": {
+          "service": "checkout-api"
+        },
+        "call_index": 2,
+        "started_at": "2026-10-16T06:14:57.335913+00:00",
+        "finished_at": "2026-10-16T06:14:57.388792+00:00"
+      }
+    },
+    {
+      "event_id": 166,
+      "occurred_at": "2026-10-16T06:14:59.56463+00:00",
+      "actor": "operator",
+      "event_type": "tool.called",
+      "entity_type": "run",
+      "entity_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": null,
+      "result": {
+        "error": null,
+        "success": true
+      },
+      "details": {
+        "tool": "get_metrics",
+        "result": {
+          "metrics": [
+            {
+              "id": 1,
+              "value": 18.4,
+              "service": "checkout-api",
+              "timestamp": "2026-10-16T06:12:51.388764Z",
+              "metric_name": "http_5xx_rate"
+            },
+            {
+              "id": 2,
+              "value": 320.0,
+              "service": "checkout-api",
+              "timestamp": "2026-10-16T06:12:51.388764Z",
+              "metric_name": "http_request_latency_ms"
+            }
+          ],
+          "service": "checkout-api"
+        },
+        "arguments": {
+          "limit": 10,
+          "service": "checkout-api"
+        },
+        "call_index": 3,
+        "started_at": "2026-10-16T06:14:59.498844+00:00",
+        "finished_at": "2026-10-16T06:14:59.554087+00:00"
+      }
+    },
+    {
+      "event_id": 167,
+      "occurred_at": "2026-10-16T06:15:01.37201+00:00",
+      "actor": "operator",
+      "event_type": "tool.called",
+      "entity_type": "run",
+      "entity_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": null,
+      "result": {
+        "error": null,
+        "success": true
+      },
+      "details": {
+        "tool": "get_incident_history",
+        "result": {
+          "service": "checkout-api",
+          "incidents": [
+            {
+              "id": 1,
+              "title": "Checkout 500 spike",
+              "status": "investigating",
+              "service": "checkout-api",
+              "severity": "sev1",
+              "created_at": "2026-10-16T06:14:51.388764Z",
+              "service_id": 1,
+              "updated_at": "2026-10-16T06:14:51.388764Z"
+            }
+          ]
+        },
+        "arguments": {
+          "limit": 5,
+          "service": "checkout-api"
+        },
+        "call_index": 4,
+        "started_at": "2026-10-16T06:15:01.300868+00:00",
+        "finished_at": "2026-10-16T06:15:01.349856+00:00"
+      }
+    },
+    {
+      "event_id": 168,
+      "occurred_at": "2026-10-16T06:15:02.949615+00:00",
+      "actor": "operator",
+      "event_type": "tool.called",
+      "entity_type": "run",
+      "entity_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": null,
+      "result": {
+        "error": null,
+        "success": true
+      },
+      "details": {
+        "tool": "search_logs",
+        "result": {
+          "logs": [
+            {
+              "id": 1,
+              "level": "error",
+              "message": "CONFIG_MISMATCH: PAYMENT_GATEWAY_URL differs from production baseline after release 2026.10.10.3",
+              "service": "checkout-api",
+              "trace_id": "trace-checkout_bad_deploy-0",
+              "timestamp": "2026-10-16T06:05:51.388764Z"
+            }
+          ],
+          "service": "checkout-api"
+        },
+        "arguments": {
+          "level": "error",
+          "limit": 20,
+          "query": "CONFIG_MISMATCH",
+          "service": "checkout-api"
+        },
+        "call_index": 5,
+        "started_at": "2026-10-16T06:15:02.921649+00:00",
+        "finished_at": "2026-10-16T06:15:02.941684+00:00"
+      }
+    },
+    {
+      "event_id": 169,
+      "occurred_at": "2026-10-16T06:15:04.832079+00:00",
+      "actor": "operator",
+      "event_type": "action.proposed",
+      "entity_type": "action",
+      "entity_id": "36e82124-1944-4d52-b9c0-d1991caac67b",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": "Rollback to the previous known‑good version (2026.10.09.7) to restore correct PAYMENT_GATEWAY_URL configuration and stop the 5xx spike.",
+      "result": {
+        "status": "approval_required"
+      },
+      "details": {
+        "reason": "Rollback to the previous known‑good version (2026.10.09.7) to restore correct PAYMENT_GATEWAY_URL configuration and stop the 5xx spike.",
+        "status": "approval_required",
+        "target": "checkout-api",
+        "evidence": [
+          {
+            "source": "search_logs",
+            "observation": "CONFIG_MISMATCH error after latest deployment"
+          },
+          {
+            "source": "get_service_health",
+            "observation": "Degraded health and high 5xx rate"
+          },
+          {
+            "source": "get_recent_deployments",
+            "observation": "Previous deployment (2026.10.09.7) had no reported issues"
+          }
+        ],
+        "risk_level": "HIGH",
+        "action_type": "rollback_deployment"
+      }
+    },
+    {
+      "event_id": 170,
+      "occurred_at": "2026-10-16T06:15:04.832079+00:00",
+      "actor": "operator",
+      "event_type": "policy.evaluated",
+      "entity_type": "action",
+      "entity_id": "36e82124-1944-4d52-b9c0-d1991caac67b",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": null,
+      "result": {
+        "role": "operator",
+        "reason": "operator policy evaluated rollback_deployment in production as HIGH risk.",
+        "outcome": "require_approval",
+        "username": "operator",
+        "risk_level": "HIGH",
+        "action_type": "rollback_deployment",
+        "environment": "production"
+      },
+      "details": {
+        "action_type": "rollback_deployment"
+      }
+    },
+    {
+      "event_id": 171,
+      "occurred_at": "2026-10-16T06:15:04.832079+00:00",
+      "actor": "operator",
+      "event_type": "approval.requested",
+      "entity_type": "approval",
+      "entity_id": "6",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": "Rollback to the previous known‑good version (2026.10.09.7) to restore correct PAYMENT_GATEWAY_URL configuration and stop the 5xx spike.",
+      "result": {
+        "decision": "pending"
+      },
+      "details": {
+        "proposal": {
+          "reason": "Rollback to the previous known‑good version (2026.10.09.7) to restore correct PAYMENT_GATEWAY_URL configuration and stop the 5xx spike.",
+          "status": "approval_required",
+          "target": "checkout-api",
+          "evidence": [
+            {
+              "source": "search_logs",
+              "observation": "CONFIG_MISMATCH error after latest deployment"
+            },
+            {
+              "source": "get_service_health",
+              "observation": "Degraded health and high 5xx rate"
+            },
+            {
+              "source": "get_recent_deployments",
+              "observation": "Previous deployment (2026.10.09.7) had no reported issues"
+            }
+          ],
+          "risk_level": "HIGH",
+          "action_type": "rollback_deployment"
+        },
+        "action_id": "36e82124-1944-4d52-b9c0-d1991caac67b",
+        "expires_at": "2026-10-16T07:15:04.823358+00:00"
+      }
+    },
+    {
+      "event_id": 172,
+      "occurred_at": "2026-10-16T06:15:04.847116+00:00",
+      "actor": "operator",
+      "event_type": "incident.investigation_linked",
+      "entity_type": "incident",
+      "entity_id": "1",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": "Agent investigated the incident service.",
+      "result": {
+        "status": "paused"
+      },
+      "details": {
+        "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+        "service": "checkout-api"
+      }
+    },
+    {
+      "event_id": 173,
+      "occurred_at": "2026-10-16T06:15:04.847116+00:00",
+      "actor": "operator",
+      "event_type": "agent.paused",
+      "entity_type": "run",
+      "entity_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": "Unverified model output: The increased checkout failures are caused by a configuration mismatch (PAYMENT_GATEWAY_URL) introduced in the latest deployment (version 2026.10.10.3) of checkout‑api, as evidenced by the CONFIG_MISMATCH error log, degraded service health, and elevated 5xx rate.\n\nSources:\n[1] postmortems/checkout-configuration-mismatch.md\n[2] runbooks/payment-latency.md\n[3] runbooks/deployment-rollback.md\n\nUncertainty: Tool search_logs returned empty records; no matching data does not establish healthy state. Missing or unavailable evidence is not evidence of healthy state.",
+      "result": {
+        "status": "paused"
+      },
+      "details": {
+        "service": "checkout-api",
+        "severity": null
+      }
+    },
+    {
+      "event_id": 174,
+      "occurred_at": "2026-10-16T06:15:04.875446+00:00",
+      "actor": "admin",
+      "event_type": "auth.login",
+      "entity_type": "user",
+      "entity_id": "admin",
+      "run_id": null,
+      "reason": "Authentication succeeded.",
+      "result": {
+        "role": "admin",
+        "status": "success"
+      },
+      "details": {}
+    },
+    {
+      "event_id": 175,
+      "occurred_at": "2026-10-16T06:15:04.90058+00:00",
+      "actor": "admin",
+      "event_type": "approval.granted",
+      "entity_type": "approval",
+      "entity_id": "6",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": "Evidence reviewed: 500s began with release 2026.10.10.3; approve rollback.",
+      "result": {
+        "decision": "approved"
+      },
+      "details": {
+        "action_id": "36e82124-1944-4d52-b9c0-d1991caac67b"
+      }
+    },
+    {
+      "event_id": 176,
+      "occurred_at": "2026-10-16T06:15:04.90058+00:00",
+      "actor": "admin",
+      "event_type": "action.executed",
+      "entity_type": "action",
+      "entity_id": "36e82124-1944-4d52-b9c0-d1991caac67b",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": "Rollback to the previous known‑good version (2026.10.09.7) to restore correct PAYMENT_GATEWAY_URL configuration and stop the 5xx spike.",
+      "result": {
+        "status": "simulated",
+        "verification": "SUCCESS"
+      },
+      "details": {
+        "proposal": {
+          "reason": "Rollback to the previous known‑good version (2026.10.09.7) to restore correct PAYMENT_GATEWAY_URL configuration and stop the 5xx spike.",
+          "status": "approval_required",
+          "target": "checkout-api",
+          "evidence": [
+            {
+              "source": "search_logs",
+              "observation": "CONFIG_MISMATCH error after latest deployment"
+            },
+            {
+              "source": "get_service_health",
+              "observation": "Degraded health and high 5xx rate"
+            },
+            {
+              "source": "get_recent_deployments",
+              "observation": "Previous deployment (2026.10.09.7) had no reported issues"
+            }
+          ],
+          "risk_level": "HIGH",
+          "action_type": "rollback_deployment"
+        },
+        "execution": {
+          "status": "simulated",
+          "target": "checkout-api",
+          "message": "No real infrastructure was changed.",
+          "action_type": "rollback_deployment",
+          "verification": {
+            "reason": "Service health or recorded metrics improved after the action.",
+            "status": "SUCCESS",
+            "attempts": [
+              {
+                "after": {
+                  "state": "healthy",
+                  "metrics": {
+                    "http_5xx_rate": 4.6,
+                    "http_request_latency_ms": 80.0
+                  },
+                  "service": "checkout-api",
+                  "latest_deployment": {
+                    "status": "rolled_back",
+                    "version": "2026.10.10.3"
+                  }
+                },
+                "before": {
+                  "state": "degraded",
+                  "metrics": {
+                    "http_5xx_rate": 18.4,
+                    "http_request_latency_ms": 320.0
+                  },
+                  "service": "checkout-api",
+                  "latest_deployment": {
+                    "status": "success",
+                    "version": "2026.10.10.3"
+                  }
+                },
+                "reason": "Service health or recorded metrics improved after the action.",
+                "attempt": 1,
+                "execution": {
+                  "applied": true,
+                  "operation": "rollback_deployment",
+                  "fault_cleared": true,
+                  "restored_version": "2026.10.09.7",
+                  "rolled_back_version": "2026.10.10.3"
+                },
+                "verification": "SUCCESS",
+                "reinvestigation": null
+              }
+            ],
+            "escalated": false,
+            "attempt_count": 1,
+            "max_automatic_attempts": 2
+          },
+          "pre_action_state": {
+            "state": "degraded",
+            "metrics": {
+              "http_5xx_rate": 18.4,
+              "http_request_latency_ms": 320.0
+            },
+            "service": "checkout-api",
+            "latest_deployment": {
+              "status": "success",
+              "version": "2026.10.10.3"
+            }
+          },
+          "post_action_state": {
+            "state": "healthy",
+            "metrics": {
+              "http_5xx_rate": 4.6,
+              "http_request_latency_ms": 80.0
+            },
+            "service": "checkout-api",
+            "latest_deployment": {
+              "status": "rolled_back",
+              "version": "2026.10.10.3"
+            }
+          },
+          "resolved_incident_ids": [
+            1
+          ]
+        }
+      }
+    },
+    {
+      "event_id": 177,
+      "occurred_at": "2026-10-16T06:15:04.90058+00:00",
+      "actor": "admin",
+      "event_type": "verification.completed",
+      "entity_type": "action",
+      "entity_id": "36e82124-1944-4d52-b9c0-d1991caac67b",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": "Service health or recorded metrics improved after the action.",
+      "result": {
+        "reason": "Service health or recorded metrics improved after the action.",
+        "status": "SUCCESS",
+        "attempts": [
+          {
+            "after": {
+              "state": "healthy",
+              "metrics": {
+                "http_5xx_rate": 4.6,
+                "http_request_latency_ms": 80.0
+              },
+              "service": "checkout-api",
+              "latest_deployment": {
+                "status": "rolled_back",
+                "version": "2026.10.10.3"
+              }
+            },
+            "before": {
+              "state": "degraded",
+              "metrics": {
+                "http_5xx_rate": 18.4,
+                "http_request_latency_ms": 320.0
+              },
+              "service": "checkout-api",
+              "latest_deployment": {
+                "status": "success",
+                "version": "2026.10.10.3"
+              }
+            },
+            "reason": "Service health or recorded metrics improved after the action.",
+            "attempt": 1,
+            "execution": {
+              "applied": true,
+              "operation": "rollback_deployment",
+              "fault_cleared": true,
+              "restored_version": "2026.10.09.7",
+              "rolled_back_version": "2026.10.10.3"
+            },
+            "verification": "SUCCESS",
+            "reinvestigation": null
+          }
+        ],
+        "escalated": false,
+        "attempt_count": 1,
+        "max_automatic_attempts": 2
+      },
+      "details": {
+        "pre_action_state": {
+          "state": "degraded",
+          "metrics": {
+            "http_5xx_rate": 18.4,
+            "http_request_latency_ms": 320.0
+          },
+          "service": "checkout-api",
+          "latest_deployment": {
+            "status": "success",
+            "version": "2026.10.10.3"
+          }
+        },
+        "post_action_state": {
+          "state": "healthy",
+          "metrics": {
+            "http_5xx_rate": 4.6,
+            "http_request_latency_ms": 80.0
+          },
+          "service": "checkout-api",
+          "latest_deployment": {
+            "status": "rolled_back",
+            "version": "2026.10.10.3"
+          }
+        }
+      }
+    },
+    {
+      "event_id": 178,
+      "occurred_at": "2026-10-16T06:15:04.90058+00:00",
+      "actor": "admin",
+      "event_type": "incident.resolved",
+      "entity_type": "incident",
+      "entity_id": "1",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": "Action verification succeeded.",
+      "result": {
+        "status": "resolved",
+        "verification": "SUCCESS"
+      },
+      "details": {
+        "title": "Checkout 500 spike",
+        "action_id": "36e82124-1944-4d52-b9c0-d1991caac67b"
+      }
+    },
+    {
+      "event_id": 179,
+      "occurred_at": "2026-10-16T06:15:04.90058+00:00",
+      "actor": "admin",
+      "event_type": "agent.completed",
+      "entity_type": "run",
+      "entity_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "reason": "Human approval granted; verification SUCCESS; resolved incidents: [1].",
+      "result": {
+        "status": "completed"
+      },
+      "details": {
+        "approval_id": 6
+      }
+    }
+  ],
+  "toolCalls": [
+    {
+      "id": 45,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "call_index": 0,
+      "tool": "get_recent_deployments",
+      "arguments": {
+        "limit": 5,
+        "service": "checkout-api"
+      },
+      "start_time": "2026-10-16T06:14:54.402856+00:00",
+      "end_time": "2026-10-16T06:14:54.425062+00:00",
+      "result": {
+        "service": "checkout-api",
+        "deployments": [
+          {
+            "author": "simulator@example.com",
+            "status": "success",
+            "service": "checkout-api",
+            "version": "2026.10.10.3",
+            "service_id": 1,
+            "deployed_at": "2026-10-16T06:02:51.388764Z",
+            "deployment_id": 1
+          },
+          {
+            "author": "simulator@example.com",
+            "status": "success",
+            "service": "checkout-api",
+            "version": "2026.10.09.7",
+            "service_id": 1,
+            "deployed_at": "2026-10-15T06:14:51.388764Z",
+            "deployment_id": 2
+          }
+        ]
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": 46,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "call_index": 1,
+      "tool": "search_logs",
+      "arguments": {
+        "level": "error",
+        "limit": 20,
+        "query": "error",
+        "service": "checkout-api"
+      },
+      "start_time": "2026-10-16T06:14:56.759297+00:00",
+      "end_time": "2026-10-16T06:14:56.779845+00:00",
+      "result": {
+        "logs": [],
+        "service": "checkout-api"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": 47,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "call_index": 2,
+      "tool": "get_service_health",
+      "arguments": {
+        "service": "checkout-api"
+      },
+      "start_time": "2026-10-16T06:14:57.335913+00:00",
+      "end_time": "2026-10-16T06:14:57.388792+00:00",
+      "result": {
+        "name": "checkout-api",
+        "state": "degraded",
+        "repository": "github.com/opspilot/checkout-api",
+        "service_id": 1,
+        "environment": "production"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": 48,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "call_index": 3,
+      "tool": "get_metrics",
+      "arguments": {
+        "limit": 10,
+        "service": "checkout-api"
+      },
+      "start_time": "2026-10-16T06:14:59.498844+00:00",
+      "end_time": "2026-10-16T06:14:59.554087+00:00",
+      "result": {
+        "metrics": [
+          {
+            "id": 1,
+            "value": 18.4,
+            "service": "checkout-api",
+            "timestamp": "2026-10-16T06:12:51.388764Z",
+            "metric_name": "http_5xx_rate"
+          },
+          {
+            "id": 2,
+            "value": 320.0,
+            "service": "checkout-api",
+            "timestamp": "2026-10-16T06:12:51.388764Z",
+            "metric_name": "http_request_latency_ms"
+          }
+        ],
+        "service": "checkout-api"
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": 49,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "call_index": 4,
+      "tool": "get_incident_history",
+      "arguments": {
+        "limit": 5,
+        "service": "checkout-api"
+      },
+      "start_time": "2026-10-16T06:15:01.300868+00:00",
+      "end_time": "2026-10-16T06:15:01.349856+00:00",
+      "result": {
+        "service": "checkout-api",
+        "incidents": [
+          {
+            "id": 1,
+            "title": "Checkout 500 spike",
+            "status": "investigating",
+            "service": "checkout-api",
+            "severity": "sev1",
+            "created_at": "2026-10-16T06:14:51.388764Z",
+            "service_id": 1,
+            "updated_at": "2026-10-16T06:14:51.388764Z"
+          }
+        ]
+      },
+      "success": true,
+      "error": null
+    },
+    {
+      "id": 50,
+      "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+      "call_index": 5,
+      "tool": "search_logs",
+      "arguments": {
+        "level": "error",
+        "limit": 20,
+        "query": "CONFIG_MISMATCH",
+        "service": "checkout-api"
+      },
+      "start_time": "2026-10-16T06:15:02.921649+00:00",
+      "end_time": "2026-10-16T06:15:02.941684+00:00",
+      "result": {
+        "logs": [
+          {
+            "id": 1,
+            "level": "error",
+            "message": "CONFIG_MISMATCH: PAYMENT_GATEWAY_URL differs from production baseline after release 2026.10.10.3",
+            "service": "checkout-api",
+            "trace_id": "trace-checkout_bad_deploy-0",
+            "timestamp": "2026-10-16T06:05:51.388764Z"
+          }
+        ],
+        "service": "checkout-api"
+      },
+      "success": true,
+      "error": null
+    }
+  ],
+  "hypotheses": [
+    {
+      "score": 0.92,
+      "hypothesis": "Configuration mismatch in latest deployment caused the 5xx spike.",
+      "supporting_evidence": [
+        {
+          "source": "search_logs",
+          "observation": "CONFIG_MISMATCH: PAYMENT_GATEWAY_URL differs from production baseline after release 2026.10.10.3"
+        },
+        {
+          "source": "get_service_health",
+          "observation": "Service health state is degraded"
+        },
+        {
+          "source": "get_metrics",
+          "observation": "http_5xx_rate = 18.4 (high)"
+        },
+        {
+          "source": "postmortems/checkout-configuration-mismatch.md",
+          "observation": "Postmortem knowledge indicates similar failures were due to config mismatches after deployments"
+        }
+      ],
+      "contradicting_evidence": []
+    },
+    {
+      "score": 0.28,
+      "hypothesis": "Transient dependency issue unrelated to deployment.",
+      "supporting_evidence": [],
+      "contradicting_evidence": [
+        {
+          "source": "search_logs",
+          "observation": "No database timeout or latency logs present; only config mismatch error observed."
+        }
+      ]
+    }
+  ],
+  "hypothesisHistory": [
+    [
+      {
+        "score": 0.92,
+        "hypothesis": "Configuration mismatch in latest deployment caused the 5xx spike.",
+        "supporting_evidence": [
+          {
+            "source": "search_logs",
+            "observation": "CONFIG_MISMATCH: PAYMENT_GATEWAY_URL differs from production baseline after release 2026.10.10.3"
+          },
+          {
+            "source": "get_service_health",
+            "observation": "Service health state is degraded"
+          },
+          {
+            "source": "get_metrics",
+            "observation": "http_5xx_rate = 18.4 (high)"
+          },
+          {
+            "source": "postmortems/checkout-configuration-mismatch.md",
+            "observation": "Postmortem knowledge indicates similar failures were due to config mismatches after deployments"
+          }
+        ],
+        "contradicting_evidence": []
+      },
+      {
+        "score": 0.28,
+        "hypothesis": "Transient dependency issue unrelated to deployment.",
+        "supporting_evidence": [],
+        "contradicting_evidence": [
+          {
+            "source": "search_logs",
+            "observation": "No database timeout or latency logs present; only config mismatch error observed."
+          }
+        ]
+      }
+    ]
+  ],
+  "proposal": {
+    "reason": "Rollback to the previous known‑good version (2026.10.09.7) to restore correct PAYMENT_GATEWAY_URL configuration and stop the 5xx spike.",
+    "status": "approval_required",
+    "target": "checkout-api",
+    "evidence": [
+      {
+        "source": "search_logs",
+        "observation": "CONFIG_MISMATCH error after latest deployment"
+      },
+      {
+        "source": "get_service_health",
+        "observation": "Degraded health and high 5xx rate"
+      },
+      {
+        "source": "get_recent_deployments",
+        "observation": "Previous deployment (2026.10.09.7) had no reported issues"
+      }
+    ],
+    "risk_level": "HIGH",
+    "action_type": "rollback_deployment"
+  },
+  "action": {
+    "action_id": "36e82124-1944-4d52-b9c0-d1991caac67b",
+    "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+    "proposal": {
+      "reason": "Rollback to the previous known‑good version (2026.10.09.7) to restore correct PAYMENT_GATEWAY_URL configuration and stop the 5xx spike.",
+      "status": "approval_required",
+      "target": "checkout-api",
+      "evidence": [
+        {
+          "source": "search_logs",
+          "observation": "CONFIG_MISMATCH error after latest deployment"
+        },
+        {
+          "source": "get_service_health",
+          "observation": "Degraded health and high 5xx rate"
+        },
+        {
+          "source": "get_recent_deployments",
+          "observation": "Previous deployment (2026.10.09.7) had no reported issues"
+        }
+      ],
+      "risk_level": "HIGH",
+      "action_type": "rollback_deployment"
+    },
+    "status": "executed",
+    "result": {
+      "status": "simulated",
+      "target": "checkout-api",
+      "message": "No real infrastructure was changed.",
+      "action_type": "rollback_deployment",
+      "verification": {
+        "reason": "Service health or recorded metrics improved after the action.",
+        "status": "SUCCESS",
+        "attempts": [
+          {
+            "after": {
+              "state": "healthy",
+              "metrics": {
+                "http_5xx_rate": 4.6,
+                "http_request_latency_ms": 80.0
+              },
+              "service": "checkout-api",
+              "latest_deployment": {
+                "status": "rolled_back",
+                "version": "2026.10.10.3"
+              }
+            },
+            "before": {
+              "state": "degraded",
+              "metrics": {
+                "http_5xx_rate": 18.4,
+                "http_request_latency_ms": 320.0
+              },
+              "service": "checkout-api",
+              "latest_deployment": {
+                "status": "success",
+                "version": "2026.10.10.3"
+              }
+            },
+            "reason": "Service health or recorded metrics improved after the action.",
+            "attempt": 1,
+            "execution": {
+              "applied": true,
+              "operation": "rollback_deployment",
+              "fault_cleared": true,
+              "restored_version": "2026.10.09.7",
+              "rolled_back_version": "2026.10.10.3"
+            },
+            "verification": "SUCCESS",
+            "reinvestigation": null
+          }
+        ],
+        "escalated": false,
+        "attempt_count": 1,
+        "max_automatic_attempts": 2
+      },
+      "pre_action_state": {
+        "state": "degraded",
+        "metrics": {
+          "http_5xx_rate": 18.4,
+          "http_request_latency_ms": 320.0
+        },
+        "service": "checkout-api",
+        "latest_deployment": {
+          "status": "success",
+          "version": "2026.10.10.3"
+        }
+      },
+      "post_action_state": {
+        "state": "healthy",
+        "metrics": {
+          "http_5xx_rate": 4.6,
+          "http_request_latency_ms": 80.0
+        },
+        "service": "checkout-api",
+        "latest_deployment": {
+          "status": "rolled_back",
+          "version": "2026.10.10.3"
+        }
+      },
+      "resolved_incident_ids": [
+        1
+      ]
+    },
+    "created_at": "2026-10-16T06:15:04.832079+00:00",
+    "executed_at": "2026-10-16T06:15:04.891716+00:00",
+    "idempotency_key": "de551d39-cf0e-482b-b66a-7efb78e57e34:rollback_deployment:checkout-api"
+  },
+  "policy": {
+    "role": "operator",
+    "reason": "operator policy evaluated rollback_deployment in production as HIGH risk.",
+    "outcome": "require_approval",
+    "username": "operator",
+    "risk_level": "HIGH",
+    "action_type": "rollback_deployment",
+    "environment": "production"
+  },
+  "approval": {
+    "id": 6,
+    "run_id": "de551d39-cf0e-482b-b66a-7efb78e57e34",
+    "action_id": "36e82124-1944-4d52-b9c0-d1991caac67b",
+    "requested_at": "2026-10-16T06:15:04.832079+00:00",
+    "expires_at": "2026-10-16T07:15:04.823358+00:00",
+    "decided_at": "2026-10-16T06:15:04.891716+00:00",
+    "decision": "approved",
+    "decided_by": "admin",
+    "reason": "Evidence reviewed: 500s began with release 2026.10.10.3; approve rollback.",
+    "requested_by": "operator"
+  },
+  "verification": {
+    "reason": "Service health or recorded metrics improved after the action.",
+    "status": "SUCCESS",
+    "attempts": [
+      {
+        "after": {
+          "state": "healthy",
+          "metrics": {
+            "http_5xx_rate": 4.6,
+            "http_request_latency_ms": 80.0
+          },
+          "service": "checkout-api",
+          "latest_deployment": {
+            "status": "rolled_back",
+            "version": "2026.10.10.3"
+          }
+        },
+        "before": {
+          "state": "degraded",
+          "metrics": {
+            "http_5xx_rate": 18.4,
+            "http_request_latency_ms": 320.0
+          },
+          "service": "checkout-api",
+          "latest_deployment": {
+            "status": "success",
+            "version": "2026.10.10.3"
+          }
+        },
+        "reason": "Service health or recorded metrics improved after the action.",
+        "attempt": 1,
+        "execution": {
+          "applied": true,
+          "operation": "rollback_deployment",
+          "fault_cleared": true,
+          "restored_version": "2026.10.09.7",
+          "rolled_back_version": "2026.10.10.3"
+        },
+        "verification": "SUCCESS",
+        "reinvestigation": null
+      }
+    ],
+    "escalated": false,
+    "attempt_count": 1,
+    "max_automatic_attempts": 2
+  },
+  "apiResponses": {
+    "selfApprovalAttempt": {
+      "request": "POST /approvals/{id}/approve as operator (the requester)",
+      "httpStatus": 403,
+      "body": {
+        "detail": "The requester cannot decide their own action"
+      },
+      "note": "Captured HTTP response; this rejected attempt did not write an audit_events row."
+    }
+  },
+  "redactions": {
+    "scanned_for": [
+      "jwt",
+      "groq_api_key",
+      "password_hash",
+      "ipv4",
+      "generic_secret"
+    ],
+    "found": [],
+    "note": "No JWTs, API keys, password hashes or IPs are stored in these rows; access tokens used by the driver were never written to the export."
+  }
+}

@@ -1,0 +1,51 @@
+---
+import type { ResultTable } from '../lib/content';
+
+interface Props { table: ResultTable }
+const { table } = Astro.props;
+// Columns after the first hold numbers; right-align them in mono.
+const isNum = (i: number) => i > 0;
+---
+
+<figure class="results">
+  <div class="table-scroll">
+    <table>
+      <caption>{table.caption}</caption>
+      <thead>
+        <tr>{table.columns.map((c, i) => <th scope="col" class:list={{ num: isNum(i) }}>{c}</th>)}</tr>
+      </thead>
+      <tbody>
+        {table.rows.map((row) => (
+          <tr>
+            {row.map((cell, i) =>
+              i === 0 ? <th scope="row">{cell}</th> : <td class="num">{cell}</td>,
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  {table.notes && table.notes.length > 0 && (
+    <ul class="notes">{table.notes.map((n) => <li>{n}</li>)}</ul>
+  )}
+  {table.findings && table.findings.length > 0 && (
+    <>
+      <p class="label mono">What the ablations showed</p>
+      <ul class="notes">{table.findings.map((n) => <li>{n}</li>)}</ul>
+    </>
+  )}
+  {table.caveats && table.caveats.length > 0 && (
+    <>
+      <p class="label mono">Caveats</p>
+      <ul class="notes muted">{table.caveats.map((n) => <li>{n}</li>)}</ul>
+    </>
+  )}
+</figure>
+
+<style>
+  .results { margin: 0 0 1.5rem; }
+  th[scope='row'] { font-weight: 400; }
+  .notes { margin: 0.6rem 0 0; padding-left: 1.1rem; font-size: 0.95rem; }
+  .notes li { margin-bottom: 0.25rem; }
+  .label { margin: 1rem 0 0; font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+</style>

@@ -1,0 +1,77 @@
+---
+// Fonts are self-hosted and subset (Latin, plus Devanagari for the signboards).
+import '@fontsource/young-serif/latin-400.css';
+import '@fontsource/tiro-devanagari-hindi/devanagari-400.css';
+import '@fontsource/tiro-devanagari-hindi/latin-400.css';
+import '@fontsource/atkinson-hyperlegible/latin-400.css';
+import '@fontsource/atkinson-hyperlegible/latin-700.css';
+import '@fontsource/atkinson-hyperlegible/latin-400-italic.css';
+import '@fontsource/martian-mono/latin-400.css';
+import '../styles/tokens.css';
+import '../styles/global.css';
+import MiniBar from '../components/MiniBar.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../lib/content';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** The plain résumé view has no mini-bar and no motion. */
+  plain?: boolean;
+}
+
+const {
+  title = `${site.name}: AI & Data Science, IIT Jodhpur`,
+  description = site.bio,
+  plain = false,
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+// Person data for search engines: name, school and profiles only. Never a phone.
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  url: Astro.site?.toString(),
+  email: `mailto:${site.contact.email}`,
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Indian Institute of Technology Jodhpur' },
+  sameAs: [site.contact.github, site.contact.linkedin],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#ece6d8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1d1a21" media="(prefers-color-scheme: dark)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+    <script is:inline>
+      // Apply a saved manual theme before first paint. Storage can throw; ignore it.
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+  </head>
+  <body class={plain ? 'plain' : undefined}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot name="header" />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer plain={plain} />
+    {!plain && <MiniBar />}
+  </body>
+</html>
