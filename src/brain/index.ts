@@ -112,6 +112,7 @@ export class Brain {
     if (m.interest && m.interest.length !== dim) m.interest = null;
     if (m.axes && m.axes.length !== AXES.length) m.axes = null;
     m.items ??= {};
+    if (!m.recent || (m.recent.v && m.recent.v.length !== dim)) m.recent = { v: null, n: 0 };
     return m;
   }
 
@@ -282,7 +283,7 @@ export class Brain {
     }
 
     if (this.pacer.mode(t) === 'quiet') {
-      const left = this.pacer.tryLeaveQuiet(profile, !!pick);
+      const left = this.pacer.tryLeaveQuiet(this.model.state.recent, !!pick);
       if (!left.ok) return hold(left.reason);
       this.decide('quiet', `Left quiet mode: ${left.reason}.`);
     }
@@ -293,6 +294,7 @@ export class Brain {
     const item = this.model.byId.get(pick.id)!;
     this.pacer.show(t, item.id, item.topic, profile);
     this.model.markShown(item.id);
+    this.model.resetRecent();
     this.cache = null;
     const liked = this.model.state.lastEngaged ? this.title(this.model.state.lastEngaged) : null;
     const text = liked ? `Liked ${liked}? → ${item.title}` : `Next for you → ${item.title}`;

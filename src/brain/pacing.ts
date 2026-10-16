@@ -25,8 +25,10 @@ export interface PacingConfig {
   hardCap: number;
   /** Reading needed before a collapse counts as a moment. */
   minReadMs: number;
-  /** Cosine distance the profile must move before Quiet can end. */
+  /** Cosine distance recent interest must move before Quiet can end. */
   drift: number;
+  /** Signals since the last suggestion needed before drift is measured. */
+  minRecent: number;
 }
 
 export const DEFAULT_PACING: PacingConfig = {
@@ -38,7 +40,8 @@ export const DEFAULT_PACING: PacingConfig = {
   ignoreAfterMs: 20_000,
   hardCap: 6,
   minReadMs: 10_000,
-  drift: 0.25,
+  drift: 0.5,
+  minRecent: 6,
 };
 
 export type Mode = 'active' | 'cooldown' | 'quiet';
@@ -68,6 +71,8 @@ export interface PacingState {
   suggested: string[];
   /** Why the site went quiet, for the panel. */
   quietReason: string | null;
+  /** Times Quiet was left this session (at most once). */
+  quietExits: number;
 }
 
 export const initialPacing = (cfg: PacingConfig = DEFAULT_PACING): PacingState => ({
@@ -86,6 +91,7 @@ export const initialPacing = (cfg: PacingConfig = DEFAULT_PACING): PacingState =
   penalties: [],
   suggested: [],
   quietReason: null,
+  quietExits: 0,
 });
 
 /** The moments a suggestion may appear at. */
@@ -151,26 +157,35 @@ export class Pacer {
     return { ok: true, reason: 'budget and cooldown allow it' };
   }
 
-  /** Drift since the last suggestion, as cosine distance (Infinity if none yet). */
-  drift(profile: Vec | null): number {
+  /**
+   * Drift: cosine distance between the profile when the last suggestion was
+   * shown and the direction of what was engaged with since then. Comparing
+   * against recent engagement (not the slowly moving profile) separates "learned
+   * a bit more" from "now interested in something else". Needs `minRecent`
+   * signals; otherwise 0.
+   */
+  drift(recent: { v: Vec | null; n: number } | null): number {
     const last = this.state.lastProfile;
-    if (!last || !profile) return Infinity;
-    return cosineDistance(profile, last);
+    if (!last || !recent?.v || recent.n < this.cfg.minRecent) return 0;
+    return cosineDistance(recent.v, last);
   }
 
   /**
-   * Try to leave Quiet. Both conditions are required: the profile moved more
-   * than cfg.drift since the last suggestion, and a candidate passed the gate.
+   * Try to leave Quiet. Both conditions are required: the visitor's recent
+   * interest moved more than cfg.drift away from the last suggestion's profile,
+   * and a candidate passed the confidence gate.
    */
-  tryLeaveQuiet(profile: Vec | null, gatePassed: boolean): Verdict {
+  tryLeaveQuiet(recent: { v: Vec | null; n: number } | null, gatePassed: boolean): Verdict {
     const s = this.state;
     if (s.mode !== 'quiet') return { ok: false, reason: 'not quiet' };
     if (s.shown >= this.cfg.hardCap) return { ok: false, reason: 'session cap reached' };
-    const d = this.drift(profile);
+    if (s.quietExits >= 1) return { ok: false, reason: 'I already came back once this visit' };
+    const d = this.drift(recent);
     if (!(d > this.cfg.drift))
       return { ok: false, reason: `your interests have not moved enough (${d.toFixed(2)} ≤ ${this.cfg.drift})` };
     if (!gatePassed) return { ok: false, reason: 'interests moved, but nothing fits clearly enough' };
     s.mode = 'active';
+    s.quietExits += 1;
     s.budget = 1;
     s.maxBudget = 1;
     s.streak = 0;

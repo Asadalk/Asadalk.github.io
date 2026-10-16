@@ -74,14 +74,14 @@ export interface Signal {
 
 /** Strength of each signal (negative pushes the profile away). */
 export const STRENGTH: Record<SignalKind, number> = {
-  demo: 1,
-  expand: 0.7,
-  ask: 0.7,
-  dwell: 0.5, // multiplied by the log-scaled dwell gain (0..1)
-  signboard: 0.4,
-  opener: 0.8,
-  'fast-scroll': -0.1,
-  dismiss: -0.4,
+  demo: 1.5,
+  expand: 1,
+  ask: 1,
+  dwell: 0.6, // multiplied by the log-scaled dwell gain (0..1)
+  signboard: 0.5,
+  opener: 1,
+  'fast-scroll': -0.15,
+  dismiss: -0.5,
 };
 
 export type Clock = () => number;

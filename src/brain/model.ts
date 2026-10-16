@@ -32,6 +32,12 @@ export interface ModelState {
   lastEngaged: string | null;
   /** Label of the opener chip, if one was picked. */
   opener: string | null;
+  /**
+   * Strength-weighted sum of what was engaged with since the last suggestion,
+   * and how many signals went into it. Pacing compares its direction with
+   * the profile at that suggestion to detect a real change of interest.
+   */
+  recent: { v: Vec | null; n: number };
 }
 
 export interface ModelConfig {
@@ -41,7 +47,7 @@ export interface ModelConfig {
   dwellEngagedSec: number;
 }
 
-export const DEFAULT_MODEL_CONFIG: ModelConfig = { alpha: 0.25, dwellEngagedSec: 10 };
+export const DEFAULT_MODEL_CONFIG: ModelConfig = { alpha: 0.3, dwellEngagedSec: 10 };
 
 export const emptyModel = (): ModelState => ({
   interest: null,
@@ -49,6 +55,7 @@ export const emptyModel = (): ModelState => ({
   updates: 0,
   items: {},
   lastEngaged: null,
+  recent: { v: null, n: 0 },
   opener: null,
 });
 
@@ -165,10 +172,16 @@ export class VisitorModel {
     if (item && (s.kind === 'expand' || s.kind === 'demo')) this.markEngaged(item.id, now);
     if (!r) return 0;
 
-    const w = this.cfg.alpha * r.strength;
+    // Clamp so one strong signal can never wipe out the history.
+    const w = Math.max(-0.5, Math.min(0.6, this.cfg.alpha * r.strength));
     st.interest = emaStep(st.interest, normalize(r.v), w);
     st.axes = emaStep(st.axes, normalize(r.a), w, true);
-    if (w > 0) st.updates += 1;
+    if (w > 0) {
+      st.updates += 1;
+      const u = normalize(r.v);
+      st.recent.v = st.recent.v ? st.recent.v.map((x, i) => x + w * u[i]) : scale(u, w);
+      st.recent.n += 1;
+    }
     return w;
   }
 
@@ -177,6 +190,11 @@ export class VisitorModel {
     stats.engaged += 1;
     stats.engagedAt = now;
     this.state.lastEngaged = id;
+  }
+
+  /** Start a new "recent" window (called when a suggestion is shown). */
+  resetRecent(): void {
+    this.state.recent = { v: null, n: 0 };
   }
 
   markShown(id: string): void {
