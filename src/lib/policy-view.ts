@@ -8,8 +8,11 @@ const TONE: Record<Outcome, 'allow' | 'approval' | 'deny'> = {
   deny: 'deny',
 };
 
+const SHORT: Record<Outcome, string> = { allow: 'Allow', require_approval: 'Approval', deny: 'Deny' };
+
+/** Compact table cell: icon plus a one-word label (full label for screen readers). */
 export function outcomeBadge(o: Outcome): string {
-  return `<span class="outcome tone-${TONE[o]}">${ICON[TONE[o]]}<span>${esc(OUTCOME_LABEL[o])}</span></span>`;
+  return `<span class="outcome tone-${TONE[o]}" title="${esc(OUTCOME_LABEL[o])}">${ICON[TONE[o]]}<span aria-hidden="true">${SHORT[o]}</span><span class="visually-hidden">${esc(OUTCOME_LABEL[o])}</span></span>`;
 }
 
 export function renderDecision(d: PolicyDecision): string {

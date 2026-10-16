@@ -42,7 +42,7 @@ export function renderMap(map: MapOutline, response: LocateResponse | null, show
       <circle cx="${c}" cy="${c}" r="3" class="pin-dot"/>
       <line x1="8" x2="${8 + unitsPerKm}" y1="${INSET.size - 10}" y2="${INSET.size - 10}" class="scale"/>
       <text x="8" y="${INSET.size - 14}" class="map-label">1 km</text>
-      <text x="0" y="${INSET.size + 14}" class="map-label">1 km circle, to scale</text>
+      <text x="8" y="14" class="map-label">to scale</text>
     </g>`;
   }
   return `<svg class="india" viewBox="0 0 ${w} ${h.toFixed(1)}" role="img" aria-labelledby="india-t">
