@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import ResearchCard from '../components/ResearchCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import Skills from '../components/Skills.astro';
+import Street from '../components/Street.astro';
 import { site, projects } from '../lib/content';
 
 // Owner's curated cold-start order. The brain (Phase 5) may reorder cards
@@ -14,32 +15,21 @@ const primaryEdu = site.education.find((e) => e.primary)!;
 
 <Base>
   <header class="hero" slot="header">
-    <div class="wrap">
+    <div class="wrap intro">
       <p class="eyebrow mono">{site.name} · {site.tagline}</p>
       <h1 data-headline>{site.headlines.default}</h1>
-      <p class="lede">{site.bio}</p>
       <div class="actions">
         <a class="button button--primary" href="#research">See the research</a>
         <a class="button button--ghost" href="/resume/">Plain résumé view</a>
       </div>
-      <nav class="signs" aria-label="Sections">
-        <ul>
-          {site.signboards.map((s) => (
-            <li>
-              <a href={`#${s.target}`}>
-                <span class="en">{s.en}</span>
-                <span class="hi" lang="hi">{s.hi}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
     </div>
+    <Street />
   </header>
 
   <div class="wrap feed">
     <section id="about" aria-labelledby="about-h">
       <h2 id="about-h">About</h2>
+      <p class="lede">{site.bio}</p>
       {site.about.map((p) => <p>{p}</p>)}
     </section>
 
@@ -104,36 +94,12 @@ const primaryEdu = site.education.find((e) => e.primary)!;
 </Base>
 
 <style>
-  .hero { padding: 3rem 0 2rem; }
-  @media (min-width: 48rem) { .hero { padding-top: 5.5rem; } }
+  .hero { padding: 2rem 0 0; }
+  @media (min-width: 48rem) { .hero { padding-top: 4.5rem; } }
+  .intro h1 { max-width: 20ch; }
   .eyebrow { font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; }
   .lede { font-size: 1.15rem; }
-  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0 2rem; }
-  .signs ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  .signs a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 6.5rem;
-    min-height: 44px;
-    padding: 0.5rem 0.85rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    text-decoration: none;
-    line-height: 1.25;
-  }
-  .signs a:hover { border-color: var(--accent); }
-  .signs .en { font-family: var(--font-display); }
-  .signs .hi { font-family: var(--font-deva); font-size: 0.95rem; color: var(--muted); }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.25rem 0 1.5rem; }
   .feed section { padding-top: 2.5rem; }
   .plain-list { padding-left: 1.1rem; }
   .plain-list li { margin-bottom: 0.5rem; }

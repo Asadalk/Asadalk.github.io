@@ -20,3 +20,15 @@ Plain-language explanations of each piece of the site, so every part can be defe
 **Theme.** The site follows the system light/dark setting. A footer button cycles system → light → dark and remembers the choice in `localStorage`. A tiny script in `<head>` applies the saved choice before first paint, so the page never flashes the wrong theme. Storage access sits inside `try/catch`, because private browsing can make it throw.
 
 **CI.** Every push runs the unit tests, the type checker and the build. The built HTML is then scanned for anything shaped like an Indian mobile number. Only `main` deploys.
+
+## Phase 2: the street
+
+**Generated, not drawn by hand.** The scene is computed by `src/lib/street.ts` at build time. Window positions, skyline heights and which windows are lit come from a small seeded random number generator, so every build produces the identical picture. Unit tests check the geometry: every detection box contains its board, and no box or label overlaps another or leaves the frame.
+
+**Detection boxes that draw themselves.** Each box is an SVG rectangle whose outline is one long dash. The dash starts fully offset (invisible) and a CSS animation slides the offset to zero, so the line appears to be drawn. The offset equals the rectangle's perimeter, computed in the same code that places the box. Under `prefers-reduced-motion` the boxes simply appear.
+
+**Tilted board, upright box.** A YOLO-style detector outputs axis-aligned boxes. For a board rotated by θ, the upright box needs width `w·cosθ + h·sinθ` and height `w·sinθ + h·cosθ`, which is what `rotatedBounds` computes.
+
+**Zoom without breaking links.** The signboards are ordinary `<a href="#research">` links. JavaScript intercepts the click, scales the scene up around the tapped shop with a CSS transform, then scrolls to the section and moves keyboard focus there. If JS is off, or the visitor prefers reduced motion, the plain link behaviour takes over.
+
+**Parallax.** The far skyline moves at 14% of scroll speed and the wires at 5%, applied with `transform` inside `requestAnimationFrame`. Transforms don't trigger layout, so there is no layout shift (CLS). The effect only runs while the hero is visible.

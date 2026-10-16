@@ -1,0 +1,207 @@
+---
+// Renders one street layout as inline SVG. Signboards are real links with
+// real text; everything else is decoration hidden from assistive tech.
+import { detectionBox, labelWidth, signLook, type Scene } from '../lib/street';
+
+interface Props { scene: Scene }
+const { scene: s } = Astro.props;
+const id = (n: string) => `${n}-${s.id}`;
+
+const shops = s.shops.map((shop, i) => {
+  const look = signLook[shop.target];
+  const box = detectionBox(shop.sign, look.tilt);
+  const label = `${shop.target} ${look.conf}`;
+  const perimeter = Math.round(2 * (box.w + box.h));
+  const cx = shop.sign.x + shop.sign.w / 2;
+  const cy = shop.sign.y + shop.sign.h / 2;
+  return {
+    ...shop,
+    look,
+    box,
+    label,
+    labelW: labelWidth(label),
+    perimeter,
+    cx,
+    cy,
+    delay: 250 + i * 150,
+    transform: look.tilt ? `rotate(${look.tilt} ${cx} ${cy})` : undefined,
+  };
+});
+
+// Rolling-shutter slats.
+const slats = (x: number, y: number, w: number, h: number) => {
+  let d = '';
+  for (let yy = y + 6; yy < y + h; yy += 7) d += `M${x} ${yy}h${w}`;
+  return d;
+};
+const balusters = (x1: number, x2: number, y: number) => {
+  let d = `M${x1} ${y}H${x2}M${x1} ${y + 12}H${x2}`;
+  for (let x = x1; x <= x2; x += 9) d += `M${x} ${y}v12`;
+  return d;
+};
+const towerPath = (x: number, top: number, base: number) => {
+  const half = (base - top) * 0.08;
+  let d = `M${x - half} ${base}L${x - 3} ${top}M${x + half} ${base}L${x + 3} ${top}`;
+  const steps = 7;
+  for (let i = 0; i < steps; i++) {
+    const y1 = base - ((base - top) * i) / steps;
+    const y2 = base - ((base - top) * (i + 1)) / steps;
+    const w1 = half - ((half - 3) * i) / steps;
+    const w2 = half - ((half - 3) * (i + 1)) / steps;
+    d += `M${x - w1} ${y1}L${x + w2} ${y2}M${x + w1} ${y1}L${x - w2} ${y2}`;
+  }
+  return d;
+};
+const b = s.bicycle;
+---
+
+<svg
+  class={`scene scene--${s.id}`}
+  viewBox={`0 0 ${s.width} ${s.height}`}
+  width={s.width}
+  height={s.height}
+  role="group"
+  aria-label="A street at dusk. Each signboard is a link to a section of this page."
+>
+  <defs>
+    <linearGradient id={id('sky')} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" style="stop-color: var(--sky-top)" />
+      <stop offset="1" style="stop-color: var(--sky-bottom)" />
+    </linearGradient>
+    <linearGradient id={id('haze')} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" style="stop-color: var(--haze-color)" stop-opacity="0.15" />
+      <stop offset="0.5" style="stop-color: var(--haze-color)" stop-opacity="0.75" />
+      <stop offset="1" style="stop-color: var(--haze-color)" stop-opacity="0.25" />
+    </linearGradient>
+  </defs>
+
+  <g aria-hidden="true">
+    <rect width={s.width} height={s.ground} fill={`url(#${id('sky')})`} />
+    <g class="layer" data-depth="0.14">
+      <circle cx={s.sun.cx} cy={s.sun.cy} r={s.sun.r} style="fill: var(--sun)" opacity="0.85" />
+      {s.skyline.map((k) => (
+        <>
+          <rect x={k.x} y={k.y} width={k.w} height={s.ground - k.y} style={`fill: var(${k.tone === 1 ? '--far' : '--far-2'})`} />
+          {k.tank && <rect x={k.tank.x} y={k.tank.y} width={k.tank.w} height={k.tank.h} rx="4" style="fill: var(--far-2)" />}
+          {k.mast && <path d={`M${k.mast} ${k.y}v-26M${k.mast - 8} ${k.y - 18}h16`} style="stroke: var(--far-2)" stroke-width="2" />}
+        </>
+      ))}
+      <path d={towerPath(s.tower.x, s.tower.top, s.tower.base)} style="stroke: var(--far-2)" stroke-width="2" fill="none" />
+      <rect x={s.tower.x - 10} y={s.tower.top + 4} width="5" height="16" style="fill: var(--far-2)" />
+      <rect x={s.tower.x + 5} y={s.tower.top + 4} width="5" height="16" style="fill: var(--far-2)" />
+    </g>
+
+    {s.facades.map((f) => (
+      <g>
+        <rect x={f.x} y={f.y} width={f.w} height={f.h} style={`fill: ${f.wall}`} />
+        <rect x={f.x - 4} y={f.y - 8} width={f.w + 8} height="10" style="fill: var(--wall-shade)" />
+        {f.tank && (
+          <>
+            <rect x={f.tank.x} y={f.tank.y} width={f.tank.w} height={f.tank.h} rx="5" style="fill: var(--tank)" />
+            <rect x={f.tank.x + 9} y={f.tank.y - 4} width="16" height="5" rx="2" style="fill: var(--tank)" />
+          </>
+        )}
+        {f.windows.map((w) => (
+          <>
+            <rect x={w.x - 3} y={w.y - 3} width={w.w + 6} height={w.h + 6} style="fill: var(--wall-shade)" />
+            <rect x={w.x} y={w.y} width={w.w} height={w.h} class={w.lit ? 'lit' : undefined} style="fill: var(--window)" />
+            <path d={`M${w.x + w.w / 2} ${w.y}v${w.h}`} style="stroke: var(--wall-shade)" stroke-width="2" />
+          </>
+        ))}
+        {f.rails.map((r) => (
+          <path d={balusters(r.x1, r.x2, r.y)} style="stroke: var(--rail)" stroke-width="1.6" fill="none" />
+        ))}
+        {f.bricks.map((k) => (
+          <rect x={k.x} y={k.y} width={k.w} height={k.h} style="fill: var(--sign-brick)" opacity="0.55" />
+        ))}
+      </g>
+    ))}
+
+    {s.shutters.map((sh) => {
+      const closed = sh.h - (sh.open ?? 0);
+      return (
+        <g>
+          {sh.open && <rect x={sh.x} y={sh.y + closed} width={sh.w} height={sh.open} style="fill: var(--interior)" />}
+          <rect x={sh.x} y={sh.y} width={sh.w} height={closed} style="fill: var(--shutter)" />
+          <path d={slats(sh.x, sh.y, sh.w, closed)} style="stroke: var(--shutter-line)" stroke-width="1" />
+          <rect x={sh.x + sh.w / 2 - 8} y={sh.y + closed - 5} width="16" height="4" style="fill: var(--shutter-line)" />
+          {sh.plaque && (
+            <>
+              <rect x={sh.x + sh.w / 2 - sh.plaque.length * 3.6 - 8} y={sh.y + 14} width={sh.plaque.length * 7.2 + 16} height="20" style="fill: var(--sign-plaster)" stroke="var(--sign-kohl)" stroke-width="1" />
+              <text x={sh.x + sh.w / 2} y={sh.y + 28} class="plaque" text-anchor="middle">{sh.plaque}</text>
+            </>
+          )}
+        </g>
+      );
+    })}
+
+    <rect x="0" y={s.ground} width={s.width} height={s.height - s.ground} style="fill: var(--road)" />
+    <rect x="0" y={s.ground} width={s.width} height="7" style="fill: var(--kerb)" />
+
+    <g style="stroke: var(--wire)" stroke-width="2.2" fill="none" stroke-linecap="round">
+      <circle cx={b.x} cy={b.y + 12} r="15" />
+      <circle cx={b.x + 52} cy={b.y + 12} r="15" />
+      <path d={`M${b.x} ${b.y + 12}L${b.x + 20} ${b.y - 10}L${b.x + 44} ${b.y - 10}L${b.x + 52} ${b.y + 12}M${b.x + 20} ${b.y - 10}L${b.x + 28} ${b.y + 12}L${b.x + 44} ${b.y - 10}M${b.x + 16} ${b.y - 16}h10M${b.x + 44} ${b.y - 10}l-4 -10h9`} />
+    </g>
+
+    <rect width={s.width} height={s.height} fill={`url(#${id('haze')})`} class="haze" />
+
+    <g class="layer" data-depth="0.05">
+      {s.poles.map((p) => (
+        <>
+          <rect x={p.x - 3} y={p.top} width="7" height={s.height - p.top} style="fill: var(--wire)" />
+          <rect x={p.x - 26} y={p.top + 8} width="52" height="5" style="fill: var(--wire)" />
+        </>
+      ))}
+      <g style="stroke: var(--wire)" stroke-width="1.6" fill="none">
+        {s.wires.map((w) => <path d={w.d} />)}
+      </g>
+      {s.birds.map(([x, y]) => (
+        <path d={`M${x - 7} ${y - 4}q4 -9 11 -6q4 -3 6 1l-4 2q1 5 -5 6l-2 5h-2l1 -5q-4 0 -5 -3z`} style="fill: var(--wire)" />
+      ))}
+    </g>
+  </g>
+
+  {shops.map((shop) => (
+    <a
+      href={`#${shop.target}`}
+      class="shop"
+      data-target={shop.target}
+      aria-label={`${shop.en} (${shop.hi})`}
+      style={`--p:${shop.perimeter};--d:${shop.delay}ms`}
+    >
+      <g transform={shop.transform}>
+        <path
+          d={`M${shop.sign.x + 18} ${shop.sign.y}v-12M${shop.sign.x + shop.sign.w - 18} ${shop.sign.y}v-12`}
+          style="stroke: var(--wire)"
+          stroke-width="2"
+        />
+        <rect x={shop.sign.x} y={shop.sign.y} width={shop.sign.w} height={shop.sign.h} rx="2" style={`fill: ${shop.look.bg}`} class="board" />
+        <rect
+          x={shop.sign.x + 5}
+          y={shop.sign.y + 5}
+          width={shop.sign.w - 10}
+          height={shop.sign.h - 10}
+          fill="none"
+          style={`stroke: ${shop.look.fg}`}
+          stroke-width="1.2"
+          opacity="0.55"
+        />
+        <text x={shop.cx} y={shop.sign.y + shop.sign.h * 0.47} class="hi" lang="hi" text-anchor="middle" style={`fill: ${shop.look.fg}; font-size: ${shop.hiSize}px`}>
+          {shop.hi}
+        </text>
+        <text x={shop.cx} y={shop.sign.y + shop.sign.h * 0.82} class="en" text-anchor="middle" style={`fill: ${shop.look.fg}; font-size: ${shop.enSize}px`}>
+          {shop.en}
+        </text>
+      </g>
+      <g class="det" aria-hidden="true">
+        <rect class="box-edge" x={shop.box.x} y={shop.box.y} width={shop.box.w} height={shop.box.h} fill="none" />
+        <rect class="box" x={shop.box.x} y={shop.box.y} width={shop.box.w} height={shop.box.h} fill="none" />
+        <g class="tag">
+          <rect x={shop.box.x - 1} y={shop.box.y - 21} width={shop.labelW} height="21" class="tag-bg" />
+          <text x={shop.box.x + 5} y={shop.box.y - 6} class="tag-text">{shop.label}</text>
+        </g>
+      </g>
+    </a>
+  ))}
+</svg>

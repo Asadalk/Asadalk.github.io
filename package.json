@@ -11,7 +11,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "5.3.0",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@astrojs/check": "0.9.10",
     "@astrojs/sitemap": "3.7.4",
+    "@playwright/test": "1.63.0",
     "typescript": "5.9.3",
     "vitest": "5.0.3"
   }

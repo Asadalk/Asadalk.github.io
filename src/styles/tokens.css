@@ -64,3 +64,86 @@
     --dur: 0ms;
   }
 }
+
+/* Street scene (hero). Signboard paint stays the same in both themes;
+   the street itself goes from dusk to night. */
+:root {
+  --sign-light: #ece6d8;
+  --sign-brick: #a9462d;
+  --sign-neem: #4e5b31;
+  --sign-kohl: #221e1c;
+  --sign-mauve: #5e5468;
+  --sign-plaster: #e1d9c6;
+
+  --sky-top: #c3b8cb;
+  --sky-bottom: #ebe2d3;
+  --sun: #e4ae8c;
+  --far: #b9afc2;
+  --far-2: #a69bb1;
+  --tank: #3a3340;
+  --wall-a: #e6ddcc;
+  --wall-b: #dccfbb;
+  --wall-c: #e5d3c8;
+  --wall-shade: #c9bda8;
+  --window: #4a4150;
+  --window-lit: #4a4150;
+  --rail: #5e5468;
+  --shutter: #b9b0a0;
+  --shutter-line: #958b7d;
+  --interior: #2f2a33;
+  --road: #9a92a3;
+  --kerb: #766d80;
+  --wire: #221e1c;
+  --haze-color: #b3a8be;
+  --haze: 0.55;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --sky-top: #121016;
+    --sky-bottom: #2b2531;
+    --sun: #6e4c40;
+    --far: #2c2733;
+    --far-2: #35303d;
+    --tank: #17151b;
+    --wall-a: #3a343f;
+    --wall-b: #332e38;
+    --wall-c: #3b3239;
+    --wall-shade: #29252e;
+    --window: #1b181f;
+    --window-lit: #d9a35f;
+    --rail: #17151b;
+    --shutter: #4b4552;
+    --shutter-line: #2d2932;
+    --interior: #6b4a2c;
+    --road: #24212a;
+    --kerb: #36313e;
+    --wire: #0c0b0e;
+    --haze-color: #6a5f74;
+    --haze: 0.5;
+  }
+}
+
+:root[data-theme='dark'] {
+  --sky-top: #121016;
+  --sky-bottom: #2b2531;
+  --sun: #6e4c40;
+  --far: #2c2733;
+  --far-2: #35303d;
+  --tank: #17151b;
+  --wall-a: #3a343f;
+  --wall-b: #332e38;
+  --wall-c: #3b3239;
+  --wall-shade: #29252e;
+  --window: #1b181f;
+  --window-lit: #d9a35f;
+  --rail: #17151b;
+  --shutter: #4b4552;
+  --shutter-line: #2d2932;
+  --interior: #6b4a2c;
+  --road: #24212a;
+  --kerb: #36313e;
+  --wire: #0c0b0e;
+  --haze-color: #6a5f74;
+  --haze: 0.5;
+}

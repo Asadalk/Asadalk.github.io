@@ -1,0 +1,155 @@
+---
+// "Read the Street": the hero. Two layouts of the same street; CSS shows the
+// one that fits. Signboards are the main navigation and work as plain anchor
+// links without JavaScript. With JS, tapping one zooms into that shop first.
+import Scene from './Scene.astro';
+import { site } from '../lib/content';
+import { wideScene, tallScene } from '../lib/street';
+
+const wide = wideScene(site.signboards);
+const tall = tallScene(site.signboards);
+---
+
+<nav class="street" aria-label="Sections" data-street>
+  <div class="frame" data-frame>
+    <Scene scene={tall} />
+    <Scene scene={wide} />
+  </div>
+</nav>
+<p class="haze-note wrap mono">
+  The haze is illustrative for now. Once SmokeTrail has data it will follow Delhi's real daily PM2.5.
+</p>
+
+<script>
+  const street = document.querySelector<HTMLElement>('[data-street]');
+  const frame = street?.querySelector<HTMLElement>('[data-frame]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (street && frame) {
+    // Zoom into the tapped shop, then jump to its section. Reduced motion (or a
+    // modified click, e.g. open in new tab) skips straight to the link.
+    street.addEventListener('click', (e) => {
+      const shop = (e.target as Element).closest<SVGAElement>('a.shop');
+      if (!shop || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+      const target = document.getElementById(shop.dataset.target ?? '');
+      if (!target) return;
+      e.preventDefault();
+      window.dispatchEvent(new CustomEvent('signboard', { detail: shop.dataset.target }));
+
+      const land = () => {
+        target.scrollIntoView({ behavior: 'instant', block: 'start' });
+        history.pushState(null, '', `#${target.id}`);
+        const heading = target.querySelector<HTMLElement>('h2') ?? target;
+        heading.setAttribute('tabindex', '-1');
+        heading.focus({ preventScroll: true });
+        frame.classList.remove('zooming');
+        frame.style.transform = '';
+      };
+      if (reduce.matches) return land();
+
+      const f = frame.getBoundingClientRect();
+      const s = shop.getBoundingClientRect();
+      const ox = s.left + s.width / 2 - f.left;
+      const oy = s.top + s.height / 2 - f.top;
+      frame.style.transformOrigin = `${ox}px ${oy}px`;
+      frame.classList.add('zooming');
+      frame.style.transform = 'scale(2.4)';
+      window.setTimeout(land, 360);
+    });
+
+    // Gentle parallax on the far skyline and the wires, only while the hero is
+    // on screen and motion is allowed.
+    const layers = [...street.querySelectorAll<SVGGElement>('[data-depth]')];
+    let visible = true;
+    let queued = false;
+    new IntersectionObserver(([entry]) => (visible = entry.isIntersecting)).observe(street);
+    const paint = () => {
+      queued = false;
+      const y = window.scrollY;
+      for (const l of layers) l.style.transform = `translateY(${y * Number(l.dataset.depth)}px)`;
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!visible || reduce.matches || queued) return;
+        queued = true;
+        requestAnimationFrame(paint);
+      },
+      { passive: true },
+    );
+  }
+</script>
+
+<style>
+  .street {
+    position: relative;
+    max-width: 75rem;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  .frame {
+    will-change: transform;
+  }
+  .frame:global(.zooming) {
+    transition: transform 360ms var(--ease), opacity 360ms var(--ease);
+    opacity: 0.6;
+  }
+  .street :global(.scene) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .street :global(.scene--wide) { display: none; }
+  @media (min-width: 40rem) {
+    .street :global(.scene--tall) { display: none; }
+    .street :global(.scene--wide) { display: block; }
+  }
+
+  .street :global(.haze) { opacity: var(--haze); pointer-events: none; }
+  .street :global(.lit) { fill: var(--window-lit) !important; }
+  .street :global(.hi) { font-family: var(--font-deva); }
+  .street :global(.en) { font-family: var(--font-display); }
+  .street :global(.plaque) { font-family: var(--font-mono); font-size: 10px; fill: var(--sign-kohl); }
+
+  /* Detection boxes: 2.5px chartreuse over a Kohl edge, drawn like a stroke. */
+  .street :global(.box-edge),
+  .street :global(.box) {
+    stroke-dasharray: var(--p);
+    stroke-dashoffset: var(--p);
+    animation: draw 650ms var(--ease) var(--d) forwards;
+  }
+  .street :global(.box-edge) { stroke: var(--sign-kohl); stroke-width: 5; }
+  .street :global(.box) { stroke: var(--detect); stroke-width: 2.5; }
+  .street :global(.tag) {
+    opacity: 0;
+    animation: appear 220ms ease-out calc(var(--d) + 520ms) forwards;
+  }
+  .street :global(.tag-bg) { fill: var(--detect); stroke: var(--sign-kohl); stroke-width: 1; }
+  .street :global(.tag-text) { font-family: var(--font-mono); font-size: 12px; fill: var(--sign-kohl); }
+
+  .street :global(.shop) { cursor: pointer; outline: none; }
+  .street :global(.shop .board) { transition: filter var(--dur) var(--ease); }
+  .street :global(.shop:hover .board) { filter: brightness(1.08); }
+  .street :global(.shop:hover .box),
+  .street :global(.shop:focus-visible .box) { stroke-width: 4.5; }
+  .street :global(.shop:hover .box-edge),
+  .street :global(.shop:focus-visible .box-edge) { stroke-width: 8; }
+
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes appear { to { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .street :global(.box-edge),
+    .street :global(.box) { animation: none; stroke-dashoffset: 0; }
+    .street :global(.tag) { animation: none; opacity: 1; }
+  }
+
+  .haze-note {
+    margin: 0.5rem auto 0;
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+  @media print {
+    .street, .haze-note { display: none; }
+  }
+</style>

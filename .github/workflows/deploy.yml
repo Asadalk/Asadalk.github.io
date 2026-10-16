@@ -31,6 +31,8 @@ jobs:
       # Hard rule: no phone number may ever ship. Fails the build if one does.
       - name: Scan build for phone numbers
         run: "! grep -rEn '(\\+91[ -]?)?\\b[6-9][0-9]{9}\\b' dist --include='*.html' --include='*.xml' --include='*.json' --include='*.txt'"
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main'
         with:
