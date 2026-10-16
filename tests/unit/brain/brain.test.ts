@@ -87,6 +87,23 @@ describe('real content', () => {
     expect(b.log.recent(1)[0].text).toBe('Moved OpsPilot up because you spent 40 s on systems content.');
   });
 
+  test('real content: reading a systems project can earn one well-founded suggestion', () => {
+    const wall = new FakeWall();
+    const b = make(memoryKV(), memoryKV(), wall);
+    const got: string[] = [];
+    for (const id of ['cellular']) {
+      b.input();
+      b.seen(id);
+      b.signal({ kind: 'expand', itemId: id });
+      wall.advance(15_000);
+      b.input();
+      b.signal({ kind: 'dwell', itemId: id, seconds: 15 });
+      const s = b.moment({ kind: 'card-collapsed', readMs: 15_000 }, [id]);
+      if (s) got.push(s.itemId);
+    }
+    expect(got).toEqual(['opspilot']);
+  });
+
   test('headline changes once, never while the hero is on screen', () => {
     const b = make();
     for (const id of ['cellular', 'opspilot', 'cellular']) b.signal({ kind: 'expand', itemId: id });

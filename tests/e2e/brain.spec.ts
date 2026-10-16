@@ -121,6 +121,29 @@ test('an idle visitor gets no suggestion', async ({ page }) => {
   expect(await page.evaluate(() => (window as any).__brain.pacer.state.shown)).toBe(0);
 });
 
+test('finishing a card earns one calm suggestion that never moves the page', async ({ page }) => {
+  await page.goto(TEST);
+  const card = page.locator('#cellular');
+  await card.evaluate((el) => el.scrollIntoView({ block: 'start', behavior: 'instant' }));
+  await card.locator('summary').click();
+  await page.waitForTimeout(2500); // ≥ 10 s of reading in test time
+  const slot = page.locator('[data-suggest-slot="projects"]');
+  const slotBox = await slot.boundingBox();
+  await card.locator('summary').click(); // collapse: a natural pause
+  const chip = slot.locator('.chip');
+  await expect(chip).toBeVisible();
+  await expect(chip).toContainText('Liked Cellular system? → OpsPilot');
+  await expect(page.locator('[data-brain-live]')).toContainText('Suggestion:');
+  // The slot's space was reserved: showing and dismissing changes no layout.
+  const box = await slot.boundingBox();
+  expect(box!.height).toBe(slotBox!.height);
+  await chip.getByRole('button', { name: 'Dismiss suggestion' }).click();
+  await expect(chip).toBeHidden();
+  expect((await slot.boundingBox())!.height).toBe(slotBox!.height);
+  await page.locator('nav.minibar a[data-brain-open]').click();
+  await expect(page.locator('[data-brain-decisions]')).toContainText('You dismissed OpsPilot');
+});
+
 test('no stray brain controls without JavaScript', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
