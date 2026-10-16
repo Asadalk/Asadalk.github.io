@@ -10,3 +10,4 @@ playwright-report/
 # Owner-only planning docs (kept local, not published)
 PORTFOLIO_SPEC.md
 docs/phase0-checkpoint.md
+public/ort/

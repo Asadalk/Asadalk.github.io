@@ -1,0 +1,188 @@
+---
+// "Scan a photo with my model": the fine-tuned YOLO11n text detector running
+// in the visitor's browser. Without JS (or if the model can't load) it shows
+// boxes precomputed in Python for the sample photo, so it never breaks.
+import sample from '../content/data/scan-sample.json';
+---
+
+<div class="scan" id="scan" data-scan>
+  <p class="where mono">Runs on your device · your photo never leaves it</p>
+  <figure class="stage" data-stage>
+    <img
+      src={sample.image}
+      width={sample.width}
+      height={sample.height}
+      alt="A busy market street in Paharganj, Delhi, full of shop signs."
+      loading="lazy"
+      decoding="async"
+      data-img
+    />
+    <svg viewBox={`0 0 ${sample.width} ${sample.height}`} preserveAspectRatio="none" aria-hidden="true" data-overlay>
+      {sample.detections.map((d) => (
+        <>
+          <rect class="edge" x={d.box[0]} y={d.box[1]} width={d.box[2] - d.box[0]} height={d.box[3] - d.box[1]} />
+          <rect class="hit" x={d.box[0]} y={d.box[1]} width={d.box[2] - d.box[0]} height={d.box[3] - d.box[1]} />
+        </>
+      ))}
+    </svg>
+  </figure>
+
+  <div class="controls" data-controls hidden>
+    <label class="button button--primary pick">
+      Choose a photo
+      <input type="file" accept="image/*" class="visually-hidden" data-file />
+    </label>
+    <label class="button button--ghost pick" data-camera hidden>
+      Take a photo
+      <input type="file" accept="image/*" capture="environment" class="visually-hidden" data-file />
+    </label>
+    <button type="button" class="button button--ghost" data-sample>Run on the sample</button>
+  </div>
+  <p class="status" role="status" aria-live="polite" data-status>
+    {sample.detections.length} text regions found in the sample photo by the same model in Python. Turn on JavaScript to run it on your own photos.
+  </p>
+  <p class="credit muted">
+    Sample photo: <a href="https://commons.wikimedia.org/wiki/File:Main_Bazaar,_Paharganj,_Delhi,_India.jpg">Main Bazaar, Paharganj, Delhi</a>
+    by Vyacheslav Argenberg, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>, resized.
+  </p>
+</div>
+
+<script>
+  import type { WorkerOut } from '../workers/detect.worker';
+  import sample from '../content/data/scan-sample.json';
+
+  const root = document.querySelector<HTMLElement>('[data-scan]');
+  if (root) {
+    const stage = root.querySelector<HTMLElement>('[data-stage]')!;
+    const img = root.querySelector<HTMLImageElement>('[data-img]')!;
+    const overlay = root.querySelector<SVGSVGElement>('[data-overlay]')!;
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const controls = root.querySelector<HTMLElement>('[data-controls]')!;
+    const camera = root.querySelector<HTMLElement>('[data-camera]')!;
+    const NS = 'http://www.w3.org/2000/svg';
+
+    controls.hidden = false;
+    if (matchMedia('(pointer: coarse)').matches) camera.hidden = false;
+    status.textContent = 'Choose or take a photo with text in it, or run the model on the sample.';
+
+    let worker: Worker | null = null;
+    let nextId = 1;
+    let objectUrl: string | null = null;
+    let opened = false;
+    const fmt = (ms: number) => (ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(1)} s`);
+
+    const draw = (w: number, h: number, dets: { box: number[] }[]) => {
+      overlay.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      overlay.replaceChildren();
+      for (const d of dets) {
+        for (const cls of ['edge', 'hit']) {
+          const r = document.createElementNS(NS, 'rect');
+          r.setAttribute('class', cls);
+          r.setAttribute('x', String(d.box[0]));
+          r.setAttribute('y', String(d.box[1]));
+          r.setAttribute('width', String(d.box[2] - d.box[0]));
+          r.setAttribute('height', String(d.box[3] - d.box[1]));
+          overlay.append(r);
+        }
+      }
+    };
+
+    const fallback = (why: string) => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      objectUrl = null;
+      img.src = sample.image;
+      draw(sample.width, sample.height, sample.detections);
+      status.textContent = `The model couldn't run in this browser (${why}). Showing the sample photo with boxes from the same model in Python.`;
+      stage.classList.remove('busy');
+    };
+
+    const getWorker = () => {
+      if (worker) return worker;
+      worker = new Worker(new URL('../workers/detect.worker.ts', import.meta.url), { type: 'module' });
+      worker.onmessage = (e: MessageEvent<WorkerOut>) => {
+        const m = e.data;
+        if (m.type === 'progress') {
+          const pct = Math.min(100, Math.round((m.loaded / m.total) * 100));
+          status.textContent = `Downloading the model (${(m.total / 1e6).toFixed(1)} MB, only the first time): ${pct}%`;
+        } else if (m.type === 'result') {
+          stage.classList.remove('busy');
+          draw(m.width, m.height, m.detections);
+          stage.dataset.result = JSON.stringify({ width: m.width, height: m.height, detections: m.detections, backend: m.backend, timings: m.timings });
+          const t = m.timings;
+          const total = t.decode + t.preprocess + t.inference + t.postprocess;
+          status.textContent =
+            `Found ${m.detections.length} text region${m.detections.length === 1 ? '' : 's'} in ${fmt(total)} ` +
+            `(model ${fmt(t.inference)}, ${m.backend === 'webgpu' ? 'WebGPU' : 'WebAssembly'}).`;
+          window.dispatchEvent(new CustomEvent('demo', { detail: { id: 'research-bstd', action: 'used' } }));
+        } else if (m.type === 'error') {
+          fallback(m.message);
+        }
+      };
+      worker.onerror = (e) => fallback(e.message || 'worker error');
+      return worker;
+    };
+
+    const run = async (file: Blob, showUrl?: string) => {
+      if (!opened) {
+        opened = true;
+        window.dispatchEvent(new CustomEvent('demo', { detail: { id: 'research-bstd', action: 'open' } }));
+      }
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      objectUrl = showUrl ? null : URL.createObjectURL(file);
+      img.src = showUrl ?? objectUrl!;
+      overlay.replaceChildren();
+      delete stage.dataset.result;
+      stage.classList.add('busy');
+      status.textContent = 'Finding text…';
+      // ?ort=wasm forces WebAssembly (used by the parity test to cover both backends).
+      const prefer = new URLSearchParams(location.search).get('ort') === 'wasm' ? 'wasm' : undefined;
+      getWorker().postMessage({ type: 'detect', id: nextId++, file, prefer });
+    };
+
+    for (const input of root.querySelectorAll<HTMLInputElement>('[data-file]')) {
+      input.addEventListener('change', () => {
+        const f = input.files?.[0];
+        if (f) run(f);
+        input.value = '';
+      });
+    }
+    root.querySelector('[data-sample]')!.addEventListener('click', async () => {
+      try {
+        const blob = await (await fetch(sample.image)).blob();
+        run(blob, sample.image);
+      } catch (err) {
+        fallback(String(err));
+      }
+    });
+
+    // Tell the recommender when the visitor moves on after using the demo.
+    new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting && stage.dataset.result) {
+        window.dispatchEvent(new CustomEvent('demo', { detail: { id: 'research-bstd', action: 'close' } }));
+      }
+    }).observe(root);
+  }
+</script>
+
+<style>
+  .scan { margin: 0 0 1.5rem; }
+  .where { font-size: 0.72rem; color: var(--ok); margin-bottom: 0.5rem; }
+  .stage {
+    position: relative;
+    margin: 0 0 0.75rem;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg);
+    line-height: 0;
+  }
+  .stage img { display: block; width: 100%; height: auto; }
+  .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .stage :global(rect) { fill: none; vector-effect: non-scaling-stroke; }
+  .stage :global(.edge) { stroke: #221e1c; stroke-width: 4; }
+  .stage :global(.hit) { stroke: var(--detect); stroke-width: 2; }
+  .stage:global(.busy) img { opacity: 0.55; transition: opacity var(--dur) var(--ease); }
+  .controls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .pick:focus-within { outline: 3px solid var(--detect); outline-offset: 2px; box-shadow: 0 0 0 5px var(--detect-edge); }
+  .status { font-size: 0.95rem; min-height: 1.6em; }
+  .credit { font-size: 0.75rem; }
+</style>

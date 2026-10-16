@@ -1,6 +1,8 @@
 ---
 import FeedCard from './FeedCard.astro';
 import Results from './Results.astro';
+import ScanDemo from './ScanDemo.astro';
+import SmallText from './SmallText.astro';
 import { research as r } from '../lib/content';
 ---
 
@@ -18,6 +20,12 @@ import { research as r } from '../lib/content';
 
   <h4>Results</h4>
   {r.results.map((t) => <Results table={t} />)}
+
+  <h4>Try it: scan a photo with my model</h4>
+  <ScanDemo />
+
+  <h4>Why small text gets missed</h4>
+  <SmallText />
 
   <h4>Credit</h4>
   <p class="credit">

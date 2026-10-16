@@ -1,0 +1,100 @@
+---
+// Why small text gets missed: a photo's long side is resized to 1,280 px for
+// the detector, and YOLO11 predicts from grids with strides 8, 16 and 32.
+// A 20 px word in a 3,200 px photo becomes 8 px: one cell of the finest grid.
+const MODEL = 1280;
+const SCALE = 6; // drawing scale: 1 model pixel = 6 SVG units
+const initial = { word: 20, side: 3200, up: false };
+const px = (initial.word * MODEL) / initial.side;
+---
+
+<div class="small" data-small>
+  <div class="inputs">
+    <label>
+      Word height in the photo: <output class="mono" data-word-out>{initial.word} px</output>
+      <input type="range" min="8" max="80" step="1" value={initial.word} data-word />
+    </label>
+    <label>
+      Photo's long side
+      <select data-side>
+        <option value="1600">1,600 px</option>
+        <option value="3200" selected>3,200 px (typical BSTD test image)</option>
+        <option value="4000">4,000 px (phone camera)</option>
+      </select>
+    </label>
+    <label class="check">
+      <input type="checkbox" data-up />
+      Upscale 1.5× before detecting
+    </label>
+  </div>
+
+  <svg viewBox={`0 0 ${32 * SCALE} ${32 * SCALE}`} class="grid" aria-hidden="true">
+    {Array.from({ length: 4 }, (_, i) => (
+      <path d={`M${i * 8 * SCALE} 0V${32 * SCALE}M0 ${i * 8 * SCALE}H${32 * SCALE}`} class="cell8" />
+    ))}
+    <path d={`M${16 * SCALE} 0V${32 * SCALE}M0 ${16 * SCALE}H${32 * SCALE}`} class="cell16" />
+    <rect x="2" y="2" width={32 * SCALE - 4} height={32 * SCALE - 4} class="cell32" />
+    <rect x={4 * SCALE} y={4 * SCALE} width={24 * SCALE} height={px * SCALE} class="word" data-bar />
+  </svg>
+
+  <p class="readout" aria-live="polite" data-readout>
+    At the model's input this word is <strong class="mono">{px.toFixed(1)} px</strong> tall: about
+    {(px / 8).toFixed(1)} cells of the finest grid (stride 8), {(px / 16).toFixed(1)} of the next, {(px / 32).toFixed(2)} of the coarsest.
+  </p>
+  <p class="muted note">
+    The square shows one 32 px cell of the coarsest grid, split into the 16 px and 8 px cells of the finer ones. The
+    chartreuse bar is the word. Below about one fine cell, a detector has very little to see. In my audit, TextBPN++
+    found words under 20 px only 0.35 of the time, and upscaling small text raised its F1 from 0.47 to 0.59.
+  </p>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-small]');
+  if (root) {
+    const MODEL = 1280;
+    const SCALE = 6;
+    const word = root.querySelector<HTMLInputElement>('[data-word]')!;
+    const side = root.querySelector<HTMLSelectElement>('[data-side]')!;
+    const up = root.querySelector<HTMLInputElement>('[data-up]')!;
+    const out = root.querySelector<HTMLOutputElement>('[data-word-out]')!;
+    const bar = root.querySelector<SVGRectElement>('[data-bar]')!;
+    const readout = root.querySelector<HTMLElement>('[data-readout]')!;
+    const update = () => {
+      const h = Number(word.value);
+      const px = ((h * MODEL) / Number(side.value)) * (up.checked ? 1.5 : 1);
+      out.textContent = `${h} px`;
+      bar.setAttribute('height', String(Math.min(px, 28) * SCALE));
+      readout.innerHTML =
+        `At the model's input this word is <strong class="mono">${px.toFixed(1)} px</strong> tall: about ` +
+        `${(px / 8).toFixed(1)} cells of the finest grid (stride 8), ${(px / 16).toFixed(1)} of the next, ` +
+        `${(px / 32).toFixed(2)} of the coarsest.`;
+    };
+    for (const el of [word, side, up]) el.addEventListener('input', update);
+  }
+</script>
+
+<style>
+  .small { margin: 0 0 1.5rem; }
+  .inputs { display: grid; gap: 0.6rem; margin-bottom: 0.75rem; max-width: 30rem; }
+  .inputs label { display: grid; gap: 0.25rem; font-size: 0.95rem; }
+  .inputs .check { display: flex; align-items: center; gap: 0.5rem; }
+  input[type='range'] { width: 100%; accent-color: var(--accent); min-height: 32px; }
+  select {
+    font: inherit;
+    font-size: 0.95rem;
+    min-height: 40px;
+    padding: 0.3rem 0.5rem;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .check input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .grid { display: block; width: 100%; max-width: 12rem; height: auto; margin-bottom: 0.5rem; background: var(--bg); }
+  .cell8 { stroke: var(--muted); stroke-width: 1; opacity: 0.45; fill: none; }
+  .cell16 { stroke: var(--muted); stroke-width: 2; opacity: 0.8; fill: none; }
+  .cell32 { stroke: var(--text); stroke-width: 3; fill: none; }
+  .word { fill: var(--detect); stroke: #221e1c; stroke-width: 1.5; }
+  .readout { font-size: 0.95rem; }
+  .note { font-size: 0.85rem; }
+</style>
