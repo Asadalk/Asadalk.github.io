@@ -11,22 +11,21 @@ test('every signboard is a visible link to its section', async ({ page }) => {
   }
 });
 
-test('tapping a signboard zooms in and lands on the section', async ({ page }) => {
+test('tapping a signboard locks on and lands on the section', async ({ page }) => {
   await page.goto('/');
   await page.locator('svg.scene:visible a.shop[data-target="projects"]').click();
   await expect(page).toHaveURL(/#projects$/);
   await expect(page.locator('#projects-h')).toBeFocused();
   await expect(page.locator('#projects-h')).toBeInViewport();
-  await expect(page.locator('[data-frame]')).not.toHaveClass(/zooming/);
+  await expect(page.locator('svg.scene:visible')).not.toHaveClass(/locking/);
 });
 
-test('reduced motion skips the zoom', async ({ page }) => {
+test('reduced motion jumps straight to the section', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
-  const frame = page.locator('[data-frame]');
   await page.locator('svg.scene:visible a.shop[data-target="contact"]').click();
   await expect(page).toHaveURL(/#contact$/);
-  await expect(frame).not.toHaveClass(/zooming/);
+  await expect(page.locator('#contact-h')).toBeInViewport();
   // Boxes are fully drawn immediately.
   const offset = await page.locator('svg.scene:visible .box').first().evaluate((el) => getComputedStyle(el).strokeDashoffset);
   expect(parseFloat(offset)).toBe(0);

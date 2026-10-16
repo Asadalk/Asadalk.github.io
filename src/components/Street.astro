@@ -1,7 +1,8 @@
 ---
 // "Read the Street": the hero. Two layouts of the same street; CSS shows the
 // one that fits. Signboards are the main navigation and work as plain anchor
-// links without JavaScript. With JS, tapping one zooms into that shop first.
+// links without JavaScript. With JS, tapping one "locks on" to that sign (its
+// box thickens, the others dim) and the page scrolls smoothly to the section.
 import Scene from './Scene.astro';
 import { site } from '../lib/content';
 import { wideScene, tallScene } from '../lib/street';
@@ -16,18 +17,18 @@ const tall = tallScene(site.signboards);
     <Scene scene={wide} />
   </div>
 </nav>
-<p class="haze-note wrap mono">
-  The haze is illustrative for now. Once SmokeTrail has data it will follow Delhi's real daily PM2.5.
+<p class="legend wrap">
+  The boxes show what a text detector sees: what each sign is, and how sure it is (0–1). Illustrative here; the photo
+  demo runs my real model. The haze is illustrative too, until SmokeTrail has Delhi's real PM2.5.
 </p>
 
 <script>
   const street = document.querySelector<HTMLElement>('[data-street]');
-  const frame = street?.querySelector<HTMLElement>('[data-frame]');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-  if (street && frame) {
-    // Zoom into the tapped shop, then jump to its section. Reduced motion (or a
-    // modified click, e.g. open in new tab) skips straight to the link.
+  if (street) {
+    // Lock on to the tapped sign, then scroll to its section. A modified click
+    // (e.g. open in new tab) falls through to the plain link.
     street.addEventListener('click', (e) => {
       const shop = (e.target as Element).closest<SVGAElement>('a.shop');
       if (!shop || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
@@ -36,25 +37,22 @@ const tall = tallScene(site.signboards);
       e.preventDefault();
       window.dispatchEvent(new CustomEvent('signboard', { detail: shop.dataset.target }));
 
-      const land = () => {
-        target.scrollIntoView({ behavior: 'instant', block: 'start' });
+      const scene = shop.closest('svg');
+      scene?.classList.add('locking');
+      shop.classList.add('locked');
+      const go = () => {
+        target.scrollIntoView({ behavior: reduce.matches ? 'instant' : 'smooth', block: 'start' });
         history.pushState(null, '', `#${target.id}`);
         const heading = target.querySelector<HTMLElement>('h2') ?? target;
         heading.setAttribute('tabindex', '-1');
         heading.focus({ preventScroll: true });
-        frame.classList.remove('zooming');
-        frame.style.transform = '';
+        window.setTimeout(() => {
+          scene?.classList.remove('locking');
+          shop.classList.remove('locked');
+        }, 700);
       };
-      if (reduce.matches) return land();
-
-      const f = frame.getBoundingClientRect();
-      const s = shop.getBoundingClientRect();
-      const ox = s.left + s.width / 2 - f.left;
-      const oy = s.top + s.height / 2 - f.top;
-      frame.style.transformOrigin = `${ox}px ${oy}px`;
-      frame.classList.add('zooming');
-      frame.style.transform = 'scale(2.4)';
-      window.setTimeout(land, 360);
+      if (reduce.matches) go();
+      else window.setTimeout(go, 260);
     });
 
     // Gentle parallax on the far skyline and the wires, only while the hero is
@@ -86,13 +84,6 @@ const tall = tallScene(site.signboards);
     max-width: 75rem;
     margin: 0 auto;
     overflow: hidden;
-  }
-  .frame {
-    will-change: transform;
-  }
-  .frame:global(.zooming) {
-    transition: transform 360ms var(--ease), opacity 360ms var(--ease);
-    opacity: 0.6;
   }
   .street :global(.scene) {
     display: block;
@@ -135,6 +126,12 @@ const tall = tallScene(site.signboards);
   .street :global(.shop:hover .box-edge),
   .street :global(.shop:focus-visible .box-edge) { stroke-width: 8; }
 
+  /* Lock-on: the chosen sign's box thickens, everything else dims. */
+  .street :global(.shop) { transition: opacity 220ms var(--ease); }
+  .street :global(.locking .shop:not(.locked)) { opacity: 0.3; }
+  .street :global(.locked .box) { stroke-width: 6; transition: stroke-width 200ms var(--ease); }
+  .street :global(.locked .box-edge) { stroke-width: 10; transition: stroke-width 200ms var(--ease); }
+
   @keyframes draw { to { stroke-dashoffset: 0; } }
   @keyframes appear { to { opacity: 1; } }
 
@@ -144,12 +141,13 @@ const tall = tallScene(site.signboards);
     .street :global(.tag) { animation: none; opacity: 1; }
   }
 
-  .haze-note {
-    margin: 0.5rem auto 0;
-    font-size: 0.68rem;
+  .legend {
+    margin: 0.6rem auto 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
     color: var(--muted);
   }
   @media print {
-    .street, .haze-note { display: none; }
+    .street, .legend { display: none; }
   }
 </style>

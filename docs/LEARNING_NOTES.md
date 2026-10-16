@@ -29,6 +29,6 @@ Plain-language explanations of each piece of the site, so every part can be defe
 
 **Tilted board, upright box.** A YOLO-style detector outputs axis-aligned boxes. For a board rotated by θ, the upright box needs width `w·cosθ + h·sinθ` and height `w·sinθ + h·cosθ`, which is what `rotatedBounds` computes.
 
-**Zoom without breaking links.** The signboards are ordinary `<a href="#research">` links. JavaScript intercepts the click, scales the scene up around the tapped shop with a CSS transform, then scrolls to the section and moves keyboard focus there. If JS is off, or the visitor prefers reduced motion, the plain link behaviour takes over.
+**Lock-on without breaking links.** The signboards are ordinary `<a href="#research">` links. JavaScript intercepts the click, thickens the chosen box and dims the rest for about a quarter of a second, then smooth-scrolls to the section and moves keyboard focus there. If JS is off, the plain link behaviour takes over; under reduced motion the jump is instant.
 
 **Parallax.** The far skyline moves at 14% of scroll speed and the wires at 5%, applied with `transform` inside `requestAnimationFrame`. Transforms don't trigger layout, so there is no layout shift (CLS). The effect only runs while the hero is visible.
