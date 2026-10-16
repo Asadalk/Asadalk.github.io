@@ -298,8 +298,10 @@ export class Brain {
     this.cache = null;
     const liked = this.model.state.lastEngaged ? this.title(this.model.state.lastEngaged) : null;
     const text = liked ? `Liked ${liked}? → ${item.title}` : `Next for you → ${item.title}`;
-    const reason = `Suggested ${item.title} ${because(item, this.model)}; ${why}.`;
+    // The panel shows the plain reason; the gate's numbers stay in the full log.
+    const reason = `Suggested ${item.title} ${because(item, this.model)}.`;
     this.decide('suggest', reason);
+    this.decide('hold', `Gate passed for ${item.title}: ${why}.`, false);
     this.save();
     return { itemId: item.id, title: item.title, likedTitle: liked, text, reason };
   }

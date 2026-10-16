@@ -29,3 +29,32 @@
 - **The haze is a fixed level with an honest note under the scene.** It switches to real PM2.5 when SmokeTrail has data.
 - **The "Scan a photo with my model" button waits for Phase 3**, when the demo exists. Until then the first hero button is "See the research".
 - **Playwright e2e tests** (hero navigation, keyboard, reduced motion, no-JS, résumé) run in CI on a phone and a desktop profile.
+
+## 2026-10-16 · Phase 5: the adaptive brain
+
+- **Pure TypeScript core, one DOM file.** `src/brain/*` has no DOM, no timers and no `Math.random`; time, randomness, storage and vectors are injected, so whole visits are simulated in unit tests. `src/brain/dom.ts` is the only adapter, with one 1-second interval as its only timer.
+- **Embeddings are optional.** `dom.ts` loads `src/content/generated/embeddings.json` through `import.meta.glob`, so the build does not break while the file is missing. Embeddings are used only when every item has one of the same size; otherwise every item falls back to its 5 axes. A stored profile of the wrong size is dropped (silent cold start).
+- **α = 0.3** (top of the allowed 0.15–0.3). Simulated visitors over synthetic 384-d topic clusters (`tests/unit/brain/tuning.test.ts`), each signal's weight is `α × strength` (expand 1, demo 1.5, ask 1, dwell 0.6 × log-gain, signboard 0.5):
+
+  | α | best-next-item on topic (30% off-topic clicks) | same, 50% off-topic | signals to follow a change |
+  |---|---|---|---|
+  | 0.10 | 0.91 | 0.73 | 20 |
+  | 0.20 | 0.97 | 0.84 | 9 |
+  | 0.25 | 0.98 | 0.88 | 7 |
+  | **0.30** | **0.99** | **0.90** | **5** |
+  | 0.40 | 0.98 | 0.87 | 3 |
+  | 0.50 | 0.94 | 0.80 | 2 |
+
+  Accuracy peaks at 0.3 and falls beyond it as the profile starts chasing stray clicks.
+- **Drift is measured against recent interest, threshold 0.5 (not the spec's 0.25).** Comparing the profile now with the profile at the last suggestion could not tell noise from a real change: a steady visitor's profile wanders as far (95th percentile 0.34) as a switcher's does after 6 signals (5th percentile 0.21). Instead, drift is the cosine distance between the profile at the last suggestion and the strength-weighted direction of everything engaged with since, measured once at least 6 signals exist. With threshold 0.5: 0% of steady visitors (≈13% stray clicks, worst moment over 16 steps) trip it, and 93% of real switchers do within 8 signals. At 0.25, 30% of steady visitors would trip it.
+- **Quiet can be left once per session**, then the budget is 1. This keeps "the ignorer sees at most 2" true even for a visitor whose interest wanders, and "exactly one new suggestion after Quiet" for a real change.
+- **Similarity is calibrated per vector space**: `sim = clamp((cos − μ)/(1 − μ), 0, 1)`, μ = mean cosine between two items. Raw cosines of the 5 non-negative axes sit around 0.6–0.95 and of text embeddings around 0–0.6, so one threshold could not serve both.
+- **Confidence gate: sim ≥ 0.45 and at least 0.2 above the average on-screen alternative.** The card the visitor just finished is not an alternative (it is engaged), otherwise the gate would always compare against a perfect match. With the real content and no embeddings, finishing Cellular earns "OpsPilot" (sim 0.52); weaker matches stay silent.
+- **Thompson sampling**: Beta prior `a = 1 + 4·sim`, `b = 1 + 4·(1 − sim)`, updated by shows and engagements; blend `0.7·sim + 0.3·sample`. Seen-and-ignored items decay ×0.85 per show (max 3), engaged items go to the bottom, a dismissed topic is ×0.5 for the session. At cold start the curated order is used with no sampling. 100 seeded runs: each opener chip puts the right project first ≥ 90% of the time.
+- **Stability rule in practice.** Only project cards whose top is below the bottom of the screen are reordered (never one holding focus); FLIP settle 300 ms ease-out, none under reduced motion. The headline changes at most once per session and only while the hero is off screen, with a viewport anchor check. Suggestions appear in a reserved slot at the end of Research and Projects (the space always exists), so showing or dismissing one moves nothing. The opener line freezes its height before swapping to its "Noted" line, and is revealed by an inline script during parsing (no shift, and no-JS visitors never see it).
+- **"Deep readers get result tables expanded"** is implemented as: once per session, after ≥ 2 cards read ≥ 20 s (or 90 s total), the next unopened project below the fold is opened, since the result tables live inside the cards.
+- **The mini-bar's fourth item is a link to `/privacy/`** that JavaScript upgrades to open the panel. Without JS, and on other pages, it still works. "Résumé view" became "Résumé" so four items fit on one line at 390 px.
+- **Dwell counts only for open cards** that are ≥ 50% visible (or fill ≥ 50% of the screen, for tall cards), with the tab visible and the visitor not idle.
+- **Session vs long-term storage.** The visitor model and decision log live in `localStorage` (`brain:v1`); pacing state and once-per-session flags in `sessionStorage` (`brain:v1:session`). Any storage error means a silent cold start. Reset clears both plus the opener flag.
+- **Test hook `?brain-test=1`** divides every timer by 10, seeds the random numbers and exposes `window.__brain` for Playwright.
+- **No new dependencies.**
