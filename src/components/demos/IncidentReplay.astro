@@ -1,0 +1,28 @@
+---
+// Incident replay. Without JS: the default run, every step in order.
+import DemoShell from './DemoShell.astro';
+import { buildReplay } from '../../lib/trace';
+import { renderAllSteps, renderMeta } from '../../lib/replay-view';
+import { TRACES } from '../../lib/traces';
+
+// The first run in the picker is the static default.
+const replay = buildReplay(await TRACES[0].load());
+const others = TRACES.filter((t) => t.slug !== replay.slug);
+---
+
+<DemoShell id="opspilot-replay" item="opspilot" label="Replay a real incident">
+  <div class="replay replay--static">
+    <p class="replay-title">{replay.title}</p>
+    <p class="replay-meta muted" set:html={renderMeta(replay)} />
+    <Fragment set:html={renderAllSteps(replay)} />
+    <p class="hint muted">
+      With JavaScript on, this becomes a step-by-step replay, and two more runs are available:
+      {others.map((t, k) => <>{k > 0 && '; '}{t.label}</>)}.
+    </p>
+  </div>
+</DemoShell>
+
+<script>
+  import { lazyDemo } from '../../lib/demo';
+  lazyDemo('opspilot-replay', () => import('../../demos/replay'));
+</script>

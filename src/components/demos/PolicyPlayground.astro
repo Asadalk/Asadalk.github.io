@@ -1,0 +1,22 @@
+---
+// Policy playground. Without JS: the full rule table and the risk of each action.
+import DemoShell from './DemoShell.astro';
+import { renderActionRisks, renderMatrix } from '../../lib/policy-view';
+---
+
+<DemoShell id="opspilot-policy" item="opspilot" label="Policy playground">
+  <div class="playground playground--static">
+    <p class="muted">
+      The same rules as OpsPilot's server-side policy engine: role × risk × environment. With JavaScript on, you can pick a
+      role, an action and an environment and see the decision.
+    </p>
+    <Fragment set:html={renderMatrix()} />
+    <p class="ev-h">Risk by action</p>
+    <Fragment set:html={renderActionRisks()} />
+  </div>
+</DemoShell>
+
+<script>
+  import { lazyDemo } from '../../lib/demo';
+  lazyDemo('opspilot-policy', () => import('../../demos/policy'));
+</script>
