@@ -22,8 +22,8 @@ const examples = queries.map((q) => q.resume_text);
   <p id="sh-status" class="sh-status muted" aria-live="polite"></p>
   <div class="sh-out" data-sh-out hidden>
     <p class="sh-legend mono muted">
-      <span class="key key--sem" aria-hidden="true"></span>0.7 × meaning
-      <span class="key key--skill" aria-hidden="true"></span>0.3 × skill overlap
+      <span class="sh-key sh-key--sem" aria-hidden="true"></span>0.7 × meaning
+      <span class="sh-key sh-key--skill" aria-hidden="true"></span>0.3 × skill overlap
     </p>
     <ol class="sh-list" data-sh-list></ol>
   </div>
@@ -73,7 +73,9 @@ const examples = queries.map((q) => q.resume_text);
           li.dataset.jobId = r.jobId;
           li.dataset.final = String(r.finalScore);
           const head = el('p', 'sh-head');
-          head.append(el('strong', undefined, r.title), ` · ${r.company}`, el('span', 'sh-score mono', fmt(r.finalScore)));
+          const name = el('span');
+          name.append(el('strong', undefined, r.title), ` · ${r.company}`);
+          head.append(name, el('span', 'sh-score mono', fmt(r.finalScore)));
           const sem = 0.7 * r.semanticScore;
           const skill = 0.3 * r.skillOverlapScore;
           const bar = el('div', 'sh-bar');
@@ -82,9 +84,9 @@ const examples = queries.map((q) => q.resume_text);
             'aria-label',
             `Score ${fmt(r.finalScore)}: ${fmt(sem)} from meaning (similarity ${fmt(r.semanticScore)}), ${fmt(skill)} from skills (${Math.round(r.skillOverlapScore * 100)}% of the job's skills)`,
           );
-          const a = el('span', 'seg seg--sem');
+          const a = el('span', 'sh-seg sh-seg--sem');
           a.style.width = `${sem * 100}%`;
-          const b = el('span', 'seg seg--skill');
+          const b = el('span', 'sh-seg sh-seg--skill');
           b.style.width = `${skill * 100}%`;
           bar.append(a, b);
           const skills = el('p', 'sh-skills');
@@ -135,7 +137,7 @@ const examples = queries.map((q) => q.resume_text);
   }
 </script>
 
-<style>
+<style is:global>
   .sh h4 { display: flex; align-items: center; gap: 0.6rem; }
   .sh h4 .det-tag { text-transform: none; letter-spacing: 0; }
   .sh-intro { font-size: 0.95rem; }
@@ -156,13 +158,13 @@ const examples = queries.map((q) => q.resume_text);
   .sh-actions .button[disabled] { opacity: 0.6; cursor: progress; }
   .sh-status { font-size: 0.85rem; min-height: 1.4em; margin: 0.4rem 0; }
   .sh-legend { font-size: 0.7rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.5rem; }
-  .key { display: inline-block; width: 0.8rem; height: 0.55rem; border-radius: 2px; }
-  .key--skill { margin-left: 0.5rem; }
-  .key--sem, .seg--sem { background: var(--accent); }
-  .key--skill, .seg--skill { background: var(--ok); }
+  .sh-key { display: inline-block; width: 0.8rem; height: 0.55rem; border-radius: 2px; }
+  .sh-key--skill { margin-left: 0.5rem; }
+  .sh-key--sem, .sh-seg--sem { background: var(--accent); }
+  .sh-key--skill, .sh-seg--skill { background: var(--ok); }
   .sh-list { padding-left: 1.4rem; margin: 0.5rem 0 0; }
   .sh-item { margin-bottom: 0.9rem; }
-  .sh-head { margin: 0 0 0.3rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.3rem; }
+  .sh-head { margin: 0 0 0.3rem; display: flex; align-items: baseline; gap: 0.75rem; line-height: 1.4; }
   .sh-score { margin-left: auto; font-size: 0.78rem; }
   .sh-bar {
     display: flex;
@@ -171,6 +173,6 @@ const examples = queries.map((q) => q.resume_text);
     border-radius: 2px;
     overflow: hidden;
   }
-  .seg { display: block; height: 100%; }
+  .sh-seg { display: block; height: 100%; }
   .sh-skills { font-size: 0.85rem; margin: 0.3rem 0 0; }
 </style>

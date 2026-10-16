@@ -124,7 +124,7 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
   }
 </script>
 
-<style>
+<style is:global>
   .ask { padding-top: 2.5rem; max-width: var(--measure); }
   .ask-label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 0.4rem; }
   .ask-input {
@@ -141,7 +141,6 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
   .ask-status { font-size: 0.85rem; margin: 0.4rem 0 0; }
   .ask-results { margin: 0.6rem 0 0; padding-left: 1.4rem; }
   .ask-results:empty { display: none; }
-  .ask-results li { margin-bottom: 0.35rem; }
-  .ask-results a { margin-right: 0.5rem; }
-  .ask-why { font-size: 0.85rem; }
+  .ask-results li { margin-bottom: 0.45rem; line-height: 1.4; }
+  .ask-why { display: block; font-size: 0.82rem; }
 </style>
