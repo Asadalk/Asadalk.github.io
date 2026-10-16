@@ -1,0 +1,10 @@
+[
+  {"query_id":"q1_nlp_search","resume_text":"Data scientist with Python, NLP, machine learning, semantic search, information retrieval and SQL experience. Built text classification and ranking evaluation pipelines.","relevant_job_ids":["job-001","job-003","job-012","job-021","job-023"]},
+  {"query_id":"q2_recommendations","resume_text":"Machine learning engineer using Python and PyTorch to build recommendation systems and ranking models. Experience with SQL, AWS, model deployment and experiments.","relevant_job_ids":["job-002","job-015","job-020","job-006"]},
+  {"query_id":"q3_backend_python","resume_text":"Backend developer with Python, FastAPI, PostgreSQL, SQL, Docker and AWS. Builds tested REST APIs and production services.","relevant_job_ids":["job-007","job-022","job-021","job-008"]},
+  {"query_id":"q4_frontend","resume_text":"Frontend engineer experienced in React, TypeScript, JavaScript, CSS and accessible web application development.","relevant_job_ids":["job-009","job-010","job-024"]},
+  {"query_id":"q5_vision","resume_text":"Computer vision engineer using Python, PyTorch and deep learning for image classification and object detection.","relevant_job_ids":["job-005","job-019","job-015"]},
+  {"query_id":"q6_data_engineering","resume_text":"Data engineer building data pipelines with Python, SQL, AWS, Docker and cloud warehouse tools.","relevant_job_ids":["job-008","job-018","job-011","job-013"]},
+  {"query_id":"q7_llm_rag","resume_text":"AI engineer building LLM and RAG applications using Python, NLP, FastAPI, embeddings and vector search.","relevant_job_ids":["job-004","job-022","job-021","job-001"]},
+  {"query_id":"q8_cloud","resume_text":"Cloud platform engineer working with AWS, Kubernetes, Docker, Linux, Terraform and deployment automation.","relevant_job_ids":["job-016","job-011","job-007"]}
+]
