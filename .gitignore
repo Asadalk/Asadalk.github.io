@@ -10,3 +10,11 @@ playwright-report/
 # Owner-only planning docs (kept local, not published)
 PORTFOLIO_SPEC.md
 docs/phase0-checkpoint.md
+
+# Copied from node_modules by scripts/copy-ort-embed.mjs (predev/prebuild)
+public/ort-embed/
+
+# Full-precision and 8-bit model weights: build-time only, never deployed
+# (scripts/download-model.mjs). The browser uses the committed fp16 file.
+public/models/all-MiniLM-L6-v2/onnx/model.onnx
+public/models/all-MiniLM-L6-v2/onnx/model_quantized.onnx

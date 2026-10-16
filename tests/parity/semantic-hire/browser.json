@@ -1,0 +1,867 @@
+{
+ "side": "browser",
+ "model": "Xenova/all-MiniLM-L6-v2",
+ "dtype": "fp16",
+ "jobVectorsDtype": "fp32",
+ "transformersJs": "4.3.0",
+ "queries": [
+  {
+   "query_id": "q1_nlp_search",
+   "top5": [
+    {
+     "job_id": "job-001",
+     "semantic": 0.8164,
+     "skill": 0.8333,
+     "final": 0.8215,
+     "matched": [
+      "Information Retrieval",
+      "Machine Learning",
+      "NLP",
+      "Python",
+      "SQL"
+     ],
+     "missing": [
+      "Docker"
+     ]
+    },
+    {
+     "job_id": "job-023",
+     "semantic": 0.7505,
+     "skill": 0.8,
+     "final": 0.7654,
+     "matched": [
+      "Information Retrieval",
+      "Machine Learning",
+      "NLP",
+      "Python"
+     ],
+     "missing": [
+      "Statistics"
+     ]
+    },
+    {
+     "job_id": "job-003",
+     "semantic": 0.6613,
+     "skill": 0.8333,
+     "final": 0.7129,
+     "matched": [
+      "Information Retrieval",
+      "Machine Learning",
+      "NLP",
+      "Python",
+      "SQL"
+     ],
+     "missing": [
+      "FAISS"
+     ]
+    },
+    {
+     "job_id": "job-012",
+     "semantic": 0.66,
+     "skill": 0.6,
+     "final": 0.642,
+     "matched": [
+      "Information Retrieval",
+      "NLP",
+      "Python"
+     ],
+     "missing": [
+      "Deep Learning",
+      "PyTorch"
+     ]
+    },
+    {
+     "job_id": "job-020",
+     "semantic": 0.6598,
+     "skill": 0.6,
+     "final": 0.6419,
+     "matched": [
+      "Machine Learning",
+      "Python",
+      "SQL"
+     ],
+     "missing": [
+      "Data Analysis",
+      "Statistics"
+     ]
+    }
+   ],
+   "cosines": {
+    "job-001": 0.816423,
+    "job-002": 0.592474,
+    "job-003": 0.661333,
+    "job-004": 0.484334,
+    "job-005": 0.416645,
+    "job-006": 0.642048,
+    "job-007": 0.374121,
+    "job-008": 0.554699,
+    "job-009": 0.302627,
+    "job-010": 0.289057,
+    "job-011": 0.416918,
+    "job-012": 0.659973,
+    "job-013": 0.456612,
+    "job-014": 0.16716,
+    "job-015": 0.591785,
+    "job-016": 0.304569,
+    "job-017": 0.526213,
+    "job-018": 0.530056,
+    "job-019": 0.497303,
+    "job-020": 0.659812,
+    "job-021": 0.575605,
+    "job-022": 0.355805,
+    "job-023": 0.750539,
+    "job-024": 0.29604
+   }
+  },
+  {
+   "query_id": "q2_recommendations",
+   "top5": [
+    {
+     "job_id": "job-002",
+     "semantic": 0.7411,
+     "skill": 0.8333,
+     "final": 0.7688,
+     "matched": [
+      "AWS",
+      "Machine Learning",
+      "Python",
+      "PyTorch",
+      "SQL"
+     ],
+     "missing": [
+      "Docker"
+     ]
+    },
+    {
+     "job_id": "job-015",
+     "semantic": 0.7351,
+     "skill": 0.8,
+     "final": 0.7546,
+     "matched": [
+      "Machine Learning",
+      "Python",
+      "PyTorch",
+      "SQL"
+     ],
+     "missing": [
+      "Deep Learning"
+     ]
+    },
+    {
+     "job_id": "job-006",
+     "semantic": 0.5317,
+     "skill": 0.8,
+     "final": 0.6122,
+     "matched": [
+      "AWS",
+      "Machine Learning",
+      "Python",
+      "SQL"
+     ],
+     "missing": [
+      "Statistics"
+     ]
+    },
+    {
+     "job_id": "job-001",
+     "semantic": 0.5606,
+     "skill": 0.5,
+     "final": 0.5424,
+     "matched": [
+      "Machine Learning",
+      "Python",
+      "SQL"
+     ],
+     "missing": [
+      "Docker",
+      "Information Retrieval",
+      "NLP"
+     ]
+    },
+    {
+     "job_id": "job-003",
+     "semantic": 0.5361,
+     "skill": 0.5,
+     "final": 0.5253,
+     "matched": [
+      "Machine Learning",
+      "Python",
+      "SQL"
+     ],
+     "missing": [
+      "FAISS",
+      "Information Retrieval",
+      "NLP"
+     ]
+    }
+   ],
+   "cosines": {
+    "job-001": 0.560641,
+    "job-002": 0.741104,
+    "job-003": 0.536138,
+    "job-004": 0.419875,
+    "job-005": 0.403197,
+    "job-006": 0.531665,
+    "job-007": 0.420958,
+    "job-008": 0.404179,
+    "job-009": 0.262068,
+    "job-010": 0.238743,
+    "job-011": 0.441803,
+    "job-012": 0.492461,
+    "job-013": 0.258733,
+    "job-014": 0.208637,
+    "job-015": 0.735096,
+    "job-016": 0.281544,
+    "job-017": 0.366403,
+    "job-018": 0.411667,
+    "job-019": 0.451094,
+    "job-020": 0.527399,
+    "job-021": 0.456942,
+    "job-022": 0.330199,
+    "job-023": 0.476667,
+    "job-024": 0.292177
+   }
+  },
+  {
+   "query_id": "q3_backend_python",
+   "top5": [
+    {
+     "job_id": "job-007",
+     "semantic": 0.8922,
+     "skill": 0.8333,
+     "final": 0.8746,
+     "matched": [
+      "Docker",
+      "FastAPI",
+      "PostgreSQL",
+      "Python",
+      "SQL"
+     ],
+     "missing": [
+      "AWS"
+     ]
+    },
+    {
+     "job_id": "job-022",
+     "semantic": 0.6275,
+     "skill": 0.6,
+     "final": 0.6192,
+     "matched": [
+      "Docker",
+      "FastAPI",
+      "Python"
+     ],
+     "missing": [
+      "LLM",
+      "RAG"
+     ]
+    },
+    {
+     "job_id": "job-014",
+     "semantic": 0.6486,
+     "skill": 0.3333,
+     "final": 0.554,
+     "matched": [
+      "Docker",
+      "PostgreSQL"
+     ],
+     "missing": [
+      "Java",
+      "Kubernetes",
+      "Spring",
+      "Spring Boot"
+     ]
+    },
+    {
+     "job_id": "job-010",
+     "semantic": 0.6147,
+     "skill": 0.3333,
+     "final": 0.5303,
+     "matched": [
+      "PostgreSQL",
+      "SQL"
+     ],
+     "missing": [
+      "JavaScript",
+      "Node.js",
+      "React",
+      "TypeScript"
+     ]
+    },
+    {
+     "job_id": "job-024",
+     "semantic": 0.6352,
+     "skill": 0,
+     "final": 0.4447,
+     "matched": [],
+     "missing": [
+      "JavaScript",
+      "MongoDB",
+      "Node.js",
+      "React",
+      "TypeScript"
+     ]
+    }
+   ],
+   "cosines": {
+    "job-001": 0.42079,
+    "job-002": 0.525441,
+    "job-003": 0.316123,
+    "job-004": 0.479127,
+    "job-005": 0.30445,
+    "job-006": 0.438966,
+    "job-007": 0.892233,
+    "job-008": 0.587631,
+    "job-009": 0.479532,
+    "job-010": 0.614651,
+    "job-011": 0.576207,
+    "job-012": 0.307065,
+    "job-013": 0.242072,
+    "job-014": 0.648603,
+    "job-015": 0.35387,
+    "job-016": 0.534153,
+    "job-017": 0.534069,
+    "job-018": 0.423556,
+    "job-019": 0.266895,
+    "job-020": 0.367225,
+    "job-021": 0.415694,
+    "job-022": 0.627483,
+    "job-023": 0.252071,
+    "job-024": 0.635214
+   }
+  },
+  {
+   "query_id": "q4_frontend",
+   "top5": [
+    {
+     "job_id": "job-009",
+     "semantic": 0.8878,
+     "skill": 0.8,
+     "final": 0.8614,
+     "matched": [
+      "CSS",
+      "JavaScript",
+      "React",
+      "TypeScript"
+     ],
+     "missing": [
+      "HTML"
+     ]
+    },
+    {
+     "job_id": "job-024",
+     "semantic": 0.7748,
+     "skill": 0.6,
+     "final": 0.7223,
+     "matched": [
+      "JavaScript",
+      "React",
+      "TypeScript"
+     ],
+     "missing": [
+      "MongoDB",
+      "Node.js"
+     ]
+    },
+    {
+     "job_id": "job-010",
+     "semantic": 0.7195,
+     "skill": 0.5,
+     "final": 0.6537,
+     "matched": [
+      "JavaScript",
+      "React",
+      "TypeScript"
+     ],
+     "missing": [
+      "Node.js",
+      "PostgreSQL",
+      "SQL"
+     ]
+    },
+    {
+     "job_id": "job-017",
+     "semantic": 0.433,
+     "skill": 0,
+     "final": 0.3031,
+     "matched": [],
+     "missing": [
+      "Database Design",
+      "PostgreSQL",
+      "Python",
+      "SQL"
+     ]
+    },
+    {
+     "job_id": "job-004",
+     "semantic": 0.4247,
+     "skill": 0,
+     "final": 0.2973,
+     "matched": [],
+     "missing": [
+      "Docker",
+      "FastAPI",
+      "LLM",
+      "NLP",
+      "Python",
+      "RAG"
+     ]
+    }
+   ],
+   "cosines": {
+    "job-001": 0.366306,
+    "job-002": 0.387572,
+    "job-003": 0.368376,
+    "job-004": 0.424673,
+    "job-005": 0.334665,
+    "job-006": 0.330574,
+    "job-007": 0.405489,
+    "job-008": 0.394094,
+    "job-009": 0.887761,
+    "job-010": 0.719538,
+    "job-011": 0.370121,
+    "job-012": 0.310581,
+    "job-013": 0.265914,
+    "job-014": 0.407782,
+    "job-015": 0.298851,
+    "job-016": 0.413915,
+    "job-017": 0.432952,
+    "job-018": 0.407789,
+    "job-019": 0.347756,
+    "job-020": 0.372479,
+    "job-021": 0.333799,
+    "job-022": 0.387762,
+    "job-023": 0.253251,
+    "job-024": 0.774762
+   }
+  },
+  {
+   "query_id": "q5_vision",
+   "top5": [
+    {
+     "job_id": "job-005",
+     "semantic": 0.7721,
+     "skill": 0.8,
+     "final": 0.7805,
+     "matched": [
+      "Computer Vision",
+      "Deep Learning",
+      "Python",
+      "PyTorch"
+     ],
+     "missing": [
+      "Docker"
+     ]
+    },
+    {
+     "job_id": "job-019",
+     "semantic": 0.6359,
+     "skill": 0.6,
+     "final": 0.6251,
+     "matched": [
+      "Deep Learning",
+      "Python",
+      "PyTorch"
+     ],
+     "missing": [
+      "Machine Learning",
+      "NLP"
+     ]
+    },
+    {
+     "job_id": "job-015",
+     "semantic": 0.4566,
+     "skill": 0.6,
+     "final": 0.4996,
+     "matched": [
+      "Deep Learning",
+      "Python",
+      "PyTorch"
+     ],
+     "missing": [
+      "Machine Learning",
+      "SQL"
+     ]
+    },
+    {
+     "job_id": "job-012",
+     "semantic": 0.389,
+     "skill": 0.6,
+     "final": 0.4523,
+     "matched": [
+      "Deep Learning",
+      "Python",
+      "PyTorch"
+     ],
+     "missing": [
+      "Information Retrieval",
+      "NLP"
+     ]
+    },
+    {
+     "job_id": "job-002",
+     "semantic": 0.4516,
+     "skill": 0.3333,
+     "final": 0.4162,
+     "matched": [
+      "Python",
+      "PyTorch"
+     ],
+     "missing": [
+      "AWS",
+      "Docker",
+      "Machine Learning",
+      "SQL"
+     ]
+    }
+   ],
+   "cosines": {
+    "job-001": 0.387867,
+    "job-002": 0.451647,
+    "job-003": 0.353792,
+    "job-004": 0.25896,
+    "job-005": 0.772097,
+    "job-006": 0.314863,
+    "job-007": 0.157087,
+    "job-008": 0.285427,
+    "job-009": 0.174473,
+    "job-010": 0.036749,
+    "job-011": 0.326899,
+    "job-012": 0.388991,
+    "job-013": 0.154602,
+    "job-014": 0.020943,
+    "job-015": 0.456621,
+    "job-016": 0.202695,
+    "job-017": 0.227674,
+    "job-018": 0.223497,
+    "job-019": 0.63592,
+    "job-020": 0.355569,
+    "job-021": 0.31715,
+    "job-022": 0.262235,
+    "job-023": 0.277729,
+    "job-024": 0.089376
+   }
+  },
+  {
+   "query_id": "q6_data_engineering",
+   "top5": [
+    {
+     "job_id": "job-008",
+     "semantic": 0.7706,
+     "skill": 0.8,
+     "final": 0.7795,
+     "matched": [
+      "AWS",
+      "Docker",
+      "Python",
+      "SQL"
+     ],
+     "missing": [
+      "Data Engineering"
+     ]
+    },
+    {
+     "job_id": "job-007",
+     "semantic": 0.6629,
+     "skill": 0.6667,
+     "final": 0.664,
+     "matched": [
+      "AWS",
+      "Docker",
+      "Python",
+      "SQL"
+     ],
+     "missing": [
+      "FastAPI",
+      "PostgreSQL"
+     ]
+    },
+    {
+     "job_id": "job-011",
+     "semantic": 0.6032,
+     "skill": 0.6,
+     "final": 0.6022,
+     "matched": [
+      "AWS",
+      "Docker",
+      "Python"
+     ],
+     "missing": [
+      "Kubernetes",
+      "Machine Learning"
+     ]
+    },
+    {
+     "job_id": "job-006",
+     "semantic": 0.5557,
+     "skill": 0.6,
+     "final": 0.569,
+     "matched": [
+      "AWS",
+      "Python",
+      "SQL"
+     ],
+     "missing": [
+      "Machine Learning",
+      "Statistics"
+     ]
+    },
+    {
+     "job_id": "job-018",
+     "semantic": 0.58,
+     "skill": 0.5,
+     "final": 0.556,
+     "matched": [
+      "Python",
+      "SQL"
+     ],
+     "missing": [
+      "Data Analysis",
+      "Statistics"
+     ]
+    }
+   ],
+   "cosines": {
+    "job-001": 0.534203,
+    "job-002": 0.511996,
+    "job-003": 0.322107,
+    "job-004": 0.470767,
+    "job-005": 0.384907,
+    "job-006": 0.555714,
+    "job-007": 0.662899,
+    "job-008": 0.770648,
+    "job-009": 0.242061,
+    "job-010": 0.367955,
+    "job-011": 0.603151,
+    "job-012": 0.362044,
+    "job-013": 0.381095,
+    "job-014": 0.378707,
+    "job-015": 0.357376,
+    "job-016": 0.524812,
+    "job-017": 0.517368,
+    "job-018": 0.580008,
+    "job-019": 0.318237,
+    "job-020": 0.469424,
+    "job-021": 0.438902,
+    "job-022": 0.482344,
+    "job-023": 0.295675,
+    "job-024": 0.367714
+   }
+  },
+  {
+   "query_id": "q7_llm_rag",
+   "top5": [
+    {
+     "job_id": "job-004",
+     "semantic": 0.6608,
+     "skill": 0.8333,
+     "final": 0.7125,
+     "matched": [
+      "FastAPI",
+      "LLM",
+      "NLP",
+      "Python",
+      "RAG"
+     ],
+     "missing": [
+      "Docker"
+     ]
+    },
+    {
+     "job_id": "job-022",
+     "semantic": 0.6037,
+     "skill": 0.8,
+     "final": 0.6626,
+     "matched": [
+      "FastAPI",
+      "LLM",
+      "Python",
+      "RAG"
+     ],
+     "missing": [
+      "Docker"
+     ]
+    },
+    {
+     "job_id": "job-021",
+     "semantic": 0.629,
+     "skill": 0.6,
+     "final": 0.6203,
+     "matched": [
+      "FastAPI",
+      "NLP",
+      "Python"
+     ],
+     "missing": [
+      "FAISS",
+      "Information Retrieval"
+     ]
+    },
+    {
+     "job_id": "job-012",
+     "semantic": 0.5231,
+     "skill": 0.4,
+     "final": 0.4862,
+     "matched": [
+      "NLP",
+      "Python"
+     ],
+     "missing": [
+      "Deep Learning",
+      "Information Retrieval",
+      "PyTorch"
+     ]
+    },
+    {
+     "job_id": "job-001",
+     "semantic": 0.4826,
+     "skill": 0.3333,
+     "final": 0.4378,
+     "matched": [
+      "NLP",
+      "Python"
+     ],
+     "missing": [
+      "Docker",
+      "Information Retrieval",
+      "Machine Learning",
+      "SQL"
+     ]
+    }
+   ],
+   "cosines": {
+    "job-001": 0.48258,
+    "job-002": 0.40934,
+    "job-003": 0.475056,
+    "job-004": 0.660752,
+    "job-005": 0.384479,
+    "job-006": 0.265165,
+    "job-007": 0.34224,
+    "job-008": 0.257259,
+    "job-009": 0.33646,
+    "job-010": 0.279547,
+    "job-011": 0.338661,
+    "job-012": 0.523128,
+    "job-013": 0.219188,
+    "job-014": 0.243047,
+    "job-015": 0.41988,
+    "job-016": 0.228486,
+    "job-017": 0.238624,
+    "job-018": 0.271595,
+    "job-019": 0.407566,
+    "job-020": 0.313861,
+    "job-021": 0.628951,
+    "job-022": 0.603739,
+    "job-023": 0.448536,
+    "job-024": 0.301609
+   }
+  },
+  {
+   "query_id": "q8_cloud",
+   "top5": [
+    {
+     "job_id": "job-016",
+     "semantic": 0.9204,
+     "skill": 1,
+     "final": 0.9443,
+     "matched": [
+      "AWS",
+      "Docker",
+      "Kubernetes",
+      "Linux",
+      "Terraform"
+     ],
+     "missing": []
+    },
+    {
+     "job_id": "job-011",
+     "semantic": 0.7487,
+     "skill": 0.6,
+     "final": 0.7041,
+     "matched": [
+      "AWS",
+      "Docker",
+      "Kubernetes"
+     ],
+     "missing": [
+      "Machine Learning",
+      "Python"
+     ]
+    },
+    {
+     "job_id": "job-008",
+     "semantic": 0.6567,
+     "skill": 0.4,
+     "final": 0.5797,
+     "matched": [
+      "AWS",
+      "Docker"
+     ],
+     "missing": [
+      "Data Engineering",
+      "Python",
+      "SQL"
+     ]
+    },
+    {
+     "job_id": "job-007",
+     "semantic": 0.584,
+     "skill": 0.3333,
+     "final": 0.5088,
+     "matched": [
+      "AWS",
+      "Docker"
+     ],
+     "missing": [
+      "FastAPI",
+      "PostgreSQL",
+      "Python",
+      "SQL"
+     ]
+    },
+    {
+     "job_id": "job-002",
+     "semantic": 0.4998,
+     "skill": 0.3333,
+     "final": 0.4499,
+     "matched": [
+      "AWS",
+      "Docker"
+     ],
+     "missing": [
+      "Machine Learning",
+      "Python",
+      "PyTorch",
+      "SQL"
+     ]
+    }
+   ],
+   "cosines": {
+    "job-001": 0.344299,
+    "job-002": 0.499789,
+    "job-003": 0.28354,
+    "job-004": 0.394894,
+    "job-005": 0.384709,
+    "job-006": 0.378344,
+    "job-007": 0.583995,
+    "job-008": 0.656679,
+    "job-009": 0.348038,
+    "job-010": 0.373563,
+    "job-011": 0.748682,
+    "job-012": 0.234809,
+    "job-013": 0.226538,
+    "job-014": 0.496956,
+    "job-015": 0.295372,
+    "job-016": 0.920364,
+    "job-017": 0.348981,
+    "job-018": 0.376271,
+    "job-019": 0.267614,
+    "job-020": 0.282179,
+    "job-021": 0.323867,
+    "job-022": 0.497988,
+    "job-023": 0.150799,
+    "job-024": 0.441931
+   }
+  }
+ ]
+}

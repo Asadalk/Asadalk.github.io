@@ -1,0 +1,147 @@
+---
+// "Ask about me": semantic search over every content item, on the visitor's
+// device. Progressive enhancement: hidden until its script runs, so the page
+// without JavaScript is unchanged.
+import { buildDocs } from '../lib/search';
+import { archive, projects, research, site, skillGroups } from '../lib/content';
+
+// Only what the results list needs; the vectors arrive lazily from
+// src/content/generated/embeddings.json when someone searches.
+const docs = buildDocs({ research, projects, site, skillGroups, archive }).map(({ id, type, title, href, text }) => ({ id, type, title, href, text }));
+---
+
+<div class="ask" role="search" aria-label="Ask about me" data-ask hidden>
+  <label class="ask-label mono" for="ask-q">Ask about me</label>
+  <input
+    id="ask-q"
+    class="ask-input"
+    type="search"
+    autocomplete="off"
+    spellcheck="false"
+    enterkeyhint="search"
+    placeholder="e.g. object detection research"
+    aria-describedby="ask-status"
+  />
+  <p id="ask-status" class="ask-status muted" aria-live="polite">Searches by meaning, on your device. Nothing you type leaves this page.</p>
+  <ol class="ask-results" data-ask-results></ol>
+  <script type="application/json" data-ask-docs set:html={JSON.stringify(docs)} />
+</div>
+
+<script>
+  import { embed, onModelState, warm, warmWhenIdle } from '../lib/embed-client';
+  import { topMatches, whyLine, type Doc } from '../lib/search';
+
+  const root = document.querySelector<HTMLElement>('[data-ask]');
+  if (root) {
+    const input = root.querySelector<HTMLInputElement>('#ask-q')!;
+    const status = root.querySelector<HTMLElement>('#ask-status')!;
+    const list = root.querySelector<HTMLOListElement>('[data-ask-results]')!;
+    const docs: Doc[] = JSON.parse(root.querySelector('[data-ask-docs]')!.textContent || '[]');
+    const byId = new Map(docs.map((d) => [d.id, d]));
+    const idle = status.textContent ?? '';
+    root.hidden = false;
+
+    let vectors: Promise<{ id: string; vector: number[] }[]> | null = null;
+    const loadVectors = () =>
+      (vectors ??= import('../content/generated/embeddings.json').then((m) => m.default.items));
+
+    const start = () => {
+      void warm().catch(() => {});
+      void loadVectors();
+    };
+    input.addEventListener('focus', start, { once: true });
+    input.addEventListener('pointerdown', start, { once: true });
+    warmWhenIdle();
+
+    let busy = false;
+    onModelState((s) => {
+      if (s === 'loading' && busy) status.textContent = 'Loading the language model (first search only)…';
+      if (s === 'error') status.textContent = 'The search model could not load. Everything below still works.';
+    });
+
+    const clearHits = () => document.querySelectorAll('.ask-hit').forEach((el) => el.classList.remove('ask-hit'));
+
+    let seq = 0;
+    async function search(raw: string) {
+      const query = raw.trim();
+      const mine = ++seq;
+      if (query.length < 3) {
+        list.replaceChildren();
+        clearHits();
+        status.textContent = idle;
+        return;
+      }
+      busy = true;
+      try {
+        const [items, [vector]] = await Promise.all([loadVectors(), embed([query])]);
+        if (mine !== seq) return;
+        const top = topMatches(vector, items);
+        const results = top.map(({ item, score }) => {
+          const d = byId.get(item.id)!;
+          return { id: d.id, type: d.type, title: d.title, href: d.href, score: Number(score.toFixed(4)), why: whyLine(query, d.text) };
+        });
+        clearHits();
+        list.replaceChildren(
+          ...results.map((r) => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = r.href;
+            a.textContent = r.title;
+            const why = document.createElement('span');
+            why.className = 'ask-why muted';
+            why.textContent = `${r.type} · ${r.why}`;
+            li.append(a, why);
+            document.getElementById(r.id)?.classList.add('ask-hit');
+            return li;
+          }),
+        );
+        status.textContent = results.length
+          ? `${results.length} closest match${results.length > 1 ? 'es' : ''}, highlighted below.`
+          : 'Nothing close enough. Try other words.';
+        window.dispatchEvent(new CustomEvent('ask', { detail: { query, vector: Array.from(vector), results } }));
+      } catch {
+        if (mine === seq) status.textContent = 'The search model could not load. Everything below still works.';
+      } finally {
+        busy = false;
+      }
+    }
+
+    let timer = 0;
+    input.addEventListener('input', () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => void search(input.value), 350);
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        window.clearTimeout(timer);
+        void search(input.value);
+      } else if (e.key === 'Escape' && input.value) {
+        input.value = '';
+        void search('');
+      }
+    });
+  }
+</script>
+
+<style>
+  .ask { padding-top: 2.5rem; max-width: var(--measure); }
+  .ask-label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .ask-input {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.55rem 0.75rem;
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .ask-input::placeholder { color: var(--muted); opacity: 0.8; }
+  .ask-status { font-size: 0.85rem; margin: 0.4rem 0 0; }
+  .ask-results { margin: 0.6rem 0 0; padding-left: 1.4rem; }
+  .ask-results:empty { display: none; }
+  .ask-results li { margin-bottom: 0.35rem; }
+  .ask-results a { margin-right: 0.5rem; }
+  .ask-why { font-size: 0.85rem; }
+</style>

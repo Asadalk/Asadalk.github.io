@@ -5,16 +5,13 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { AutoModel, AutoTokenizer, env } from '@huggingface/transformers';
 import { MAX_TOKENS, meanPoolNormalize } from '../../src/lib/embed-math.ts';
-
-export const MODEL_ID = 'all-MiniLM-L6-v2';
-/** Which ONNX weights the site ships (see docs/decisions.md, Phase 4). */
-export const MODEL_DTYPE = 'fp32';
+import { BUILD_DTYPE, MODEL_ID } from '../../src/lib/embed-config.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 env.allowRemoteModels = false;
 env.localModelPath = join(root, 'public/models') + '/';
 
-export async function loadEmbedder(dtype = MODEL_DTYPE) {
+export async function loadEmbedder(dtype = BUILD_DTYPE) {
   const tokenizer = await AutoTokenizer.from_pretrained(MODEL_ID);
   const model = await AutoModel.from_pretrained(MODEL_ID, { dtype, device: 'cpu' });
   /** @param {string[]} texts @returns {Promise<Float32Array[]>} */
