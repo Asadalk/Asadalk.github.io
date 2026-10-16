@@ -1,10 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// PW_PORT lets several checkouts run their own preview server side by side.
+// Runs against the built static site. Locally it can reuse the system Chrome
+// (PW_CHANNEL=chrome); CI installs Playwright's own Chromium. PW_PORT picks the
+// preview port, so several worktrees can test at once.
 const port = Number(process.env.PW_PORT || 4321);
 
-// Runs against the built static site. Locally it can reuse the system Chrome
-// (PW_CHANNEL=chrome); CI installs Playwright's own Chromium.
 export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: true,

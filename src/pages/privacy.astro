@@ -6,7 +6,6 @@ import Base from '../layouts/Base.astro';
   <div class="wrap page">
     <h1>Privacy</h1>
     <p>This site has no analytics, no cookies, no trackers, and loads no third-party fonts or scripts.</p>
-    <p class="muted">The two features below are being built. These are the rules they will follow.</p>
     <p>
       Some pages learn what you seem interested in (which cards you open, how long you read) so they can
       order the rest of the page for you. That happens entirely in your browser. It is saved only in your
@@ -14,8 +13,13 @@ import Base from '../layouts/Base.astro';
       learned".
     </p>
     <p>
-      The photo demo runs the text detector on your device. Recognizing the words in a photo needs a server: the
-      site asks before sending the photo, and the server does not store it.
+      The photo demo and "Ask about me" run their models on your device. Your photos and questions are never
+      uploaded. The model files are downloaded from this site the first time you use them and then kept in your
+      browser's cache.
+    </p>
+    <p class="muted">
+      Recognizing the words inside a detected box would need a server. That is not part of the site yet; if it is
+      added, the site will ask before sending a photo, and the server will not store it.
     </p>
     <p><a href="/">← Back</a></p>
   </div>

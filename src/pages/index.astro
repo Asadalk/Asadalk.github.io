@@ -5,13 +5,25 @@ import ProjectCard from '../components/ProjectCard.astro';
 import Skills from '../components/Skills.astro';
 import Street from '../components/Street.astro';
 import AskAboutMe from '../components/AskAboutMe.astro';
-import { site, projects } from '../lib/content';
+import OpenerChips from '../components/OpenerChips.astro';
+import SuggestionChip from '../components/SuggestionChip.astro';
+import BrainPanel from '../components/BrainPanel.astro';
+import { site, projects, research } from '../lib/content';
 
 // Owner's curated cold-start order. The brain (Phase 5) may reorder cards
 // below the fold; it never hides any.
 const projectOrder = ['opspilot', 'semantic-hire', 'cellular', 'smoketrail'];
 const ordered = projectOrder.map((id) => projects.find((p) => p.id === id)!);
 const primaryEdu = site.education.find((e) => e.primary)!;
+
+// The brain's input: just ids, titles and axes, so the client never loads the
+// full content JSON. See src/brain/dom.ts.
+const brainData = {
+  items: [research, ...ordered].map((p) => ({ id: p.id, type: p.type, title: (p as { short?: string }).short ?? p.title, axes: p.axes })),
+  curated: [research.id, ...projectOrder],
+  headlines: site.headlines,
+  openerChips: site.openerChips,
+};
 ---
 
 <Base>
@@ -25,6 +37,7 @@ const primaryEdu = site.education.find((e) => e.primary)!;
       </div>
     </div>
     <Street />
+    <OpenerChips />
   </header>
 
   <div class="wrap feed">
@@ -39,12 +52,14 @@ const primaryEdu = site.education.find((e) => e.primary)!;
     <section id="research" aria-labelledby="research-h">
       <h2 id="research-h">Research</h2>
       <ResearchCard />
+      <SuggestionChip section="research" />
     </section>
 
     <section id="projects" aria-labelledby="projects-h">
       <h2 id="projects-h">Projects</h2>
       {ordered.map((p) => <ProjectCard project={p} />)}
       <p><a href="/archive/">Smaller projects and coursework →</a></p>
+      <SuggestionChip section="projects" />
     </section>
 
     <section id="experience" aria-labelledby="experience-h">
@@ -94,7 +109,16 @@ const primaryEdu = site.education.find((e) => e.primary)!;
       </ul>
     </section>
   </div>
+
+  <BrainPanel />
+  <p class="visually-hidden" aria-live="polite" data-brain-live></p>
+  <script type="application/json" id="brain-data" set:html={JSON.stringify(brainData)} />
 </Base>
+
+<script>
+  import { startBrain } from '../brain/dom';
+  startBrain();
+</script>
 
 <style>
   .hero { padding: 2rem 0 0; }

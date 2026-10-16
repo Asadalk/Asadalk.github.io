@@ -1,0 +1,73 @@
+---
+// One optional line after the street: "What brings you here?" Picking a chip
+// nudges the order of the projects further down. Hidden by default; the inline
+// script reveals it during parsing (before first paint, so nothing shifts),
+// and only when JavaScript runs and the visitor hasn't used or dismissed it.
+import { site } from '../lib/content';
+---
+
+<div class="opener wrap" data-opener hidden>
+  <p class="opener-line">
+    <span class="opener-q mono">What brings you here?</span>
+    {site.openerChips.map((c, i) => (
+      <button type="button" class="opener-chip mono" data-opener-chip={i}>{c.label}</button>
+    ))}
+    <button type="button" class="opener-x" data-opener-dismiss aria-label="Dismiss">
+      <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
+    </button>
+  </p>
+  <p class="opener-done mono muted" hidden aria-live="polite"></p>
+</div>
+<script is:inline>
+  (function () {
+    var el = document.currentScript && document.currentScript.previousElementSibling;
+    if (!el) return;
+    try {
+      if (localStorage.getItem('brain:opener-done')) return;
+    } catch (e) {}
+    el.hidden = false;
+  })();
+</script>
+
+<style>
+  .opener { margin-top: 1rem; }
+  .opener[hidden] { display: none; }
+  .opener-line,
+  .opener-done {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    min-height: 2.75rem;
+    font-size: 0.75rem;
+  }
+  .opener-done { align-items: center; }
+  .opener-done[hidden],
+  .opener-line[hidden] { display: none; }
+  .opener-q { color: var(--muted); margin-right: 0.25rem; font-size: 0.75rem; }
+  .opener-chip {
+    min-height: 2.25rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.72rem;
+    cursor: pointer;
+  }
+  .opener-chip:hover { border-color: var(--muted); }
+  .opener-x {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .opener-x:hover { color: var(--text); }
+</style>
