@@ -1,0 +1,176 @@
+---
+// semantic-hire, running in the visitor's browser: the repo's 24 jobs, its
+// ranking (src/lib/matcher.ts) and the same embedding model. No server, no
+// Gemini. Hidden until its script runs, so the card is unchanged without JS.
+import queries from '../content/data/semantic-hire/queries.json';
+
+const examples = queries.map((q) => q.resume_text);
+---
+
+<div class="sh" data-sh hidden>
+  <h4>Try it <span class="det-tag">Runs on your device</span></h4>
+  <p class="sh-intro">
+    Paste a resume (or a few lines about your skills) to rank the repo's 24 synthetic job descriptions with the same model and scoring.
+    Nothing is sent anywhere.
+  </p>
+  <label class="sh-label mono" for="sh-resume">Resume text</label>
+  <textarea id="sh-resume" class="sh-text" rows="5" spellcheck="false" aria-describedby="sh-status"></textarea>
+  <div class="sh-actions">
+    <button type="button" class="button button--primary" data-sh-run>Rank the jobs</button>
+    <button type="button" class="button button--ghost" data-sh-example>Try an example resume</button>
+  </div>
+  <p id="sh-status" class="sh-status muted" aria-live="polite"></p>
+  <div class="sh-out" data-sh-out hidden>
+    <p class="sh-legend mono muted">
+      <span class="key key--sem" aria-hidden="true"></span>0.7 × meaning
+      <span class="key key--skill" aria-hidden="true"></span>0.3 × skill overlap
+    </p>
+    <ol class="sh-list" data-sh-list></ol>
+  </div>
+  <script type="application/json" data-sh-examples set:html={JSON.stringify(examples)} />
+</div>
+
+<script>
+  import { embed, warm } from '../lib/embed-client';
+  import { dot } from '../lib/embed-math';
+  import { MIN_RESUME_CHARS, cleanText, rankJobs, type Job, type MatchResult } from '../lib/matcher';
+
+  const root = document.querySelector<HTMLElement>('[data-sh]');
+  if (root) {
+    const text = root.querySelector<HTMLTextAreaElement>('#sh-resume')!;
+    const run = root.querySelector<HTMLButtonElement>('[data-sh-run]')!;
+    const example = root.querySelector<HTMLButtonElement>('[data-sh-example]')!;
+    const status = root.querySelector<HTMLElement>('#sh-status')!;
+    const out = root.querySelector<HTMLElement>('[data-sh-out]')!;
+    const list = root.querySelector<HTMLOListElement>('[data-sh-list]')!;
+    const examples: string[] = JSON.parse(root.querySelector('[data-sh-examples]')!.textContent || '[]');
+    root.hidden = false;
+
+    type StoredJob = Job & { vector: number[] };
+    let jobs: Promise<StoredJob[]> | null = null;
+    const loadJobs = () => (jobs ??= import('../content/generated/jobs.json').then((m) => m.default.jobs as StoredJob[]));
+    const start = () => {
+      void warm().catch(() => {});
+      void loadJobs();
+    };
+    for (const el of [text, run, example]) {
+      el.addEventListener('focus', start, { once: true });
+      el.addEventListener('pointerdown', start, { once: true });
+    }
+
+    const fmt = (x: number) => x.toFixed(2);
+    const el = <K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, txt?: string) => {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (txt !== undefined) e.textContent = txt;
+      return e;
+    };
+
+    function render(results: MatchResult[]) {
+      list.replaceChildren(
+        ...results.map((r) => {
+          const li = el('li', 'sh-item');
+          li.dataset.jobId = r.jobId;
+          li.dataset.final = String(r.finalScore);
+          const head = el('p', 'sh-head');
+          head.append(el('strong', undefined, r.title), ` · ${r.company}`, el('span', 'sh-score mono', fmt(r.finalScore)));
+          const sem = 0.7 * r.semanticScore;
+          const skill = 0.3 * r.skillOverlapScore;
+          const bar = el('div', 'sh-bar');
+          bar.setAttribute('role', 'img');
+          bar.setAttribute(
+            'aria-label',
+            `Score ${fmt(r.finalScore)}: ${fmt(sem)} from meaning (similarity ${fmt(r.semanticScore)}), ${fmt(skill)} from skills (${Math.round(r.skillOverlapScore * 100)}% of the job's skills)`,
+          );
+          const a = el('span', 'seg seg--sem');
+          a.style.width = `${sem * 100}%`;
+          const b = el('span', 'seg seg--skill');
+          b.style.width = `${skill * 100}%`;
+          bar.append(a, b);
+          const skills = el('p', 'sh-skills');
+          skills.append(
+            el('span', 'muted', 'Matched: '),
+            r.matchedSkills.join(', ') || 'none',
+            el('span', 'muted', ' · Missing: '),
+            r.missingSkills.join(', ') || 'none',
+          );
+          li.append(head, bar, skills);
+          return li;
+        }),
+      );
+    }
+
+    async function rank() {
+      const resume = text.value;
+      if (cleanText(resume).length < MIN_RESUME_CHARS) {
+        status.textContent = `Add a little more text (at least ${MIN_RESUME_CHARS} characters).`;
+        text.focus();
+        return;
+      }
+      run.disabled = true;
+      status.textContent = 'Loading the model if needed, then ranking…';
+      try {
+        const [all, [v]] = await Promise.all([loadJobs(), embed([resume])]);
+        const results = rankJobs(resume, all, all.map((j) => dot(v, j.vector)));
+        render(results);
+        out.hidden = false;
+        status.textContent = `Top ${results.length} of ${all.length} jobs, ranked on this device.`;
+      } catch {
+        status.textContent = 'The model could not load in this browser. The results table above shows how the ranker scores.';
+      } finally {
+        run.disabled = false;
+      }
+    }
+
+    let next = 0;
+    example.addEventListener('click', () => {
+      text.value = examples[next % examples.length];
+      next++;
+      void rank();
+    });
+    run.addEventListener('click', () => void rank());
+    text.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) void rank();
+    });
+  }
+</script>
+
+<style>
+  .sh h4 { display: flex; align-items: center; gap: 0.6rem; }
+  .sh h4 .det-tag { text-transform: none; letter-spacing: 0; }
+  .sh-intro { font-size: 0.95rem; }
+  .sh-label { display: block; font-size: 0.72rem; color: var(--muted); margin-bottom: 0.3rem; }
+  .sh-text {
+    display: block;
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    font: inherit;
+    font-size: 0.95rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    resize: vertical;
+  }
+  .sh-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.75rem 0 0.25rem; }
+  .sh-actions .button[disabled] { opacity: 0.6; cursor: progress; }
+  .sh-status { font-size: 0.85rem; min-height: 1.4em; margin: 0.4rem 0; }
+  .sh-legend { font-size: 0.7rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.5rem; }
+  .key { display: inline-block; width: 0.8rem; height: 0.55rem; border-radius: 2px; }
+  .key--skill { margin-left: 0.5rem; }
+  .key--sem, .seg--sem { background: var(--accent); }
+  .key--skill, .seg--skill { background: var(--ok); }
+  .sh-list { padding-left: 1.4rem; margin: 0.5rem 0 0; }
+  .sh-item { margin-bottom: 0.9rem; }
+  .sh-head { margin: 0 0 0.3rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.3rem; }
+  .sh-score { margin-left: auto; font-size: 0.78rem; }
+  .sh-bar {
+    display: flex;
+    height: 0.55rem;
+    background: color-mix(in srgb, var(--muted) 15%, transparent);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .seg { display: block; height: 100%; }
+  .sh-skills { font-size: 0.85rem; margin: 0.3rem 0 0; }
+</style>

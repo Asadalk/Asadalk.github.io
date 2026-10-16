@@ -1,6 +1,7 @@
 ---
 import FeedCard from './FeedCard.astro';
 import Results from './Results.astro';
+import SemanticHireDemo from './SemanticHireDemo.astro';
 import type { Project } from '../lib/content';
 
 interface Props { project: Project }
@@ -50,6 +51,8 @@ const { project: p } = Astro.props;
       <Results table={p.results} />
     </>
   )}
+
+  {p.id === 'semantic-hire' && <SemanticHireDemo />}
 
   {p.statusNote && <p class="muted">{p.statusNote}</p>}
 
