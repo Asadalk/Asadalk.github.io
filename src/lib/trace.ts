@@ -418,6 +418,13 @@ export function buildReplay(trace: RawTrace): Replay {
 
   // 4. Diagnosis and competing hypotheses
   const diagnosis = findAgent((e) => e.event_type === 'diagnosis');
+  // The runs row's diagnosis is rewritten when the run closes (it gains the
+  // approval outcome), so show the text as first recorded: on run.paused, or
+  // on run.completed when the run never paused.
+  const diagnosisText: string | null =
+    agent.find((e) => e.event_type === 'run.paused' && typeof e.details?.diagnosis === 'string')?.details.diagnosis ??
+    agent.find((e) => e.event_type === 'run.completed' && typeof e.details?.diagnosis === 'string')?.details.diagnosis ??
+    trace.run.diagnosis;
   if (diagnosis) {
     push(
       {
@@ -427,7 +434,7 @@ export function buildReplay(trace: RawTrace): Replay {
         title: 'Diagnosis and competing hypotheses',
         duration: diagnosis.duration_ms != null ? `model ${ms(diagnosis.duration_ms)}` : null,
         tone: 'neutral',
-        text: trace.run.diagnosis ?? undefined,
+        text: diagnosisText ?? undefined,
         facts: diagnosis.details?.input_tokens != null
           ? [{ label: 'Tokens', value: `${diagnosis.details.input_tokens} in · ${diagnosis.details.output_tokens} out` }]
           : [],
@@ -652,7 +659,7 @@ export function buildReplay(trace: RawTrace): Replay {
       title: 'Run completed: audit trail',
       duration: trace.run.completed_at ? `whole run ${ms(time(trace.run.completed_at) - time(trace.run.created_at))}` : null,
       tone: 'neutral',
-      text: closing?.reason && closing.reason !== trace.run.diagnosis ? closing.reason : undefined,
+      text: closing?.reason && closing.reason !== trace.run.diagnosis && closing.reason !== diagnosisText ? closing.reason : undefined,
       facts: outcomeFacts,
       note: 'audit_events and agent_events are append-only; database triggers reject updates and deletes.',
     },

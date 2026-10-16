@@ -13,17 +13,17 @@ const json = (p: Promise<{ default: unknown }>) => p.then((m) => m.default as Ra
 export const TRACES: TraceEntry[] = [
   {
     slug: 'happy-path-rollback',
-    label: 'Checkout 500s: rollback approved and verified',
+    label: 'Rollback approved and verified',
     load: () => json(import('../content/data/opspilot/trace-happy-path-rollback.json')),
   },
   {
     slug: 'viewer-injection-denied',
-    label: 'Viewer prompt injection: policy denies',
+    label: 'Viewer prompt injection, denied',
     load: () => json(import('../content/data/opspilot/trace-viewer-injection-denied.json')),
   },
   {
     slug: 'approval-rejected',
-    label: 'Payments latency: admin rejects the restart',
+    label: 'Restart rejected by admin',
     load: () => json(import('../content/data/opspilot/trace-approval-rejected.json')),
   },
 ];

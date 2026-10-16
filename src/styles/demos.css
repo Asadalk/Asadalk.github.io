@@ -64,13 +64,17 @@
   font-size: 0.95rem;
   max-width: 62ch;
   overflow-wrap: anywhere;
+  white-space: pre-line;
 }
 .demo .step-text::before { content: '“'; color: var(--muted); }
 .demo .step-text::after { content: '”'; color: var(--muted); }
 
 .demo .facts { display: grid; gap: 0.3rem; margin: 0 0 0.6rem; font-size: 0.88rem; }
-.demo .facts > div { display: grid; grid-template-columns: minmax(6.5rem, max-content) 1fr; gap: 0.6rem; }
-.demo .facts dt { color: var(--muted); }
+.demo .facts dt { color: var(--muted); font-size: 0.78rem; }
+@media (min-width: 30rem) {
+  .demo .facts > div { display: grid; grid-template-columns: 9rem 1fr; gap: 0.6rem; }
+  .demo .facts dt { font-size: inherit; }
+}
 .demo .facts dd { margin: 0; overflow-wrap: anywhere; }
 .demo .facts dd.mono { font-size: 0.74rem; line-height: 1.7; }
 
@@ -115,7 +119,7 @@
 .demo .replay-all { list-style: none; margin: 0.75rem 0 0; padding: 0; }
 .demo .replay-all > li { margin-bottom: 1.1rem; max-width: none; }
 
-.demo .replay-title { font-weight: 700; margin: 0.75rem 0 0.15rem; }
+.demo .replay-title { font-weight: 700; font-size: 0.95rem; margin: 0.75rem 0 0.15rem; }
 .demo .replay-meta { font-size: 0.78rem; margin: 0 0 0.75rem; }
 .demo .replay-meta .mono { font-size: 0.7rem; }
 
@@ -189,7 +193,7 @@
 .demo .stepper-controls .button { flex: 1; justify-content: center; max-width: 12rem; }
 .demo .button:disabled { opacity: 0.4; cursor: default; }
 
-.demo .step-slot { min-height: 12rem; }
+.demo .replay .step-slot { min-height: 12rem; }
 
 /* ---- policy ---- */
 .demo .decision {

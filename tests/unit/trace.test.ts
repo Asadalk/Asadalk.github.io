@@ -105,6 +105,10 @@ describe('story-specific steps', () => {
     expect(self.text).toBe('The requester cannot decide their own action');
     expect(self.at).toBeNull();
     expect(r.steps.find((s) => s.kind === 'verification')!.title).toContain('SUCCESS');
+    // The diagnosis is shown as recorded at pause time, before the approval outcome existed.
+    const diag = r.steps.find((s) => s.kind === 'diagnosis')!;
+    expect(diag.text).not.toContain('Human approval');
+    expect(diag.text).toBe(load('happy-path-rollback').agentEvents.find((e) => e.event_type === 'run.paused')!.details.diagnosis);
     const outcome = Object.fromEntries(r.steps.at(-1)!.facts.map((f) => [f.label, f.value]));
     expect(outcome['Audit rows']).toBe('19 (17 for this run + 2 sign-ins)');
     expect(outcome['Incident status']).toBe('resolved');

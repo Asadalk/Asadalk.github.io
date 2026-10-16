@@ -13,7 +13,7 @@ export function renderHop(h: Hop, n: number, total: number, heading = 'h5'): str
 
 // The inset shows a 5 km × 5 km square around the tower, so the fixed
 // 1 km radius can be drawn to scale (on the India outline it is < 1 unit).
-const INSET = { size: 110, km: 5 };
+const INSET = { size: 100, km: 5 };
 
 /**
  * India outline with an optional pin. `show` false draws the map without it
@@ -32,8 +32,9 @@ export function renderMap(map: MapOutline, response: LocateResponse | null, show
       <circle r="9" class="pin-halo"/><circle r="4" class="pin-dot"/></g>`;
     const unitsPerKm = INSET.size / INSET.km;
     const r = (RADIUS_M / 1000) * unitsPerKm;
-    const ix = pad + 4;
-    const iy = h - INSET.size - pad - 22;
+    // Top right: open space north of the north-east states.
+    const ix = w - INSET.size - pad;
+    const iy = pad;
     const c = INSET.size / 2;
     inset = `<g class="inset" transform="translate(${ix} ${iy})">
       <rect width="${INSET.size}" height="${INSET.size}" class="inset-box"/>

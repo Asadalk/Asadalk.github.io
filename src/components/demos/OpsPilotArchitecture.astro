@@ -37,7 +37,7 @@ const bw = 84;
       <path d="M230 132H354V502H262" />
     </g>
     <g class="arch-edge arch-edge--write" marker-end="url(#arch-aw)">
-      <path d={`M${col[2]} 222H${col[3]}V242`} />
+      <path d={`M300 185H${col[3]}V242`} />
       <path d={`M${col[3]} 288V314`} />
       <path d={`M${col[3]} 360V386`} />
       <path d={`M${col[3]} 432V490H262`} />
@@ -87,7 +87,7 @@ const bw = 84;
     </g>
     <g class="arch-node arch-node--write">
       <rect x={col[3] - bw / 2} y="388" width={bw} height="44" rx="4" />
-      <text x={col[3]} y="406">Simulator action</text>
+      <text x={col[3]} y="406" class="arch-tight">Simulator action</text>
       <text x={col[3]} y="421">+ verification</text>
     </g>
     <g class="arch-node arch-db">
@@ -119,6 +119,7 @@ const bw = 84;
     text-anchor: middle;
   }
   .arch-node .arch-sub { font-size: 9.5px; fill: var(--muted); }
+  .arch-node .arch-tight { font-size: 10px; }
   .arch-node--agent rect { stroke: var(--text); stroke-width: 1.4; }
   .arch-node--ext rect { stroke-dasharray: 3 2; }
   .arch-node--write rect { stroke: var(--accent); stroke-width: 1.6; }

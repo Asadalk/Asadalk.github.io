@@ -48,13 +48,13 @@ export interface Sample {
 
 /** A handful of rows from tower_sample.csv, plus one cell that is not in it. */
 export const SAMPLES: Sample[] = [
-  { id: 'gujarat', label: 'Gujarat coast (the test cell in the app code)', payload: { mcc: 404, mnc: 5, tac: 221, cid: 2171 } },
+  { id: 'gujarat', label: 'Gujarat (the app’s test cell)', payload: { mcc: 404, mnc: 5, tac: 221, cid: 2171 } },
   { id: 'delhi', label: 'Delhi', payload: { mcc: 404, mnc: 10, tac: 310, cid: 27942 } },
   { id: 'mumbai', label: 'Mumbai', payload: { mcc: 405, mnc: 805, tac: 101, cid: 55963 } },
   { id: 'bengaluru', label: 'Bengaluru', payload: { mcc: 404, mnc: 45, tac: 61111, cid: 45842 } },
   { id: 'kochi', label: 'Kochi', payload: { mcc: 404, mnc: 46, tac: 101, cid: 10051 } },
   { id: 'chhattisgarh', label: 'Chhattisgarh', payload: { mcc: 404, mnc: 58, tac: 6043, cid: 60092 } },
-  { id: 'unknown', label: 'Unknown cell (Delhi’s CID + 1)', payload: { mcc: 404, mnc: 10, tac: 310, cid: 27943 } },
+  { id: 'unknown', label: 'Unknown: Delhi’s CID + 1', payload: { mcc: 404, mnc: 10, tac: 310, cid: 27943 } },
 ];
 
 /** Equirectangular projection parameters written by scripts/build-india-outline.py. */
