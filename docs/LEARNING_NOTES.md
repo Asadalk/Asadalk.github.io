@@ -32,3 +32,21 @@ Plain-language explanations of each piece of the site, so every part can be defe
 **Lock-on without breaking links.** The signboards are ordinary `<a href="#research">` links. JavaScript intercepts the click, thickens the chosen box and dims the rest for about a quarter of a second, then smooth-scrolls to the section and moves keyboard focus there. If JS is off, the plain link behaviour takes over; under reduced motion the jump is instant.
 
 **Parallax.** The far skyline moves at 14% of scroll speed and the wires at 5%, applied with `transform` inside `requestAnimationFrame`. Transforms don't trigger layout, so there is no layout shift (CLS). The effect only runs while the hero is visible.
+
+## Phase 4: search by meaning, on the visitor's device
+
+**Embeddings.** A sentence-embedding model turns a piece of text into a list of 384 numbers (a vector). Texts that mean similar things get vectors that point in similar directions, even with no words in common: "object detection research" lands near "Scene text detection in Indian languages". The model is all-MiniLM-L6-v2, a small 6-layer transformer, the same one semantic-hire uses in Python.
+
+**Mean pooling.** The transformer outputs one vector per word piece, not one per sentence. To get a single sentence vector, sentence-transformers averages the word-piece vectors and skips padding. The site does exactly that (`meanPoolNormalize` in `src/lib/embed-math.ts`) and then scales the result to length 1.
+
+**Cosine similarity.** Two vectors are compared by the angle between them: cosine 1 means the same direction, 0 means unrelated. When both vectors have length 1, the cosine is just the dot product, the sum of element-by-element products. That is why every vector is normalised once and later comparisons are a single multiply-and-add loop.
+
+**IndexFlatIP on normalised vectors = cosine.** semantic-hire stores its job vectors in a FAISS `IndexFlatIP`, an exact (not approximate) inner-product index. Because the vectors are normalised, the inner product is the cosine, so "FAISS top 5" means "the 5 jobs with the highest cosine". With only 24 jobs, the browser simply computes all 24 dot products and sorts them, which gives the same answer.
+
+**The 0.7 / 0.3 blend.** Meaning alone ignores hard requirements, and keywords alone miss paraphrases. semantic-hire takes the 5 jobs closest in meaning, then scores each as 0.7 × semantic similarity (clamped to 0–1) + 0.3 × skill overlap, where overlap is the share of the job's skills that also appear in the resume. Skills come from a fixed list of 49, matched with word boundaries so "Java" doesn't match inside "JavaScript". The bar under each result shows the two parts.
+
+**Why a Web Worker.** Running a neural network takes tens of milliseconds per sentence, plus a second or two to start. Inside a worker, that work happens off the main thread, so scrolling and typing stay smooth. Both features talk to the same worker, so the model downloads and loads once.
+
+**Why fp16, and the parity test.** Model weights come in several precisions. The 8-bit file is half the size of fp16, but its small rounding errors were enough to swap two jobs in 2 of the 8 test queries. The parity test runs the original Python service and the browser port on the same 8 queries and requires the same top 5 in the same order. fp16 passes in Node and in a real Chrome page, with scores within 0.0002. Stored vectors are built with the full-precision fp32 file, so only the visitor's own text goes through fp16.
+
+**Nothing leaves the page.** The model, tokenizer, WASM runtime and vectors are all served by the site. The e2e tests fail if the page makes a request to any other origin.

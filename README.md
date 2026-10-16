@@ -8,6 +8,7 @@ Design decisions and plain-language notes on how everything works are in [docs/]
 
 - [Astro](https://astro.build) 7 with TypeScript, static output: every page is rendered at build time and works without JavaScript.
 - Self-hosted fonts via `@fontsource` (Young Serif, Tiro Devanagari Hindi, Atkinson Hyperlegible, Martian Mono; all OFL-1.1).
+- On-device semantic search and the semantic-hire matcher: `all-MiniLM-L6-v2` via transformers.js in a Web Worker, with the model and WASM runtime self-hosted (`public/models/`, `public/ort-embed/`).
 - Vitest for unit tests. GitHub Actions builds, tests and deploys to GitHub Pages on every push to `main`.
 - No analytics, cookies, trackers or third-party requests at runtime.
 
@@ -23,6 +24,8 @@ All text lives in `src/content/*.json`. Pages render only from these files.
 | `skills.json` | Skill groups; every skill lists the items (`proof`) that show it in use |
 | `archive.json` | Smaller repos shown on `/archive` |
 | `data/opspilot/` | Real exported OpsPilot run traces for the incident replay demo |
+| `data/semantic-hire/` | The 24 jobs and 8 evaluation queries from semantic-hire, for the in-browser matcher |
+| `generated/` | Embeddings written by `npm run embed`. Re-run it after editing content. |
 
 Each item has an `axes` object (ML, DL, Software, Data, Research, each 0–1) that the on-device recommender will use to order the feed.
 
@@ -36,6 +39,9 @@ npm run dev      # local dev server at http://localhost:4321
 npm test         # unit tests
 npm run check    # type-check .astro and .ts files
 npm run build    # static site in dist/
+npm run download-model  # fetch the embedding model (hash-checked; needed for embed and parity)
+npm run embed    # re-embed content and jobs into src/content/generated/
+npm run test:parity     # semantic-hire: browser port vs. python.json
 ```
 
 ## Licenses
