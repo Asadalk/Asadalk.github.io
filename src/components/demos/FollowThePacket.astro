@@ -1,0 +1,34 @@
+---
+// Follow the packet. Without JS: every hop for the first sample cell, and the pin.
+import DemoShell from './DemoShell.astro';
+import towers from '../../content/data/cellular/towers.json';
+import india from '../../content/data/cellular/india.json';
+import { SAMPLES, hops, type MapOutline, type Tower } from '../../lib/cellular';
+import { ATTRIBUTION, renderHop, renderMap } from '../../lib/packet-view';
+
+const first = SAMPLES[0];
+const flow = hops(towers as Tower[], first.payload);
+---
+
+<DemoShell id="cellular-packet" item="cellular" label="Follow the packet">
+  <div class="packet packet--static">
+    <p class="muted">Sample cell: {first.label}.</p>
+    <ol class="replay-all">
+      {flow.hops.map((h, k) => <li set:html={renderHop(h, k + 1, flow.hops.length)} />)}
+    </ol>
+    <figure class="map-fig">
+      <Fragment set:html={renderMap(india as MapOutline, flow.response)} />
+      <figcaption class="muted">
+        The demo searches the 49-row sample from the repo, not the full dataset. At this scale the 1 km circle is smaller
+        than the pin, so the inset draws it to scale.
+      </figcaption>
+    </figure>
+    <p class="hint muted">With JavaScript on, you can pick other cells, including one that is not in the data.</p>
+  </div>
+</DemoShell>
+<p class="attribution muted">{ATTRIBUTION}</p>
+
+<script>
+  import { lazyDemo } from '../../lib/demo';
+  lazyDemo('cellular-packet', () => import('../../demos/packet'));
+</script>

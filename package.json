@@ -13,8 +13,8 @@
     "check": "astro check",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "predev": "node scripts/copy-ort.mjs",
-    "prebuild": "node scripts/copy-ort.mjs"
+    "predev": "node scripts/copy-ort.mjs && node scripts/build-towers.mjs",
+    "prebuild": "node scripts/copy-ort.mjs && node scripts/build-towers.mjs"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "5.3.0",

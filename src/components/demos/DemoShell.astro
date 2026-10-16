@@ -1,0 +1,22 @@
+---
+// A demo that loads only when opened. The slot is the static, no-JS version;
+// the demo's script replaces it with the interactive one (see src/lib/demo.ts).
+import '../../styles/demos.css';
+
+interface Props {
+  id: string;
+  item: string;
+  label: string;
+}
+const { id, item, label } = Astro.props;
+---
+
+<details class="demo" data-demo={id} data-item={item}>
+  <summary class="demo-summary">
+    <span class="demo-label">{label}</span>
+    <span class="demo-device mono">Runs on your device</span>
+  </summary>
+  <div class="demo-root" data-demo-root>
+    <slot />
+  </div>
+</details>

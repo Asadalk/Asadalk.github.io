@@ -1,0 +1,128 @@
+---
+// The architecture flowchart from the OpsPilot README (mermaid), drawn by hand
+// as inline SVG so no diagram library ships. Same nodes and edges as the source.
+const col = [46, 134, 222, 310]; // centres of the four boxes under the agent
+const bw = 84;
+---
+
+<figure class="arch">
+  <svg viewBox="0 0 360 518" role="img" aria-labelledby="arch-t arch-d">
+    <title id="arch-t">OpsPilot architecture</title>
+    <desc id="arch-d">
+      User to Next.js workspace; workspace to FastAPI over HTTP with JWT; FastAPI to the Ops Agent, a single manual loop.
+      The agent uses READ tools, hybrid retrieval and an LLM provider (Groq or Gemini), and sends proposed actions to the
+      policy engine (role × risk × environment). The policy engine leads to durable human approval, then simulator action
+      and verification. READ tools, retrieval, the simulator and FastAPI all use PostgreSQL with pgvector.
+    </desc>
+    <defs>
+      <marker id="arch-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0L8 4L0 8z" class="arch-head" />
+      </marker>
+      <marker id="arch-aw" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0L8 4L0 8z" class="arch-head-write" />
+      </marker>
+    </defs>
+
+    <!-- edges -->
+    <path class="arch-edge" d={`M180 200V222M${col[0]} 222H${col[2]}`} />
+    <g class="arch-edge" marker-end="url(#arch-a)">
+      <path d="M180 34V56" />
+      <path d="M180 86V116" />
+      <path d="M180 146V168" />
+      <path d={`M${col[0]} 222V242`} />
+      <path d={`M${col[1]} 222V242`} />
+      <path d={`M${col[2]} 222V242`} />
+      <path d={`M${col[0]} 288V490H59`} />
+      <path d={`M${col[1]} 288V462`} />
+      <path d="M230 132H354V502H262" />
+    </g>
+    <g class="arch-edge arch-edge--write" marker-end="url(#arch-aw)">
+      <path d={`M300 185H${col[3]}V242`} />
+      <path d={`M${col[3]} 288V314`} />
+      <path d={`M${col[3]} 360V386`} />
+      <path d={`M${col[3]} 432V490H262`} />
+    </g>
+    <text x="188" y="105" class="arch-edge-label">HTTP + JWT</text>
+
+    <!-- nodes -->
+    <g class="arch-node">
+      <rect x="130" y="6" width="100" height="28" rx="4" />
+      <text x="180" y="24">User</text>
+    </g>
+    <g class="arch-node">
+      <rect x="100" y="58" width="160" height="28" rx="4" />
+      <text x="180" y="76">Next.js workspace</text>
+    </g>
+    <g class="arch-node">
+      <rect x="130" y="118" width="100" height="28" rx="4" />
+      <text x="180" y="136">FastAPI</text>
+    </g>
+    <g class="arch-node arch-node--agent">
+      <rect x="60" y="170" width="240" height="30" rx="4" />
+      <text x="180" y="189">Ops Agent: one manual loop</text>
+    </g>
+    <g class="arch-node">
+      <rect x={col[0] - bw / 2} y="244" width={bw} height="44" rx="4" />
+      <text x={col[0]} y="270">READ tools</text>
+    </g>
+    <g class="arch-node">
+      <rect x={col[1] - bw / 2} y="244" width={bw} height="44" rx="4" />
+      <text x={col[1]} y="262">Hybrid</text>
+      <text x={col[1]} y="277">retrieval</text>
+    </g>
+    <g class="arch-node arch-node--ext">
+      <rect x={col[2] - bw / 2} y="244" width={bw} height="44" rx="4" />
+      <text x={col[2]} y="262">LLM provider</text>
+      <text x={col[2]} y="277" class="arch-sub">Groq or Gemini</text>
+    </g>
+    <g class="arch-node arch-node--write">
+      <rect x={col[3] - bw / 2} y="244" width={bw} height="44" rx="4" />
+      <text x={col[3]} y="262">Policy engine</text>
+      <text x={col[3]} y="277" class="arch-sub">role × risk × env</text>
+    </g>
+    <g class="arch-node arch-node--write">
+      <rect x={col[3] - bw / 2} y="316" width={bw} height="44" rx="4" />
+      <text x={col[3]} y="334">Durable human</text>
+      <text x={col[3]} y="349">approval</text>
+    </g>
+    <g class="arch-node arch-node--write">
+      <rect x={col[3] - bw / 2} y="388" width={bw} height="44" rx="4" />
+      <text x={col[3]} y="406" class="arch-tight">Simulator action</text>
+      <text x={col[3]} y="421">+ verification</text>
+    </g>
+    <g class="arch-node arch-db">
+      <path d="M60 470v34a100 7 0 0 0 200 0v-34" />
+      <ellipse cx="160" cy="470" rx="100" ry="7" />
+      <text x="160" y="497">PostgreSQL + pgvector</text>
+    </g>
+  </svg>
+  <figcaption class="muted">
+    From the project README. The model can only pick a READ tool or return a diagnosis. A change can only happen along the
+    brick path: policy, human approval when required, simulated execution, verification.
+  </figcaption>
+</figure>
+
+<style>
+  .arch { margin: 0 0 1rem; }
+  .arch svg { display: block; width: 100%; max-width: 30rem; height: auto; }
+  .arch figcaption { font-size: 0.85rem; margin-top: 0.5rem; max-width: 52ch; }
+  .arch-edge { fill: none; stroke: var(--muted); stroke-width: 1.2; }
+  .arch-edge--write { stroke: var(--accent); stroke-width: 1.8; }
+  .arch-head { fill: var(--muted); }
+  .arch-head-write { fill: var(--accent); }
+  .arch-edge-label { font-family: var(--font-mono); font-size: 9px; fill: var(--muted); }
+  .arch-node rect { fill: var(--bg); stroke: var(--muted); stroke-width: 1; }
+  .arch-node text {
+    font-family: var(--font-body);
+    font-size: 11px;
+    fill: var(--text);
+    text-anchor: middle;
+  }
+  .arch-node .arch-sub { font-size: 9.5px; fill: var(--muted); }
+  .arch-node .arch-tight { font-size: 10px; }
+  .arch-node--agent rect { stroke: var(--text); stroke-width: 1.4; }
+  .arch-node--ext rect { stroke-dasharray: 3 2; }
+  .arch-node--write rect { stroke: var(--accent); stroke-width: 1.6; }
+  .arch-db path, .arch-db ellipse { fill: var(--bg); stroke: var(--muted); stroke-width: 1; }
+  .arch-db text { font-family: var(--font-body); font-size: 11px; fill: var(--text); text-anchor: middle; }
+</style>

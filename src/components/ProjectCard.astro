@@ -1,6 +1,10 @@
 ---
 import FeedCard from './FeedCard.astro';
 import Results from './Results.astro';
+import OpsPilotArchitecture from './demos/OpsPilotArchitecture.astro';
+import IncidentReplay from './demos/IncidentReplay.astro';
+import PolicyPlayground from './demos/PolicyPlayground.astro';
+import FollowThePacket from './demos/FollowThePacket.astro';
 import type { Project } from '../lib/content';
 
 interface Props { project: Project }
@@ -34,6 +38,13 @@ const { project: p } = Astro.props;
 
   {p.focus && <p class="muted">{p.focus}</p>}
 
+  {p.id === 'opspilot' && (
+    <>
+      <h4>How it fits together</h4>
+      <OpsPilotArchitecture />
+    </>
+  )}
+
   {p.timeline && (
     <>
       <h4>How it evolved</h4>
@@ -52,6 +63,21 @@ const { project: p } = Astro.props;
   )}
 
   {p.statusNote && <p class="muted">{p.statusNote}</p>}
+
+  {p.id === 'opspilot' && (
+    <>
+      <h4>Try it</h4>
+      <IncidentReplay />
+      <PolicyPlayground />
+    </>
+  )}
+
+  {p.id === 'cellular' && (
+    <>
+      <h4>Try it</h4>
+      <FollowThePacket />
+    </>
+  )}
 
   {p.media && (
     <>
