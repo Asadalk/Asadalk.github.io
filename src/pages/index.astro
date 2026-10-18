@@ -53,7 +53,7 @@ const brainData = {
       <h2 id="about-h">About</h2>
       <div class="about-grid">
         <Portrait variant="about" />
-        <div class="calm">
+        <div class="plain-text">
           <p class="lede">{site.bio}</p>
           {site.about.map((p) => <p>{p}</p>)}
         </div>
@@ -77,7 +77,7 @@ const brainData = {
 
     <section id="experience" aria-labelledby="experience-h">
       <h2 id="experience-h">Experience</h2>
-      <ul class="plain-list calm">
+      <ul class="plain-list plain-text">
         {site.experience.map((x) => (
           <li id={x.id}>
             <strong>{x.role}</strong>, {x.org}
@@ -90,32 +90,32 @@ const brainData = {
 
     <section id="education" aria-labelledby="education-h">
       <h2 id="education-h">Education</h2>
-      <p id={primaryEdu.id} class="calm">
+      <p id={primaryEdu.id} class="plain-text">
         <strong>{primaryEdu.degree}</strong><br />
         {primaryEdu.institution} <span class="mono muted dates">{primaryEdu.years}</span>
       </p>
-      <p class="muted coursework calm">Coursework: {primaryEdu.coursework?.join(', ')}</p>
-      <ul class="plain-list calm">
+      <p class="muted coursework plain-text">Coursework: {primaryEdu.coursework?.join(', ')}</p>
+      <ul class="plain-list plain-text">
         {site.education.filter((e) => !e.primary).map((e) => (
           <li id={e.id}>{e.degree}, {e.institution} <span class="mono muted dates">{e.years}</span></li>
         ))}
       </ul>
       <h3>Achievements</h3>
-      <ul class="plain-list calm">
+      <ul class="plain-list plain-text">
         {site.achievements.map((a) => <li id={a.id}>{a.text}</li>)}
       </ul>
     </section>
 
     <section id="skills" aria-labelledby="skills-h">
       <h2 id="skills-h">Skills</h2>
-      <p class="muted calm">Each skill links to the work that uses it.</p>
+      <p class="muted plain-text">Each skill links to the work that uses it.</p>
       <Skills />
     </section>
 
     <section id="contact" aria-labelledby="contact-h">
       <h2 id="contact-h">Contact</h2>
-      <p class="calm">The fastest way to reach me is email.</p>
-      <ul class="contact calm">
+      <p class="plain-text">The fastest way to reach me is email.</p>
+      <ul class="contact plain-text">
         <li><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></li>
         <li><a href={site.contact.linkedin} rel="me">LinkedIn</a></li>
         <li><a href={site.contact.github} rel="me">GitHub</a></li>

@@ -187,33 +187,15 @@ html.lg-refract .button {
   html { scroll-padding-bottom: 84px; }
 }
 
-/* ----------------------------------------------------- calm plain text -- */
-/* Light mode only: text that isn't on glass gets an invisible frosting, with
-   no tint, border or shadow, so the lattice right behind the words melts
-   into the soft background. Feathered edges keep it from looking like a box.
-   Glass panes and dark mode are untouched. */
+/* ------------------------------------------------------- plain text -- */
+/* Light mode only: text that isn't on glass gets a hair more weight
+   (a 0.25px stroke, not a jump to bold) so it holds its own against the
+   lattice. No backgrounds or blur. Dark mode is untouched. */
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) .calm {
-    --calm: 1;
+  :root:not([data-theme='dark']) .plain-text {
+    -webkit-text-stroke: 0.25px currentColor;
   }
 }
-:root[data-theme='light'] .calm {
-  --calm: 1;
-}
-.calm {
-  --calm: 0;
-}
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .calm {
-    padding: 14px 18px;
-    margin: -14px -18px;
-    -webkit-backdrop-filter: blur(calc(9px * var(--calm)));
-    backdrop-filter: blur(calc(9px * var(--calm)));
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 18px, #000 calc(100% - 18px), transparent),
-      linear-gradient(to bottom, transparent, #000 14px, #000 calc(100% - 14px), transparent);
-    -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(to right, transparent, #000 18px, #000 calc(100% - 18px), transparent),
-      linear-gradient(to bottom, transparent, #000 14px, #000 calc(100% - 14px), transparent);
-    mask-composite: intersect;
-  }
+:root[data-theme='light'] .plain-text {
+  -webkit-text-stroke: 0.25px currentColor;
 }
