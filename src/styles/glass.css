@@ -142,3 +142,9 @@ html.lg-refract .glass--lens {
 }
 .ask-input { border-radius: 999px !important; padding-left: 1.1rem !important; }
 .sh-text { border-radius: var(--radius-md) !important; }
+
+/* The floating dock covers the bottom ~70px on phones: anything scrolled into
+   view (links, focus, find-in-page) must land above it. */
+@media (max-width: 47.99rem) {
+  html { scroll-padding-bottom: 84px; }
+}
