@@ -63,18 +63,39 @@ body {
 }
 
 /* ---------------------------------------------------------------- glass -- */
+/* Everything below is a function of --lg, the "Liquid glass" slider (0..1).
+   Low = frosted and calm; high = clear, lensing, with bright edges.
+   0.7 is the default sweet spot. */
+:root {
+  --lg: 0.7;
+  --glass-tint: rgb(var(--glass-rgb) / calc(0.66 - 0.54 * var(--lg)));
+  --glass-tint-strong: rgb(var(--glass-rgb) / calc(0.84 - 0.42 * var(--lg)));
+  --glass-blur: calc(22px - 19px * var(--lg));
+  --glass-sat: calc(120% + 100% * var(--lg));
+  --glass-glow: rgb(255 255 255 / calc(0.24 * var(--lg)));
+  --glass-catch: rgb(255 255 255 / calc(0.5 * var(--lg)));
+  --glass-warm: rgb(255 110 150 / calc(0.14 * var(--lg)));
+  --glass-cool: rgb(110 200 255 / calc(0.14 * var(--lg)));
+}
+
 .glass {
   background-color: var(--glass-tint);
   background-image: linear-gradient(140deg, var(--glass-sheen) 0%, transparent 34%, transparent 72%, var(--glass-edge) 100%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(175%);
-  backdrop-filter: blur(var(--glass-blur)) saturate(175%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   border-radius: var(--radius-lg);
   border: 0;
+  /* A thick sheet of glass: bright top rim, light catching the bottom edge,
+     a faint chromatic fringe at the sides, inner glow, depth and lift. */
   box-shadow:
-    inset 0 1px 0.5px var(--glass-rim),
+    inset 0 1.5px 1px var(--glass-rim),
+    inset 0 -1.5px 1px var(--glass-catch),
+    inset 2px 0 3px var(--glass-warm),
+    inset -2px 0 3px var(--glass-cool),
     inset 0 0 0 1px var(--glass-edge),
-    inset 0 -14px 28px -22px var(--glass-depth),
-    0 18px 40px -22px var(--glass-shadow),
+    inset 0 0 28px var(--glass-glow),
+    inset 0 -16px 30px -22px var(--glass-depth),
+    0 20px 44px -24px var(--glass-shadow),
     0 2px 6px -2px var(--glass-shadow);
 }
 
@@ -83,10 +104,25 @@ body {
 }
 
 /* True refraction (Chromium): the backdrop is bent through a liquid noise
-   displacement before it is blurred. Only on a few panes: it is GPU work. */
-html.lg-refract .glass--lens {
-  -webkit-backdrop-filter: url(#lg-refract) blur(calc(var(--glass-blur) * 0.6)) saturate(180%);
-  backdrop-filter: url(#lg-refract) blur(calc(var(--glass-blur) * 0.6)) saturate(180%);
+   displacement before it is blurred. The slider sets the strength; at its
+   lowest the class is removed so phones do no displacement work at all. */
+html.lg-refract .glass,
+html.lg-refract .button {
+  -webkit-backdrop-filter: url(#lg-refract) blur(calc(var(--glass-blur) * 0.45)) saturate(var(--glass-sat));
+  backdrop-filter: url(#lg-refract) blur(calc(var(--glass-blur) * 0.45)) saturate(var(--glass-sat));
+}
+
+/* Jaali: a Mughal lattice fixed behind everything, so the glass has fine
+   detail to bend and blur as it scrolls over it. */
+.jaali {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--jaali-color);
+  opacity: var(--jaali-opacity);
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 30%, #000 40%, transparent 100%);
+  mask-image: radial-gradient(120% 90% at 50% 30%, #000 40%, transparent 100%);
 }
 
 /* No backdrop-filter support: fall back to a more opaque tint for legibility. */
@@ -105,11 +141,13 @@ html.lg-refract .glass--lens {
 .button {
   border: 0;
   border-radius: 999px;
-  -webkit-backdrop-filter: blur(14px) saturate(170%);
-  backdrop-filter: blur(14px) saturate(170%);
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.7)) saturate(var(--glass-sat));
+  backdrop-filter: blur(calc(var(--glass-blur) * 0.7)) saturate(var(--glass-sat));
   box-shadow:
-    inset 0 1px 0.5px var(--glass-rim),
+    inset 0 1.5px 1px var(--glass-rim),
+    inset 0 -1px 1px var(--glass-catch),
     inset 0 0 0 1px var(--glass-edge),
+    inset 0 0 14px var(--glass-glow),
     0 10px 22px -14px var(--glass-shadow);
   transition: transform 160ms var(--ease), background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }

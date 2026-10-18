@@ -154,14 +154,12 @@
    that already uses it turns glassy. */
 :root {
   --surface: rgba(255, 251, 244, 0.5);
-  --glass-tint: rgba(255, 251, 244, 0.44);
-  --glass-tint-strong: rgba(255, 251, 244, 0.62);
+  --glass-rgb: 255 251 244;
   --glass-sheen: rgba(255, 255, 255, 0.55);
   --glass-rim: rgba(255, 255, 255, 0.85);
   --glass-edge: rgba(255, 255, 255, 0.45);
   --glass-depth: rgba(94, 84, 104, 0.28);
   --glass-shadow: rgba(60, 40, 50, 0.22);
-  --glass-blur: 22px;
   --radius-lg: 28px;
   --radius-md: 18px;
 
@@ -173,13 +171,14 @@
   --bd-neem: rgba(110, 128, 70, 0.34);
   --bd-mauve: rgba(120, 100, 140, 0.32);
   --bd-brick: rgba(169, 70, 45, 0.26);
+  --jaali-color: #6b5a6e;
+  --jaali-opacity: 0.3;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --surface: rgba(34, 29, 40, 0.55);
-    --glass-tint: rgba(30, 26, 36, 0.46);
-    --glass-tint-strong: rgba(30, 26, 36, 0.66);
+    --glass-rgb: 30 26 36;
     --glass-sheen: rgba(255, 255, 255, 0.14);
     --glass-rim: rgba(255, 255, 255, 0.26);
     --glass-edge: rgba(255, 255, 255, 0.12);
@@ -193,13 +192,14 @@
     --bd-neem: rgba(157, 176, 106, 0.16);
     --bd-mauve: rgba(150, 120, 190, 0.22);
     --bd-brick: rgba(224, 122, 88, 0.18);
+    --jaali-color: #c9b8d6;
+    --jaali-opacity: 0.16;
   }
 }
 
 :root[data-theme='dark'] {
   --surface: rgba(34, 29, 40, 0.55);
-  --glass-tint: rgba(30, 26, 36, 0.46);
-  --glass-tint-strong: rgba(30, 26, 36, 0.66);
+  --glass-rgb: 30 26 36;
   --glass-sheen: rgba(255, 255, 255, 0.14);
   --glass-rim: rgba(255, 255, 255, 0.26);
   --glass-edge: rgba(255, 255, 255, 0.12);
@@ -213,4 +213,6 @@
   --bd-neem: rgba(157, 176, 106, 0.16);
   --bd-mauve: rgba(150, 120, 190, 0.22);
   --bd-brick: rgba(224, 122, 88, 0.18);
+  --jaali-color: #c9b8d6;
+  --jaali-opacity: 0.16;
 }

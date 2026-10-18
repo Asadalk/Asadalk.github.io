@@ -1,0 +1,61 @@
+---
+// "Liquid glass" slider: from frosted (0) to clear, lensing glass (100).
+// Drives --lg and the refraction strength via window.__applyGlass (Base.astro).
+// Hidden without JS, where the default glass simply stays as it is.
+---
+
+<div class="dial" data-glass-dial hidden>
+  <label for="glass-range" class="mono">Liquid glass</label>
+  <span class="end mono" aria-hidden="true">frosted</span>
+  <input id="glass-range" type="range" min="0" max="100" step="1" value="70" />
+  <span class="end mono" aria-hidden="true">clear</span>
+</div>
+
+<script>
+  type W = Window & { __applyGlass?: (lg: number) => void };
+  const dial = document.querySelector<HTMLElement>('[data-glass-dial]');
+  const range = dial?.querySelector<HTMLInputElement>('input');
+  if (dial && range) {
+    let saved: number | null = null;
+    try {
+      const v = parseFloat(localStorage.getItem('glass') ?? '');
+      if (Number.isFinite(v)) saved = v;
+    } catch {}
+    // Visitors who ask the system for less transparency start calmer.
+    const start = saved ?? (matchMedia('(prefers-reduced-transparency: reduce)').matches ? 0.25 : 0.7);
+    range.value = String(Math.round(start * 100));
+    (window as W).__applyGlass?.(start);
+    const label = () => range.setAttribute('aria-valuetext', `${range.value}%, ${Number(range.value) < 35 ? 'frosted' : Number(range.value) < 75 ? 'balanced' : 'clear'}`);
+    label();
+    dial.hidden = false;
+    range.addEventListener('input', () => {
+      const lg = Number(range.value) / 100;
+      (window as W).__applyGlass?.(lg);
+      label();
+      try {
+        localStorage.setItem('glass', String(lg));
+      } catch {}
+    });
+  }
+</script>
+
+<style>
+  .dial {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.25rem 0 1rem;
+    max-width: 26rem;
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+  .dial label { color: var(--text); margin-right: 0.25rem; }
+  .end { font-size: 0.62rem; }
+  input[type='range'] {
+    width: 100%;
+    min-height: 32px;
+    accent-color: var(--accent-ink);
+    background: transparent;
+  }
+</style>

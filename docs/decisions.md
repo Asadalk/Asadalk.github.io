@@ -142,3 +142,11 @@
 - **Tested** with natural, unanswerable and adversarial questions: highest education, year of study, research, LLM experience, contact, JEE rank, club, OpsBench results, Kubernetes (not on the site), CGPA and phone (not on the site), and an injection attempt (refused).
 - **Abuse limits:** 300-character questions and 12 questions per minute per IP. The Groq key lives only in the Modal secret `portfolio-groq`.
 - **Fallbacks:** if `/ask` fails, the box shows semantic-search results; if the server is unreachable, the in-browser model.
+
+## 2026-10-18 · Stronger liquid glass and a "Liquid glass" slider
+
+- **Light mode read as plain cream cards on phones.** The glass was 44% cream with a 22 px blur over a soft cream gradient, so there was nothing to refract. Three changes:
+  - **A jaali lattice behind everything.** A Mughal lattice pattern (the Taj Mahal's screen work) is fixed behind the page, so the glass has fine detail to bend and blur as cards scroll over it.
+  - **Clearer glass.** At the default setting the tint is about 28% and the blur about 7 px, or about 3 px under refraction in Chromium.
+  - **Lens-like edges.** A bright top rim, light catching the bottom edge, a faint warm and cool chromatic fringe at the sides, and an inner glow. Refraction now covers cards and buttons too.
+- **The "Liquid glass" slider** sits in the headline pane, from frosted (0) to clear (100), with a default of 70 chosen visually as the sweet spot. It drives `--lg`, which controls tint, blur, saturation, edge highlights and the displacement strength (0–110). The setting is saved per visitor. Below 15 refraction is switched off, an escape hatch for slow phones. If the system asks for reduced transparency, it starts at 25. Without JS the slider is hidden and the default glass applies.
