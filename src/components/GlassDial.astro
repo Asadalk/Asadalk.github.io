@@ -7,7 +7,7 @@
 <div class="dial" data-glass-dial hidden>
   <label for="glass-range" class="mono">Liquid glass</label>
   <span class="end mono" aria-hidden="true">frosted</span>
-  <input id="glass-range" type="range" min="0" max="100" step="1" value="70" />
+  <input id="glass-range" type="range" min="0" max="100" step="1" value="100" />
   <span class="end mono" aria-hidden="true">clear</span>
 </div>
 
@@ -22,7 +22,7 @@
       if (Number.isFinite(v)) saved = v;
     } catch {}
     // Visitors who ask the system for less transparency start calmer.
-    const start = saved ?? (matchMedia('(prefers-reduced-transparency: reduce)').matches ? 0.25 : 0.7);
+    const start = saved ?? (matchMedia('(prefers-reduced-transparency: reduce)').matches ? 0.25 : 1);
     range.value = String(Math.round(start * 100));
     (window as W).__applyGlass?.(start);
     const label = () => range.setAttribute('aria-valuetext', `${range.value}%, ${Number(range.value) < 35 ? 'frosted' : Number(range.value) < 75 ? 'balanced' : 'clear'}`);

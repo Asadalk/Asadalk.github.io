@@ -65,9 +65,9 @@ body {
 /* ---------------------------------------------------------------- glass -- */
 /* Everything below is a function of --lg, the "Liquid glass" slider (0..1).
    Low = frosted and calm; high = clear, lensing, with bright edges.
-   0.7 is the default sweet spot. */
+   Full (1) is the default: the owner wants every visitor to see the full effect. */
 :root {
-  --lg: 0.7;
+  --lg: 1;
   --glass-tint: rgb(var(--glass-rgb) / calc(0.66 - 0.54 * var(--lg)));
   --glass-tint-strong: rgb(var(--glass-rgb) / calc(0.84 - 0.42 * var(--lg)));
   --glass-blur: calc(22px - 19px * var(--lg));
