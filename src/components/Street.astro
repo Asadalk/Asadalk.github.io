@@ -139,16 +139,18 @@ const tall = tallScene(site.signboards);
   .street :global(.shop) { cursor: pointer; outline: none; }
   .street :global(.shop .board) { transition: filter var(--dur) var(--ease); }
   .street :global(.shop:hover .board) { filter: brightness(1.08); }
-  .street :global(.shop:hover .box),
-  .street :global(.shop:focus-visible .box) { stroke-width: 4.5; }
-  .street :global(.shop:hover .box-edge),
-  .street :global(.shop:focus-visible .box-edge) { stroke-width: 8; }
+  .street :global(.shop:hover + .det .box),
+  .street :global(.shop:focus-visible + .det .box) { stroke-width: 4.5; }
+  .street :global(.shop:hover + .det .box-edge),
+  .street :global(.shop:focus-visible + .det .box-edge) { stroke-width: 8; }
 
   /* Lock-on: the chosen sign's box thickens, everything else dims. */
   .street :global(.shop) { transition: opacity 220ms var(--ease); }
-  .street :global(.locking .shop:not(.locked)) { opacity: 0.3; }
-  .street :global(.locked .box) { stroke-width: 6; transition: stroke-width 200ms var(--ease); }
-  .street :global(.locked .box-edge) { stroke-width: 10; transition: stroke-width 200ms var(--ease); }
+  .street :global(.det) { transition: opacity 220ms var(--ease); }
+  .street :global(.locking .shop:not(.locked)),
+  .street :global(.locking .shop:not(.locked) + .det) { opacity: 0.3; }
+  .street :global(.locked + .det .box) { stroke-width: 6; transition: stroke-width 200ms var(--ease); }
+  .street :global(.locked + .det .box-edge) { stroke-width: 10; transition: stroke-width 200ms var(--ease); }
 
   @keyframes draw { to { stroke-dashoffset: 0; } }
   @keyframes appear { to { opacity: 1; } }

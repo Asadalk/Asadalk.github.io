@@ -163,12 +163,11 @@ const b = s.bicycle;
   </g>
 
   {shops.map((shop) => (
+    <>
     <a
       href={`#${shop.target}`}
       class="shop"
       data-target={shop.target}
-      aria-label={`${shop.hi} ${shop.en}`}
-      style={`--p:${shop.perimeter};--d:${shop.delay}ms`}
     >
       <g transform={shop.transform}>
         <path
@@ -194,7 +193,8 @@ const b = s.bicycle;
           {shop.en}
         </text>
       </g>
-      <g class="det" aria-hidden="true">
+    </a>
+      <g class="det" aria-hidden="true" style={`--p:${shop.perimeter};--d:${shop.delay}ms`}>
         <rect class="box-edge" x={shop.box.x} y={shop.box.y} width={shop.box.w} height={shop.box.h} fill="none" />
         <rect class="box" x={shop.box.x} y={shop.box.y} width={shop.box.w} height={shop.box.h} fill="none" />
         <g class="tag">
@@ -202,6 +202,6 @@ const b = s.bicycle;
           <text x={shop.box.x + 5} y={shop.box.y - 6} class="tag-text">{shop.label}</text>
         </g>
       </g>
-    </a>
+    </>
   ))}
 </svg>
