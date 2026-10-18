@@ -68,7 +68,7 @@ body {
    Full (1) is the default: the owner wants every visitor to see the full effect. */
 :root {
   --lg: 1;
-  --glass-tint: rgb(var(--glass-rgb) / calc(0.66 - 0.54 * var(--lg)));
+  --glass-tint: rgb(var(--glass-rgb) / calc(var(--tint-max) - var(--tint-range) * var(--lg)));
   --glass-tint-strong: rgb(var(--glass-rgb) / calc(0.84 - 0.42 * var(--lg)));
   --glass-blur: calc(22px - 19px * var(--lg));
   --glass-sat: calc(120% + 100% * var(--lg));
