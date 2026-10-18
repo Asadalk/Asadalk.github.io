@@ -1,0 +1,70 @@
+---
+// The owner's portrait: cropped from his own photo at the Taj Mahal, global
+// colour/brightness only (no facial edits), sRGB, metadata stripped.
+// AVIF → WebP → JPEG, sized for each use so phones download a few KB.
+interface Props {
+  variant: 'hero' | 'about';
+}
+const { variant } = Astro.props;
+const base = '/media/portrait/asad';
+const sizes = variant === 'hero' ? '(min-width: 48rem) 168px, 92px' : '(min-width: 48rem) 300px, 72vw';
+const set = (ext: string, list: number[]) => list.map((w) => `${base}-${w}.${ext} ${w}w`).join(', ');
+const widths = variant === 'hero' ? [192, 384] : [384, 640, 960];
+const alt = 'Asadullah Faisal, smiling, in front of the marble arches of the Taj Mahal';
+---
+
+<figure class:list={['portrait', `portrait--${variant}`]}>
+  <picture>
+    <source type="image/avif" srcset={set('avif', widths)} sizes={sizes} />
+    <source type="image/webp" srcset={set('webp', widths)} sizes={sizes} />
+    <img
+      src={`${base}-640.jpg`}
+      width="640"
+      height="640"
+      alt={alt}
+      decoding="async"
+      loading={variant === 'hero' ? 'eager' : 'lazy'}
+      fetchpriority={variant === 'hero' ? 'high' : undefined}
+    />
+  </picture>
+  {variant === 'about' && <figcaption class="mono">At the Taj Mahal, Agra</figcaption>}
+</figure>
+
+<style>
+  .portrait { margin: 0; }
+  picture { display: block; }
+  img { display: block; width: 100%; height: auto; }
+
+  /* Hero: a round portrait set in a thick glass ring. */
+  .portrait--hero {
+    width: 92px;
+    flex: none;
+    padding: 5px;
+    border-radius: 50%;
+    background: var(--glass-tint) linear-gradient(140deg, var(--glass-sheen), transparent 50%);
+    box-shadow:
+      inset 0 1px 0.5px var(--glass-rim),
+      inset 0 0 0 1px var(--glass-edge),
+      0 14px 30px -16px var(--glass-shadow);
+  }
+  .portrait--hero img { border-radius: 50%; }
+  @media (min-width: 48rem) {
+    .portrait--hero { width: 168px; padding: 7px; }
+  }
+
+  /* About: a larger frame of glass with a quiet caption. */
+  .portrait--about {
+    width: min(72vw, 300px);
+    padding: 8px;
+    border-radius: var(--radius-lg);
+    background: var(--glass-tint) linear-gradient(140deg, var(--glass-sheen), transparent 45%);
+    -webkit-backdrop-filter: blur(16px) saturate(170%);
+    backdrop-filter: blur(16px) saturate(170%);
+    box-shadow:
+      inset 0 1px 0.5px var(--glass-rim),
+      inset 0 0 0 1px var(--glass-edge),
+      0 22px 44px -24px var(--glass-shadow);
+  }
+  .portrait--about img { border-radius: calc(var(--radius-lg) - 8px); }
+  figcaption { font-size: 0.68rem; color: var(--muted); text-align: center; padding: 0.5rem 0 0.15rem; }
+</style>

@@ -4,6 +4,7 @@ import ResearchCard from '../components/ResearchCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import Skills from '../components/Skills.astro';
 import Street from '../components/Street.astro';
+import Portrait from '../components/Portrait.astro';
 import AskAboutMe from '../components/AskAboutMe.astro';
 import OpenerChips from '../components/OpenerChips.astro';
 import SuggestionChip from '../components/SuggestionChip.astro';
@@ -30,11 +31,14 @@ const brainData = {
   <header class="hero" slot="header">
     <div class="wrap">
       <div class="intro glass glass--lens">
-        <p class="eyebrow mono">{site.name} · {site.tagline}</p>
-        <h1 data-headline>{site.headlines.default}</h1>
-        <div class="actions">
-          <a class="button button--primary" href="#scan">Scan a photo with my model</a>
-          <a class="button button--ghost" href="/resume/">Plain résumé view</a>
+        <Portrait variant="hero" />
+        <div class="intro-text">
+          <p class="eyebrow mono">{site.name} · {site.tagline}</p>
+          <h1 data-headline>{site.headlines.default}</h1>
+          <div class="actions">
+            <a class="button button--primary" href="#scan">Scan a photo with my model</a>
+            <a class="button button--ghost" href="/resume/">Plain résumé view</a>
+          </div>
         </div>
       </div>
     </div>
@@ -45,8 +49,13 @@ const brainData = {
   <div class="wrap feed">
     <section id="about" aria-labelledby="about-h">
       <h2 id="about-h">About</h2>
-      <p class="lede">{site.bio}</p>
-      {site.about.map((p) => <p>{p}</p>)}
+      <div class="about-grid">
+        <Portrait variant="about" />
+        <div>
+          <p class="lede">{site.bio}</p>
+          {site.about.map((p) => <p>{p}</p>)}
+        </div>
+      </div>
     </section>
 
     <AskAboutMe />
@@ -128,6 +137,14 @@ const brainData = {
   .intro { padding: 1.4rem 1.4rem 0.4rem; margin-bottom: 1.25rem; }
   @media (min-width: 48rem) { .intro { padding: 2rem 2.2rem 0.8rem; } }
   .intro h1 { max-width: 20ch; }
+  .intro { display: flex; flex-direction: column; gap: 1rem; }
+  @media (min-width: 48rem) {
+    .intro { flex-direction: row-reverse; align-items: center; justify-content: space-between; gap: 2rem; }
+  }
+  .about-grid { display: grid; gap: 1.5rem; justify-items: start; }
+  @media (min-width: 56rem) {
+    .about-grid { grid-template-columns: auto 1fr; align-items: start; gap: 2.5rem; }
+  }
   .eyebrow { font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; }
   .lede { font-size: 1.15rem; }
   .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.25rem 0 1.5rem; }
