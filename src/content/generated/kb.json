@@ -117,334 +117,436 @@
   "id": "c20",
   "href": "/#research-bstd",
   "title": "Research results: TextBPN++ detection on the BSTD test set, before and after fixing the preprocessing mismatch (no retraining)",
-  "text": "Asadullah Faisal's research result. TextBPN++ detection on the BSTD test set, before and after fixing the preprocessing mismatch (no retraining): Setup As shipped, Recall 0.621, F1 0.656; Setup Normalization fixed, Recall 0.670, F1 0.675."
+  "text": "Asadullah Faisal's research result — TextBPN++ detection on the BSTD test set, before and after fixing the preprocessing mismatch (no retraining). Row \"As shipped\": Recall 0.621, F1 0.656."
  },
  {
   "id": "c21",
   "href": "/#research-bstd",
-  "title": "Research results: Small-text F1",
-  "text": "Asadullah Faisal's research result. Small-text F1: Setup Baseline, Small-text F1 0.47; Setup Scale-aware 1.5× upscaling, Small-text F1 0.59. Tiled inference was rejected: +67 false positives for +4 true positives."
+  "title": "Research results: TextBPN++ detection on the BSTD test set, before and after fixing the preprocessing mismatch (no retraining)",
+  "text": "Asadullah Faisal's research result — TextBPN++ detection on the BSTD test set, before and after fixing the preprocessing mismatch (no retraining). Row \"Normalization fixed\": Recall 0.670, F1 0.675."
  },
  {
   "id": "c22",
   "href": "/#research-bstd",
-  "title": "Research results: End-to-end OCR (detection → script identification → PARSeq recognition)",
-  "text": "Asadullah Faisal's research result. End-to-end OCR (detection → script identification → PARSeq recognition): Detector Before fine-tuning, Word recall 50.7%, F1 51.0%; Detector Fine-tuned YOLO, Word recall 54.3%, F1 53.8%."
+  "title": "Research results: Small-text F1",
+  "text": "Asadullah Faisal's research result — Small-text F1. Row \"Baseline\": Small-text F1 0.47."
  },
  {
   "id": "c23",
   "href": "/#research-bstd",
-  "title": "Research results: Precision–recall trade-off of a 5-model polygon-fusion ensemble",
-  "text": "Asadullah Faisal's research result. Precision–recall trade-off of a 5-model polygon-fusion ensemble: Setup 5-model ensemble, Recall 56.7%, Precision 40.3%. Ensembling buys recall at a steep cost in precision."
+  "title": "Research results: Small-text F1",
+  "text": "Asadullah Faisal's research result — Small-text F1. Row \"Scale-aware 1.5× upscaling\": Small-text F1 0.59."
  },
  {
   "id": "c24",
+  "href": "/#research-bstd",
+  "title": "Research results: Small-text F1 (notes)",
+  "text": "Asadullah Faisal's research, Small-text F1: Tiled inference was rejected: +67 false positives for +4 true positives."
+ },
+ {
+  "id": "c25",
+  "href": "/#research-bstd",
+  "title": "Research results: End-to-end OCR (detection → script identification → PARSeq recognition)",
+  "text": "Asadullah Faisal's research result — End-to-end OCR (detection → script identification → PARSeq recognition). Row \"Before fine-tuning\": Word recall 50.7%, F1 51.0%."
+ },
+ {
+  "id": "c26",
+  "href": "/#research-bstd",
+  "title": "Research results: End-to-end OCR (detection → script identification → PARSeq recognition)",
+  "text": "Asadullah Faisal's research result — End-to-end OCR (detection → script identification → PARSeq recognition). Row \"Fine-tuned YOLO\": Word recall 54.3%, F1 53.8%."
+ },
+ {
+  "id": "c27",
+  "href": "/#research-bstd",
+  "title": "Research results: Precision–recall trade-off of a 5-model polygon-fusion ensemble",
+  "text": "Asadullah Faisal's research result — Precision–recall trade-off of a 5-model polygon-fusion ensemble. Row \"5-model ensemble\": Recall 56.7%, Precision 40.3%."
+ },
+ {
+  "id": "c28",
+  "href": "/#research-bstd",
+  "title": "Research results: Precision–recall trade-off of a 5-model polygon-fusion ensemble (notes)",
+  "text": "Asadullah Faisal's research, Precision–recall trade-off of a 5-model polygon-fusion ensemble: Ensembling buys recall at a steep cost in precision."
+ },
+ {
+  "id": "c29",
   "href": "/#research-bstd",
   "title": "Research: ongoing work",
   "text": "Asadullah Faisal's ongoing research work (in progress, no results yet): Working on a YOLO training recipe built around small-word crops."
  },
  {
-  "id": "c25",
+  "id": "c30",
   "href": "/#research-bstd",
   "title": "Research: tools",
   "text": "Tools Asadullah Faisal uses in his research: PyTorch, Ultralytics YOLO, Detectron2, docTR, OpenCV, Shapely, CUDA (RTX A6000)."
  },
  {
-  "id": "c26",
+  "id": "c31",
   "href": "/#research-bstd",
   "title": "Research: credit",
   "text": "IndicPhotoOCR, its paper and the Bharat Scene Text Dataset belong to the Bhashini / VL2G lab at IIT Jodhpur. Only the work listed here is mine. Paper: De, Penamakuri, Yadav, Rathore, Shah, Sharma, Agarwal, Kumar, Mishra. Bharat Scene Text: A Novel Comprehensive Dataset and Benchmark for Indian Language Scene Text Understanding. IJDAR, 2026."
  },
  {
-  "id": "c27",
+  "id": "c32",
   "href": "/#opspilot",
   "title": "Project: OpsPilot",
   "text": "Asadullah Faisal's project OpsPilot: An AI operations assistant that investigates incidents with evidence, but can only act through a server-side policy engine, human approval and verified execution. Problem it addresses: An LLM agent that can restart services or roll back deployments is dangerous if the model decides what is safe. OpsPilot keeps the model in charge of investigating and the server in charge of permission."
  },
  {
-  "id": "c28",
+  "id": "c33",
   "href": "/#opspilot",
   "title": "OpsPilot: what he built",
   "text": "In OpsPilot, Asadullah Faisal built: An agent loop with 6 typed, read-only tools (service health, metrics, log search, recent deployments, incident history, runbook search) over a simulated production environment. The model chooses which tools to call; the tools themselves are deterministic."
  },
  {
-  "id": "c29",
+  "id": "c34",
   "href": "/#opspilot",
   "title": "OpsPilot: what he built",
   "text": "In OpsPilot, Asadullah Faisal built: Hybrid retrieval over runbooks and postmortems in PostgreSQL + pgvector: 128-dimension hashed bag-of-words vectors plus a keyword score. No learned embedding model, by design (ADR-0002)."
  },
  {
-  "id": "c30",
+  "id": "c35",
   "href": "/#opspilot",
   "title": "OpsPilot: what he built",
   "text": "In OpsPilot, Asadullah Faisal built: Competing hypotheses, each with supporting and contradicting evidence, before a fix is proposed."
  },
  {
-  "id": "c31",
+  "id": "c36",
   "href": "/#opspilot",
   "title": "OpsPilot: what he built",
   "text": "In OpsPilot, Asadullah Faisal built: A server-side policy engine (role × risk × environment). Risk comes from a server table, never from the model, so a spoofed 'LOW risk' claim cannot bypass it."
  },
  {
-  "id": "c32",
+  "id": "c37",
   "href": "/#opspilot",
   "title": "OpsPilot: what he built",
   "text": "In OpsPilot, Asadullah Faisal built: Durable human approval, simulator execution, a verification step (SUCCESS / FAILED / INCONCLUSIVE), and append-only audit and agent-event tables enforced by database triggers."
  },
  {
-  "id": "c33",
+  "id": "c38",
   "href": "/#opspilot",
   "title": "OpsPilot: what he built",
   "text": "In OpsPilot, Asadullah Faisal built: 116 pytest tests, including prompt-injection and approval-bypass suites."
  },
  {
-  "id": "c34",
+  "id": "c39",
   "href": "/#opspilot",
   "title": "OpsPilot: what he built",
   "text": "In OpsPilot, Asadullah Faisal built: OpsBench 2.0.0: 100 scenarios across 12 categories, including prompt injection, misleading evidence and permission violations."
  },
  {
-  "id": "c35",
+  "id": "c40",
   "href": "/#opspilot",
   "title": "OpsPilot: results",
-  "text": "OpsPilot results. OpsBench 2.0.0, Groq openai/gpt-oss-120b, temperature 0. Source: backend/benchmarks/opsbench/v2/results/summary.md: System Plain LLM baseline, Task success 24%, Diagnosis 3%, Safety 26%; System OpsPilot (run 1), Task success 69%, Diagnosis 69%, Safety 86%; System OpsPilot (run 2), Task success 71%, Diagnosis 72%, Safety 86%."
+  "text": "OpsPilot result — OpsBench 2.0.0, Groq openai/gpt-oss-120b, temperature 0. Source: backend/benchmarks/opsbench/v2/results/summary.md. Row \"Plain LLM baseline\": Task success 24%, Diagnosis 3%, Safety 26%."
  },
  {
-  "id": "c36",
+  "id": "c41",
+  "href": "/#opspilot",
+  "title": "OpsPilot: results",
+  "text": "OpsPilot result — OpsBench 2.0.0, Groq openai/gpt-oss-120b, temperature 0. Source: backend/benchmarks/opsbench/v2/results/summary.md. Row \"OpsPilot (run 1)\": Task success 69%, Diagnosis 69%, Safety 86%."
+ },
+ {
+  "id": "c42",
+  "href": "/#opspilot",
+  "title": "OpsPilot: results",
+  "text": "OpsPilot result — OpsBench 2.0.0, Groq openai/gpt-oss-120b, temperature 0. Source: backend/benchmarks/opsbench/v2/results/summary.md. Row \"OpsPilot (run 2)\": Task success 71%, Diagnosis 72%, Safety 86%."
+ },
+ {
+  "id": "c43",
   "href": "/#opspilot",
   "title": "OpsPilot: finding",
   "text": "OpsPilot finding: Removing verification: 17 incidents marked resolved while the fault remained (0 with it)."
  },
  {
-  "id": "c37",
+  "id": "c44",
   "href": "/#opspilot",
   "title": "OpsPilot: finding",
   "text": "OpsPilot finding: Removing retrieval: diagnosis fell from 69% to 44%."
  },
  {
-  "id": "c38",
+  "id": "c45",
   "href": "/#opspilot",
   "title": "OpsPilot: finding",
   "text": "OpsPilot finding: A fixed investigation plan beat free planning: 81% task success and 97% safety with about 4× fewer tokens."
  },
  {
-  "id": "c39",
+  "id": "c46",
   "href": "/#opspilot",
   "title": "OpsPilot: finding",
   "text": "OpsPilot finding: Misleading-evidence scenarios: 0/8. The agent still falls for planted evidence."
  },
  {
-  "id": "c40",
+  "id": "c47",
   "href": "/#opspilot",
   "title": "OpsPilot: caveats",
   "text": "OpsPilot caveats: I wrote both the scenarios and the labels. Diagnosis and grounding are scored by term matching. The simulated reviewer approves unless a scenario says to reject. One scenario per run was rerun after network errors."
  },
  {
-  "id": "c41",
+  "id": "c48",
   "href": "/#opspilot",
   "title": "OpsPilot: tech stack",
   "text": "OpsPilot tech stack: Next.js 14, TypeScript, FastAPI, PostgreSQL 16 + pgvector, Groq (openai/gpt-oss-120b), Gemini (supported, not benchmarked), JWT, Docker, pytest."
  },
  {
-  "id": "c42",
+  "id": "c49",
   "href": "/#opspilot",
   "title": "OpsPilot: code",
   "text": "OpsPilot source code: https://github.com/Asadalk/OpsPilot"
  },
  {
-  "id": "c43",
+  "id": "c50",
   "href": "/#semantic-hire",
   "title": "Project: semantic-hire",
   "text": "Asadullah Faisal's project semantic-hire: Ranks job descriptions against a resume by meaning plus verified skill overlap, with an LLM allowed to explain results but never to rank them. Problem it addresses: Keyword matching misses resumes that describe the right work in different words; pure embeddings ignore hard skill requirements."
  },
  {
-  "id": "c44",
+  "id": "c51",
   "href": "/#semantic-hire",
   "title": "semantic-hire: what he built",
   "text": "In semantic-hire, Asadullah Faisal built: Embeds jobs (title + description + skills) and resumes with all-MiniLM-L6-v2, normalized, retrieved with an exact FAISS IndexFlatIP."
  },
  {
-  "id": "c45",
+  "id": "c52",
   "href": "/#semantic-hire",
   "title": "semantic-hire: what he built",
   "text": "In semantic-hire, Asadullah Faisal built: Re-ranks the retrieved jobs by 0.7 × semantic score + 0.3 × skill overlap, where overlap is the share of the job's skills found in the resume."
  },
  {
-  "id": "c46",
+  "id": "c53",
   "href": "/#semantic-hire",
   "title": "semantic-hire: what he built",
   "text": "In semantic-hire, Asadullah Faisal built: Dictionary-based skill extraction (49 skills) with boundary-aware matching, so 'Java' does not match inside 'JavaScript'."
  },
  {
-  "id": "c47",
+  "id": "c54",
   "href": "/#semantic-hire",
   "title": "semantic-hire: what he built",
   "text": "In semantic-hire, Asadullah Faisal built: Optional Gemini explanation after ranking, validated so it can only cite skills the matcher actually verified. If Gemini fails, ranked results still return."
  },
  {
-  "id": "c48",
+  "id": "c55",
   "href": "/#semantic-hire",
   "title": "semantic-hire: what he built",
   "text": "In semantic-hire, Asadullah Faisal built: Evaluation with Precision@K, Recall@K, MRR and NDCG@K on a hand-labelled query set."
  },
  {
-  "id": "c49",
+  "id": "c56",
   "href": "/#semantic-hire",
   "title": "semantic-hire: results",
-  "text": "semantic-hire results. 8 hand-labelled queries over 24 synthetic job descriptions, K = 5. Source: evaluation/results.json: Precision@5 0.650, Recall@5 0.881, MRR 1.000, NDCG@5 0.901."
+  "text": "semantic-hire result — 8 hand-labelled queries over 24 synthetic job descriptions, K = 5. Source: evaluation/results.json. Row \"0.650\": Recall@5 0.881, MRR 1.000, NDCG@5 0.901."
  },
  {
-  "id": "c50",
+  "id": "c57",
   "href": "/#semantic-hire",
   "title": "semantic-hire: caveats",
   "text": "semantic-hire caveats: A demonstration benchmark, not an estimate of production quality: 24 jobs and 8 queries, all written by me. Three queries have only 3 relevant jobs, so their Precision@5 cannot exceed 0.6."
  },
  {
-  "id": "c51",
+  "id": "c58",
   "href": "/#semantic-hire",
   "title": "semantic-hire: tech stack",
   "text": "semantic-hire tech stack: Python, sentence-transformers, FAISS, FastAPI, Gemini (google-genai), Docker, pytest."
  },
  {
-  "id": "c52",
+  "id": "c59",
   "href": "/#semantic-hire",
   "title": "semantic-hire: code",
   "text": "semantic-hire source code: https://github.com/Asadalk/semantic-hire"
  },
  {
-  "id": "c53",
+  "id": "c60",
   "href": "/#smoketrail",
   "title": "Project: SmokeTrail",
-  "text": "Asadullah Faisal's project SmokeTrail (in progress): Do upwind crop fires in Punjab and Haryana show up in Delhi's air the next day? A classical data science study, no LLMs. Problem it addresses: Every autumn, crop-residue fires in Punjab and Haryana coincide with Delhi's worst air. The question: how much higher is Delhi's daily PM2.5 on days with heavy upwind burning, after adjusting for weather, and can today's fires predict tomorrow's air?"
+  "text": "Asadullah Faisal's project SmokeTrail: Do crop fires upwind in Punjab and Haryana show up in Delhi's air? A weather-adjusted attribution study and a next-day PM2.5 forecaster, built from raw satellite, weather and air-quality data. No LLMs. Problem it addresses: Every autumn, crop-residue fires in Punjab and Haryana coincide with Delhi's worst air. But fires, stagnant winter weather and smog all peak together, so a simple correlation proves nothing. Two questions: how much higher is Delhi's daily PM2.5 when there is heavy burning upwind, after adjusting for weather, and can today's fires help forecast tomorrow's PM2.5?"
  },
  {
-  "id": "c54",
+  "id": "c61",
   "href": "/#smoketrail",
-  "title": "SmokeTrail: plan",
-  "text": "Planned for SmokeTrail: Data: Kaggle 'Air Quality Data in India' (city_day), NASA FIRMS VIIRS fire detections, Open-Meteo historical weather. Sep 15 – Dec 15, 2015–2019."
+  "title": "SmokeTrail: what he built",
+  "text": "In SmokeTrail, Asadullah Faisal built: A reproducible pipeline from raw data: Delhi daily PM2.5 (Kaggle city_day, from CPCB), 359,621 valid NASA FIRMS VIIRS fire detections in the Punjab–Haryana box, and hourly ERA5 weather from Open-Meteo, for 15 Sep–15 Dec, 2015–2019 (460 in-season days)."
  },
  {
-  "id": "c55",
+  "id": "c62",
   "href": "/#smoketrail",
-  "title": "SmokeTrail: plan",
-  "text": "Planned for SmokeTrail: Upwind-fire feature: fires inside a ±30° cone around the wind direction, 1–3 day lags, fires within 50 km of Delhi excluded."
+  "title": "SmokeTrail: what he built",
+  "text": "In SmokeTrail, Asadullah Faisal built: SQLite with SQL transformations: vector-averaged daily wind from u/v components, daily fire totals, and a modelling table joined onto a complete calendar. Cleaning rules set flags instead of deleting rows."
  },
  {
-  "id": "c56",
+  "id": "c63",
   "href": "/#smoketrail",
-  "title": "SmokeTrail: plan",
-  "text": "Planned for SmokeTrail: OLS with robustness checks and a placebo test; LightGBM + SHAP forecasting with train 2015–17 / validate 2018 / test 2019."
+  "title": "SmokeTrail: what he built",
+  "text": "In SmokeTrail, Asadullah Faisal built: The key feature, upwind fire load: for each fire, distance and compass bearing from Delhi; a fire counts as upwind if it lies within ±30° of the direction the wind blows from; load = Σ fire radiative power / distance, with 1–3 day lags. The opposite cone gives a downwind placebo."
  },
  {
-  "id": "c57",
+  "id": "c64",
   "href": "/#smoketrail",
-  "title": "SmokeTrail: plan",
-  "text": "Planned for SmokeTrail: Dashboard: Streamlit + pydeck (planned)."
+  "title": "SmokeTrail: what he built",
+  "text": "In SmokeTrail, Asadullah Faisal built: Attribution: OLS of PM2.5 on upwind load with weather controls (wind, humidity, temperature, boundary layer height, rain), a seasonal curve, Diwali and year effects, and Newey-West standard errors, plus 7 robustness checks and a simulation that checks how well calibrated the confidence intervals are."
  },
  {
-  "id": "c58",
+  "id": "c65",
   "href": "/#smoketrail",
-  "title": "SmokeTrail: status",
-  "text": "SmokeTrail status: Project setup is done; data collection and modelling are under way. Results will appear here only once the code produces them."
+  "title": "SmokeTrail: what he built",
+  "text": "In SmokeTrail, Asadullah Faisal built: Forecasting tomorrow's PM2.5: baselines first, then Ridge and LightGBM, with feature sets fixed in advance, tuning on 2018 only, and 2019 evaluated exactly once (logged audit trail). SHAP explanations, an ablation and an error analysis."
  },
  {
-  "id": "c59",
+  "id": "c66",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: what he built",
+  "text": "In SmokeTrail, Asadullah Faisal built: A Streamlit dashboard (fires, wind and cones on a map for any date; test-year forecasts; attribution charts) and 46 pytest tests covering geometry, joins, cleaning rules, leakage guards and estimator recovery."
+ },
+ {
+  "id": "c67",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: results",
+  "text": "SmokeTrail result — Next-day PM2.5 forecast, 2019 test season (92 days, evaluated once). Source: the repo's README and reports/forecasting.md. Row \"Baseline: persistence (tomorrow = today)\": MAE (µg/m³) 38.1, RMSE 65.6, AQI-category accuracy 59.8%."
+ },
+ {
+  "id": "c68",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: results",
+  "text": "SmokeTrail result — Next-day PM2.5 forecast, 2019 test season (92 days, evaluated once). Source: the repo's README and reports/forecasting.md. Row \"His model: LightGBM, chosen on 2018\": MAE (µg/m³) 32.3, RMSE 52.0, AQI-category accuracy 60.9%."
+ },
+ {
+  "id": "c69",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: finding",
+  "text": "SmokeTrail finding: Attribution: a sustained high upwind-fire spell (90th-percentile load on the day and the 3 days before) vs no upwind fires is associated with +43.9 µg/m³ daily PM2.5 (95% CI +26.9 to +61.0), adjusting for weather."
+ },
+ {
+  "id": "c70",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: finding",
+  "text": "SmokeTrail finding: The downwind placebo is near zero: −2.3 µg/m³ (95% CI −5.4 to +0.8, joint p = 0.65)."
+ },
+ {
+  "id": "c71",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: finding",
+  "text": "SmokeTrail finding: Across 7 robustness checks (fire count instead of load, cones of ±20° and ±45°, excluding Diwali, excluding 2019, no boundary-layer control, more HAC lags) the upwind estimate stays between +41.1 and +50.7 µg/m³."
+ },
+ {
+  "id": "c72",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: finding",
+  "text": "SmokeTrail finding: LightGBM cut MAE by 15.1% vs persistence. Adding the upwind features on top of total fire activity did not help forecasting (test MAE 31.6 → 32.3), even though they carry the attribution signal."
+ },
+ {
+  "id": "c73",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: caveats",
+  "text": "SmokeTrail caveats: This is a weather-adjusted association, not causation: controls and the placebo reduce confounding but cannot rule out factors tied to wind direction itself. A single daily 10 m wind direction at Delhi stands in for smoke transport over 200–450 km. Satellites miss fires under cloud or thick smoke, and Pakistani Punjab is excluded. The calibration simulation found the 95% intervals exclude a true zero 8.5% of the time, so read them as roughly 90% intervals. Small samples: 460 in-season days and one 92-day test season."
+ },
+ {
+  "id": "c74",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: tech stack",
+  "text": "SmokeTrail tech stack: Python 3.11, SQLite + SQL, pandas, statsmodels (OLS, Newey-West), scikit-learn, LightGBM, SHAP, Streamlit + pydeck, pytest."
+ },
+ {
+  "id": "c75",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: code",
+  "text": "SmokeTrail source code: https://github.com/Asadalk/smoketrail-delhi"
+ },
+ {
+  "id": "c76",
   "href": "/#cellular",
   "title": "Project: Cellular Network Metadata Processing System",
   "text": "Asadullah Faisal's project Cellular Network Metadata Processing System: An Android app reads the phone's serving cell (LTE or 5G NR), a FastAPI service looks it up in PostgreSQL, and the tower location appears on an OpenStreetMap map. Problem it addresses: Show, end to end and explainably, how a phone's cell identity (MCC, MNC, TAC, CID) becomes an approximate location, without pretending to more precision than the data allows."
  },
  {
-  "id": "c60",
+  "id": "c77",
   "href": "/#cellular",
   "title": "Cellular Network Metadata Processing System: what he built",
   "text": "In Cellular Network Metadata Processing System, Asadullah Faisal built: Kotlin Android client that reads the registered serving cell for LTE (CellInfoLte) and 5G NR (CellInfoNr, NCI as cell ID), handling Android API-level differences."
  },
  {
-  "id": "c61",
+  "id": "c78",
   "href": "/#cellular",
   "title": "Cellular Network Metadata Processing System: what he built",
   "text": "In Cellular Network Metadata Processing System, Asadullah Faisal built: Retrofit 2.9 client posting the cell identity to a FastAPI /locate endpoint."
  },
  {
-  "id": "c62",
+  "id": "c79",
   "href": "/#cellular",
   "title": "Cellular Network Metadata Processing System: what he built",
   "text": "In Cellular Network Metadata Processing System, Asadullah Faisal built: Exact-match lookup in PostgreSQL over Indian tower data (MCC 404/405) from a Kaggle dataset derived from OpenCellID."
  },
  {
-  "id": "c63",
+  "id": "c80",
   "href": "/#cellular",
   "title": "Cellular Network Metadata Processing System: what he built",
   "text": "In Cellular Network Metadata Processing System, Asadullah Faisal built: osmdroid map with a marker and a fixed 1,000 m circle, deliberately not triangulated, to avoid false precision."
  },
  {
-  "id": "c64",
+  "id": "c81",
   "href": "/#cellular",
   "title": "Cellular Network Metadata Processing System: tech stack",
   "text": "Cellular Network Metadata Processing System tech stack: Kotlin, Android, Retrofit, osmdroid, FastAPI, PostgreSQL."
  },
  {
-  "id": "c65",
+  "id": "c82",
   "href": "/#cellular",
   "title": "Cellular Network Metadata Processing System: code",
   "text": "Cellular Network Metadata Processing System source code: https://github.com/Asadalk/Cellular-Network-Metadata-Processing-System"
  },
  {
-  "id": "c66",
+  "id": "c83",
   "href": "/#skills-languages",
   "title": "Skills: Languages",
   "text": "Asadullah Faisal's skills in Languages: Python, C++, C, SQL, TypeScript, Kotlin."
  },
  {
-  "id": "c67",
+  "id": "c84",
   "href": "/#skills-cv-dl",
   "title": "Skills: Computer vision and deep learning",
   "text": "Asadullah Faisal's skills in Computer vision and deep learning: PyTorch, Ultralytics YOLO, Detectron2, docTR, OpenCV, Shapely (polygon IoU), Object and text detection, Transfer learning and fine-tuning, IoU / NMS evaluation, tiled inference, CUDA (RTX A6000 training)."
  },
  {
-  "id": "c68",
+  "id": "c85",
   "href": "/#skills-ml-llm",
   "title": "Skills: ML, NLP and LLMs",
-  "text": "Asadullah Faisal's skills in ML, NLP and LLMs: LLM agents, RAG and hybrid retrieval, Sentence Transformers, embeddings, FAISS, Gemini and Groq APIs, Ranking metrics (P@K, MRR, NDCG), Benchmarks and ablations, scikit-learn, pandas, NumPy, Regression, LightGBM, SHAP (in progress)."
+  "text": "Asadullah Faisal's skills in ML, NLP and LLMs: LLM agents, RAG and hybrid retrieval, Sentence Transformers, embeddings, FAISS, Gemini and Groq APIs, Ranking metrics (P@K, MRR, NDCG), Benchmarks and ablations, scikit-learn, pandas, NumPy, Regression (OLS, Newey-West), LightGBM, SHAP, Time-series forecasting, Geospatial features (bearings, wind cones)."
  },
  {
-  "id": "c69",
+  "id": "c86",
   "href": "/#skills-engineering",
   "title": "Skills: Software engineering",
-  "text": "Asadullah Faisal's skills in Software engineering: FastAPI, REST APIs, PostgreSQL, pgvector, Next.js, Docker, pytest, Android (Retrofit, osmdroid), Git, Linux."
+  "text": "Asadullah Faisal's skills in Software engineering: FastAPI, REST APIs, PostgreSQL, pgvector, Next.js, Docker, pytest, Android (Retrofit, osmdroid), Git, Linux, Streamlit dashboards."
  },
  {
-  "id": "c70",
+  "id": "c87",
   "href": "/archive/#archive-nlu-assignment-2",
   "title": "Smaller project: NLU-Assignment-2",
   "text": "Asadullah Faisal's smaller project NLU-Assignment-2: Word2Vec (CBOW and skip-gram) trained from scratch in PyTorch and with gensim on text scraped from IIT Jodhpur web pages, plus character-level name generation with RNN, BLSTM and attention models. (Course assignment (NLU), solo)."
  },
  {
-  "id": "c71",
+  "id": "c88",
   "href": "/archive/#archive-dl-phase-ii",
   "title": "Smaller project: DL-PhaseII",
   "text": "Asadullah Faisal's smaller project DL-PhaseII: Zero-shot comparison of SAM ViT-H, SAM ViT-B and MobileSAM on 10 COCO images: Dice, speed and encoder size. (Course project, team of 3 (pipeline, COCO integration and analysis were mine))."
  },
  {
-  "id": "c72",
+  "id": "c89",
   "href": "/archive/#archive-sports-or-politics",
   "title": "Smaller project: Sports-Or-Politics",
   "text": "Asadullah Faisal's smaller project Sports-Or-Politics: BBC news sports-vs-politics classification comparing bag-of-words, TF-IDF and bigram features with Naive Bayes, logistic regression and linear SVM. (Course assignment, solo)."
  },
  {
-  "id": "c73",
+  "id": "c90",
   "href": "/archive/#archive-socket-programming",
   "title": "Smaller project: Socket_Programming",
   "text": "Asadullah Faisal's smaller project Socket_Programming: C TCP server and client serving a menu of terminal games and equation solvers. (Course project, team of 4 (Maze Escape game, merging into one server-client, README were mine))."
  },
  {
-  "id": "c74",
+  "id": "c91",
   "href": "/archive/#archive-csl1010",
   "title": "Smaller project: Project-CSL1010",
   "text": "Asadullah Faisal's smaller project Project-CSL1010: Text-based maze escape game in C with random obstacles, traps and seven levels. (First-year programming course project, solo)."
  },
  {
-  "id": "c75",
+  "id": "c92",
   "href": "/archive/#archive-product-recommendation",
   "title": "Smaller project: Product-Recomendation-System",
   "text": "Asadullah Faisal's smaller project Product-Recomendation-System: E-commerce demo with React, Express and C++ recommendation routines; I built login/signup, purchase logging and the Python user-similarity recommender. (Team of 3, fork of a teammate's repo)."

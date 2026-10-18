@@ -4,62 +4,290 @@
     {
       "id": "skills-languages",
       "name": "Languages",
-      "axes": { "ml": 0.2, "dl": 0.1, "software": 0.8, "data": 0.3, "research": 0.1 },
+      "axes": {
+        "ml": 0.2,
+        "dl": 0.1,
+        "software": 0.8,
+        "data": 0.3,
+        "research": 0.1
+      },
       "skills": [
-        { "name": "Python", "proof": ["research-bstd", "opspilot", "semantic-hire"] },
-        { "name": "C++", "proof": ["https://leetcode.com/u/asad08/"], "proofLabel": "LeetCode" },
-        { "name": "C", "proof": ["archive-socket-programming", "archive-csl1010"] },
-        { "name": "SQL", "proof": ["opspilot", "cellular"] },
-        { "name": "TypeScript", "proof": ["opspilot"] },
-        { "name": "Kotlin", "proof": ["cellular"] }
+        {
+          "name": "Python",
+          "proof": [
+            "research-bstd",
+            "opspilot",
+            "semantic-hire"
+          ]
+        },
+        {
+          "name": "C++",
+          "proof": [
+            "https://leetcode.com/u/asad08/"
+          ],
+          "proofLabel": "LeetCode"
+        },
+        {
+          "name": "C",
+          "proof": [
+            "archive-socket-programming",
+            "archive-csl1010"
+          ]
+        },
+        {
+          "name": "SQL",
+          "proof": [
+            "opspilot",
+            "cellular",
+            "smoketrail"
+          ]
+        },
+        {
+          "name": "TypeScript",
+          "proof": [
+            "opspilot"
+          ]
+        },
+        {
+          "name": "Kotlin",
+          "proof": [
+            "cellular"
+          ]
+        }
       ]
     },
     {
       "id": "skills-cv-dl",
       "name": "Computer vision and deep learning",
-      "axes": { "ml": 0.6, "dl": 1.0, "software": 0.2, "data": 0.2, "research": 0.7 },
+      "axes": {
+        "ml": 0.6,
+        "dl": 1.0,
+        "software": 0.2,
+        "data": 0.2,
+        "research": 0.7
+      },
       "skills": [
-        { "name": "PyTorch", "proof": ["research-bstd", "archive-nlu-assignment-2"] },
-        { "name": "Ultralytics YOLO", "proof": ["research-bstd"] },
-        { "name": "Detectron2", "proof": ["research-bstd"] },
-        { "name": "docTR", "proof": ["research-bstd"] },
-        { "name": "OpenCV", "proof": ["research-bstd"] },
-        { "name": "Shapely (polygon IoU)", "proof": ["research-bstd"] },
-        { "name": "Object and text detection", "proof": ["research-bstd", "archive-dl-phase-ii"] },
-        { "name": "Transfer learning and fine-tuning", "proof": ["research-bstd"] },
-        { "name": "IoU / NMS evaluation, tiled inference", "proof": ["research-bstd"] },
-        { "name": "CUDA (RTX A6000 training)", "proof": ["research-bstd"] }
+        {
+          "name": "PyTorch",
+          "proof": [
+            "research-bstd",
+            "archive-nlu-assignment-2"
+          ]
+        },
+        {
+          "name": "Ultralytics YOLO",
+          "proof": [
+            "research-bstd"
+          ]
+        },
+        {
+          "name": "Detectron2",
+          "proof": [
+            "research-bstd"
+          ]
+        },
+        {
+          "name": "docTR",
+          "proof": [
+            "research-bstd"
+          ]
+        },
+        {
+          "name": "OpenCV",
+          "proof": [
+            "research-bstd"
+          ]
+        },
+        {
+          "name": "Shapely (polygon IoU)",
+          "proof": [
+            "research-bstd"
+          ]
+        },
+        {
+          "name": "Object and text detection",
+          "proof": [
+            "research-bstd",
+            "archive-dl-phase-ii"
+          ]
+        },
+        {
+          "name": "Transfer learning and fine-tuning",
+          "proof": [
+            "research-bstd"
+          ]
+        },
+        {
+          "name": "IoU / NMS evaluation, tiled inference",
+          "proof": [
+            "research-bstd"
+          ]
+        },
+        {
+          "name": "CUDA (RTX A6000 training)",
+          "proof": [
+            "research-bstd"
+          ]
+        }
       ]
     },
     {
       "id": "skills-ml-llm",
       "name": "ML, NLP and LLMs",
-      "axes": { "ml": 1.0, "dl": 0.3, "software": 0.5, "data": 0.6, "research": 0.3 },
+      "axes": {
+        "ml": 1.0,
+        "dl": 0.3,
+        "software": 0.5,
+        "data": 0.6,
+        "research": 0.3
+      },
       "skills": [
-        { "name": "LLM agents", "proof": ["opspilot"] },
-        { "name": "RAG and hybrid retrieval", "proof": ["opspilot", "semantic-hire"] },
-        { "name": "Sentence Transformers, embeddings", "proof": ["semantic-hire"] },
-        { "name": "FAISS", "proof": ["semantic-hire"] },
-        { "name": "Gemini and Groq APIs", "proof": ["opspilot", "semantic-hire"] },
-        { "name": "Ranking metrics (P@K, MRR, NDCG)", "proof": ["semantic-hire"] },
-        { "name": "Benchmarks and ablations", "proof": ["opspilot", "research-bstd"] },
-        { "name": "scikit-learn", "proof": ["archive-sports-or-politics"] },
-        { "name": "pandas, NumPy", "proof": ["semantic-hire", "research-bstd"] },
-        { "name": "Regression, LightGBM, SHAP", "proof": ["smoketrail"], "inProgress": true }
+        {
+          "name": "LLM agents",
+          "proof": [
+            "opspilot"
+          ]
+        },
+        {
+          "name": "RAG and hybrid retrieval",
+          "proof": [
+            "opspilot",
+            "semantic-hire"
+          ]
+        },
+        {
+          "name": "Sentence Transformers, embeddings",
+          "proof": [
+            "semantic-hire"
+          ]
+        },
+        {
+          "name": "FAISS",
+          "proof": [
+            "semantic-hire"
+          ]
+        },
+        {
+          "name": "Gemini and Groq APIs",
+          "proof": [
+            "opspilot",
+            "semantic-hire"
+          ]
+        },
+        {
+          "name": "Ranking metrics (P@K, MRR, NDCG)",
+          "proof": [
+            "semantic-hire"
+          ]
+        },
+        {
+          "name": "Benchmarks and ablations",
+          "proof": [
+            "opspilot",
+            "research-bstd"
+          ]
+        },
+        {
+          "name": "scikit-learn",
+          "proof": [
+            "archive-sports-or-politics"
+          ]
+        },
+        {
+          "name": "pandas, NumPy",
+          "proof": [
+            "smoketrail",
+            "semantic-hire",
+            "research-bstd"
+          ]
+        },
+        {
+          "name": "Regression (OLS, Newey-West), LightGBM, SHAP",
+          "proof": [
+            "smoketrail"
+          ]
+        },
+        {
+          "name": "Time-series forecasting",
+          "proof": [
+            "smoketrail"
+          ]
+        },
+        {
+          "name": "Geospatial features (bearings, wind cones)",
+          "proof": [
+            "smoketrail"
+          ]
+        }
       ]
     },
     {
       "id": "skills-engineering",
       "name": "Software engineering",
-      "axes": { "ml": 0.2, "dl": 0.1, "software": 1.0, "data": 0.4, "research": 0.1 },
+      "axes": {
+        "ml": 0.2,
+        "dl": 0.1,
+        "software": 1.0,
+        "data": 0.4,
+        "research": 0.1
+      },
       "skills": [
-        { "name": "FastAPI, REST APIs", "proof": ["opspilot", "semantic-hire", "cellular"] },
-        { "name": "PostgreSQL, pgvector", "proof": ["opspilot", "cellular"] },
-        { "name": "Next.js", "proof": ["opspilot"] },
-        { "name": "Docker", "proof": ["opspilot", "semantic-hire", "research-bstd"] },
-        { "name": "pytest", "proof": ["opspilot", "semantic-hire"] },
-        { "name": "Android (Retrofit, osmdroid)", "proof": ["cellular"] },
-        { "name": "Git, Linux", "proof": ["opspilot", "research-bstd"] }
+        {
+          "name": "FastAPI, REST APIs",
+          "proof": [
+            "opspilot",
+            "semantic-hire",
+            "cellular"
+          ]
+        },
+        {
+          "name": "PostgreSQL, pgvector",
+          "proof": [
+            "opspilot",
+            "cellular"
+          ]
+        },
+        {
+          "name": "Next.js",
+          "proof": [
+            "opspilot"
+          ]
+        },
+        {
+          "name": "Docker",
+          "proof": [
+            "opspilot",
+            "semantic-hire",
+            "research-bstd"
+          ]
+        },
+        {
+          "name": "pytest",
+          "proof": [
+            "opspilot",
+            "semantic-hire",
+            "smoketrail"
+          ]
+        },
+        {
+          "name": "Android (Retrofit, osmdroid)",
+          "proof": [
+            "cellular"
+          ]
+        },
+        {
+          "name": "Git, Linux",
+          "proof": [
+            "opspilot",
+            "research-bstd"
+          ]
+        },
+        {
+          "name": "Streamlit dashboards",
+          "proof": [
+            "smoketrail"
+          ]
+        }
       ]
     }
   ]

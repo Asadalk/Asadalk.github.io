@@ -1,0 +1,171 @@
+---
+// "Scrub through Delhi's air": SmokeTrail's 2019 test season, day by day.
+// Data exported read-only from the owner's repo (scripts/export-smoketrail.py):
+// actual vs LightGBM forecast vs persistence, and the 3 SHAP drivers per day.
+import data from '../../content/data/smoketrail/forecast-2019.json';
+
+const days = data.days;
+const W = 600;
+const H = 210;
+const PAD = { l: 34, r: 8, t: 10, b: 22 };
+const yMax = Math.ceil(Math.max(...days.flatMap((d) => [d.actual, d.forecast, d.persistence])) / 100) * 100;
+const x = (i: number) => PAD.l + (i / (days.length - 1)) * (W - PAD.l - PAD.r);
+const y = (v: number) => H - PAD.b - (v / yMax) * (H - PAD.t - PAD.b);
+const path = (key: 'actual' | 'forecast' | 'persistence') =>
+  days.map((d, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(d[key]).toFixed(1)}`).join('');
+const ticks = Array.from({ length: yMax / 100 + 1 }, (_, k) => k * 100);
+const months = days
+  .map((d, i) => ({ i, d: d.target }))
+  .filter(({ d }) => d.endsWith('-01') || d.endsWith('-15'))
+  .map(({ i, d }) => ({ i, label: new Date(d + 'T00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) }));
+// Start on the season's worst-air day: the most striking forecast to explain.
+const start = days.reduce((best, d, i) => (d.actual > days[best].actual ? i : best), 0);
+const fmtDate = (s: string) => new Date(s + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+const d0 = days[start];
+---
+
+<div class="st" data-st>
+  <p class="where mono">2019 test season · LightGBM chosen on 2018 · evaluated once</p>
+  <svg viewBox={`0 0 ${W} ${H}`} class="chart" role="img" aria-label="Line chart of Delhi's next-day PM2.5 in autumn 2019: actual values and the model's forecasts track each other, peaking in early November.">
+    {ticks.map((t) => (
+      <g>
+        <path d={`M${PAD.l} ${y(t)}H${W - PAD.r}`} class="grid" />
+        <text x={PAD.l - 6} y={y(t) + 3} class="tick" text-anchor="end">{t}</text>
+      </g>
+    ))}
+    {months.map((m) => <text x={x(m.i)} y={H - 6} class="tick" text-anchor="middle">{m.label}</text>)}
+    <path d={path('persistence')} class="line persistence" />
+    <path d={path('actual')} class="line actual" />
+    <path d={path('forecast')} class="line forecast" />
+    <g data-st-marker transform={`translate(${x(start)} 0)`}>
+      <path d={`M0 ${PAD.t}V${H - PAD.b}`} class="marker" />
+      <circle cx="0" cy={y(d0.actual)} r="4" class="dot actual-dot" data-st-dot-a />
+      <circle cx="0" cy={y(d0.forecast)} r="4" class="dot forecast-dot" data-st-dot-f />
+    </g>
+  </svg>
+  <p class="legend mono">
+    <span class="key k-actual"></span>actual <span class="key k-forecast"></span>forecast <span class="key k-persist"></span>persistence (tomorrow = today) · µg/m³
+  </p>
+
+  <label class="slider" data-st-slider hidden>
+    <span class="visually-hidden">Day of the 2019 season</span>
+    <input type="range" min="0" max={days.length - 1} value={start} step="1" />
+  </label>
+
+  <div class="readout glass" aria-live="polite">
+    <p class="day" data-st-day>Forecast for {fmtDate(d0.target)}</p>
+    <p class="nums">
+      <span><strong data-st-f>{Math.round(d0.forecast)}</strong> forecast</span>
+      <span><strong data-st-a>{Math.round(d0.actual)}</strong> actual</span>
+      <span class="muted"><span data-st-p>{Math.round(d0.persistence)}</span> persistence</span>
+      <span class="muted">miss <span data-st-e>{Math.round(Math.abs(d0.forecast - d0.actual))}</span></span>
+    </p>
+    <p class="drivers-h mono">What moved this forecast (SHAP)</p>
+    <ul class="drivers" data-st-drivers>
+      {d0.drivers.map((r) => (
+        <li><span>{r.feature}</span><span class:list={['pct', r.pct >= 0 ? 'up' : 'down']}>{r.pct >= 0 ? '+' : '−'}{Math.abs(r.pct).toFixed(1)}%</span></li>
+      ))}
+    </ul>
+  </div>
+  <script type="application/json" data-st-data set:html={JSON.stringify({ days, yMax, W, H, PAD })} />
+</div>
+
+<script>
+  type Day = { target: string; actual: number; forecast: number; persistence: number; drivers: { feature: string; pct: number }[] };
+  const root = document.querySelector<HTMLElement>('[data-st]');
+  if (root) {
+    const { days, yMax, W, H, PAD } = JSON.parse(root.querySelector('[data-st-data]')!.textContent!) as {
+      days: Day[]; yMax: number; W: number; H: number; PAD: { l: number; r: number; t: number; b: number };
+    };
+    const x = (i: number) => PAD.l + (i / (days.length - 1)) * (W - PAD.l - PAD.r);
+    const y = (v: number) => H - PAD.b - (v / yMax) * (H - PAD.t - PAD.b);
+    const $ = <T extends Element>(s: string) => root.querySelector<T>(s)!;
+    const slider = $<HTMLElement>('[data-st-slider]');
+    const range = slider.querySelector('input')!;
+    const fmt = (s: string) => new Date(s + 'T00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    let used = false;
+
+    const show = (i: number) => {
+      const d = days[i];
+      $<SVGGElement>('[data-st-marker]').setAttribute('transform', `translate(${x(i)} 0)`);
+      $<SVGCircleElement>('[data-st-dot-a]').setAttribute('cy', String(y(d.actual)));
+      $<SVGCircleElement>('[data-st-dot-f]').setAttribute('cy', String(y(d.forecast)));
+      $('[data-st-day]').textContent = `Forecast for ${fmt(d.target)}`;
+      $('[data-st-f]').textContent = String(Math.round(d.forecast));
+      $('[data-st-a]').textContent = String(Math.round(d.actual));
+      $('[data-st-p]').textContent = String(Math.round(d.persistence));
+      $('[data-st-e]').textContent = String(Math.round(Math.abs(d.forecast - d.actual)));
+      $('[data-st-drivers]').replaceChildren(
+        ...d.drivers.map((r) => {
+          const li = document.createElement('li');
+          const name = document.createElement('span');
+          name.textContent = r.feature;
+          const pct = document.createElement('span');
+          pct.className = `pct ${r.pct >= 0 ? 'up' : 'down'}`;
+          pct.textContent = `${r.pct >= 0 ? '+' : '−'}${Math.abs(r.pct).toFixed(1)}%`;
+          li.append(name, pct);
+          return li;
+        }),
+      );
+      range.setAttribute('aria-valuetext', fmt(d.target));
+    };
+
+    slider.hidden = false;
+    range.addEventListener('input', () => {
+      show(Number(range.value));
+      if (!used) {
+        used = true;
+        window.dispatchEvent(new CustomEvent('demo', { detail: { id: 'smoketrail-explorer', item: 'smoketrail', action: 'used' } }));
+      }
+    });
+    // Tap or drag on the chart itself picks the nearest day.
+    const svg = $<SVGSVGElement>('svg');
+    const pick = (e: PointerEvent) => {
+      const r = svg.getBoundingClientRect();
+      const vx = ((e.clientX - r.left) / r.width) * W;
+      const i = Math.round(((vx - PAD.l) / (W - PAD.l - PAD.r)) * (days.length - 1));
+      range.value = String(Math.min(days.length - 1, Math.max(0, i)));
+      range.dispatchEvent(new Event('input'));
+    };
+    svg.addEventListener('pointerdown', (e) => {
+      pick(e);
+      svg.setPointerCapture(e.pointerId);
+    });
+    svg.addEventListener('pointermove', (e) => e.buttons && pick(e));
+  }
+</script>
+
+<style>
+  .st { margin: 0 0 1.5rem; }
+  .where { font-size: 0.72rem; color: var(--ok); margin-bottom: 0.5rem; }
+  .chart { display: block; width: 100%; height: auto; touch-action: pan-y; cursor: crosshair; }
+  .grid { stroke: var(--border); stroke-width: 1; }
+  .tick { font-family: var(--font-mono); font-size: 9px; fill: var(--muted); }
+  .line { fill: none; stroke-linejoin: round; stroke-linecap: round; }
+  .actual { stroke: var(--text); stroke-width: 1.8; }
+  .forecast { stroke: var(--accent-ink); stroke-width: 2.2; }
+  .persistence { stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 3 3; opacity: 0.7; }
+  .marker { stroke: var(--detect); stroke-width: 2; }
+  .dot { stroke: var(--bg); stroke-width: 1.5; }
+  .actual-dot { fill: var(--text); }
+  .forecast-dot { fill: var(--accent-ink); }
+  .legend { font-size: 0.68rem; color: var(--muted); display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.5rem; margin: 0.4rem 0 0.6rem; }
+  .key { display: inline-block; width: 16px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 0.15rem; }
+  .k-actual { border-color: var(--text); }
+  .k-forecast { border-color: var(--accent-ink); }
+  .k-persist { border-color: var(--muted); border-top-style: dashed; }
+  .slider { display: block; margin-bottom: 0.75rem; }
+  .slider input { width: 100%; min-height: 36px; accent-color: var(--accent-ink); }
+  .readout { padding: 1rem 1.15rem 0.6rem; border-radius: var(--radius-md); }
+  .day { font-weight: 700; margin: 0 0 0.35rem; }
+  .nums { display: flex; flex-wrap: wrap; gap: 0.2rem 1.1rem; margin: 0 0 0.75rem; font-size: 0.95rem; }
+  .nums strong { font-family: var(--font-mono); font-size: 1.05rem; }
+  .drivers-h { font-size: 0.66rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 0.3rem; }
+  .drivers { list-style: none; padding: 0; margin: 0 0 0.4rem; }
+  /* :global because the script rebuilds these rows when the slider moves. */
+  .drivers :global(li) { display: flex; justify-content: space-between; gap: 1rem; padding: 0.25rem 0; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+  .drivers :global(li:last-child) { border-bottom: 0; }
+  .drivers :global(.pct) { font-family: var(--font-mono); font-size: 0.82rem; white-space: nowrap; }
+  .drivers :global(.up) { color: var(--accent-ink); }
+  .drivers :global(.down) { color: var(--ok); }
+</style>

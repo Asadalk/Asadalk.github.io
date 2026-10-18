@@ -14,7 +14,10 @@ const archive = load('archive.json');
 
 const chunks = [];
 const add = (href, title, text) => chunks.push({ id: `c${chunks.length + 1}`, href, title, text: text.replace(/\s+/g, ' ').trim() });
-const table = (t) => `${t.caption}: ` + t.rows.map((r) => t.columns.map((c, i) => `${c} ${r[i]}`).join(', ')).join('; ') + '.';
+// One self-contained fact per table row: a whole table in one chunk let the
+// model attribute a baseline's numbers to the main result.
+const rowFacts = (t, subject) =>
+  t.rows.map((r) => `${subject} — ${t.caption}. Row "${r[0]}": ` + t.columns.slice(1).map((c, i) => `${c} ${r[i + 1]}`).join(', ') + '.');
 const who = site.name;
 
 // Identity and about
@@ -44,7 +47,10 @@ const r = research;
 add('/#research-bstd', 'Research overview', `${who}'s research: ${r.title}. ${r.role} with ${r.supervisor}, since August 2026 (ongoing). ${r.summary}`);
 add('/#research-bstd', 'Research problem', `The problem in ${who}'s research: ${r.problem}`);
 for (const x of r.contributions) add('/#research-bstd', `Research: ${x.title}`, `In his research, ${who} — ${x.title}: ${x.text}`);
-for (const t of r.results) add('/#research-bstd', `Research results: ${t.caption}`, `${who}'s research result. ${table(t)} ${(t.notes || []).join(' ')}`);
+for (const t of r.results) {
+  for (const f of rowFacts(t, `${who}'s research result`)) add('/#research-bstd', `Research results: ${t.caption}`, f);
+  if (t.notes?.length) add('/#research-bstd', `Research results: ${t.caption} (notes)`, `${who}'s research, ${t.caption}: ${t.notes.join(' ')}`);
+}
 add('/#research-bstd', 'Research: ongoing work', `${who}'s ongoing research work (in progress, no results yet): ${r.ongoing}`);
 add('/#research-bstd', 'Research: tools', `Tools ${who} uses in his research: ${r.stack.join(', ')}.`);
 add('/#research-bstd', 'Research: credit', r.credit.text + ` Paper: ${r.credit.citation}`);
@@ -57,7 +63,7 @@ for (const p of projects) {
   for (const b of p.built || []) add(href, `${p.title}: what he built`, `In ${p.title}, ${who} built: ${b}`);
   for (const b of p.plannedMethod || []) add(href, `${p.title}: plan`, `Planned for ${p.title}: ${b}`);
   if (p.results) {
-    add(href, `${p.title}: results`, `${p.title} results. ${table(p.results)}`);
+    for (const f of rowFacts(p.results, `${p.title} result`)) add(href, `${p.title}: results`, f);
     for (const f of p.results.findings || []) add(href, `${p.title}: finding`, `${p.title} finding: ${f}`);
     if (p.results.caveats?.length) add(href, `${p.title}: caveats`, `${p.title} caveats: ${p.results.caveats.join(' ')}`);
   }

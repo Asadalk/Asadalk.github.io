@@ -72,6 +72,7 @@ export interface Project {
   timeline?: { date: string; text: string }[];
   evolvedFrom?: string;
   media?: { video: string; poster: string; caption: string; source: string };
+  figures?: { src: string; width: number; height: number; alt: string; caption: string }[];
   demo?: Demo & { blockedOn?: string };
 }
 

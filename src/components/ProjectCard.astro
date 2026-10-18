@@ -5,6 +5,7 @@ import OpsPilotArchitecture from './demos/OpsPilotArchitecture.astro';
 import IncidentReplay from './demos/IncidentReplay.astro';
 import PolicyPlayground from './demos/PolicyPlayground.astro';
 import FollowThePacket from './demos/FollowThePacket.astro';
+import SmokeTrailExplorer from './demos/SmokeTrailExplorer.astro';
 import SemanticHireDemo from './SemanticHireDemo.astro';
 import type { Project } from '../lib/content';
 
@@ -75,6 +76,24 @@ const { project: p } = Astro.props;
     </>
   )}
 
+  {p.figures && (
+    <div class="figures">
+      {p.figures.map((f) => (
+        <figure class="fig">
+          <img src={f.src} width={f.width} height={f.height} alt={f.alt} loading="lazy" decoding="async" />
+          <figcaption class="muted">{f.caption}</figcaption>
+        </figure>
+      ))}
+    </div>
+  )}
+
+  {p.id === 'smoketrail' && (
+    <>
+      <h4>Try it</h4>
+      <SmokeTrailExplorer />
+    </>
+  )}
+
   {p.id === 'cellular' && (
     <>
       <h4>Try it</h4>
@@ -113,4 +132,9 @@ const { project: p } = Astro.props;
   }
   .media figcaption { font-size: 0.9rem; margin-top: 0.4rem; max-width: 40ch; }
   .stack { font-size: 0.72rem; margin-top: 1rem; }
+  .figures { display: grid; gap: 1rem; margin: 0.5rem 0 1.25rem; }
+  @media (min-width: 48rem) { .figures { grid-template-columns: 1.25fr 1fr; align-items: start; } }
+  .fig { margin: 0; }
+  .fig img { width: 100%; height: auto; border-radius: var(--radius-md); background: #fbfaf8; }
+  .fig figcaption { font-size: 0.82rem; margin-top: 0.4rem; }
 </style>

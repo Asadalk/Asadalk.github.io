@@ -6,12 +6,19 @@
 import Scene from './Scene.astro';
 import { site } from '../lib/content';
 import { wideScene, tallScene } from '../lib/street';
+import pm from '../content/data/smoketrail/pm25-daily.json';
+import { hazeCaption, hazeLevel, pickDay, type PmDay } from '../lib/haze';
 
 const wide = wideScene(site.signboards);
 const tall = tallScene(site.signboards);
+// Real haze: Delhi's PM2.5 on this calendar day in autumn 2019 (SmokeTrail).
+// Computed at build time for no-JS visitors; the script below redoes it for
+// the visitor's own date.
+const season2019 = (pm.days as PmDay[]).filter(([d]) => d.startsWith('2019-'));
+const today = pickDay(season2019, new Date());
 ---
 
-<nav class="street" aria-label="Sections" data-street>
+<nav class="street" aria-label="Sections" data-street style={`--haze: ${hazeLevel(today[1])}`}>
   <div class="frame" data-frame>
     <Scene scene={tall} />
     <Scene scene={wide} />
@@ -19,10 +26,25 @@ const tall = tallScene(site.signboards);
 </nav>
 <p class="legend wrap">
   The boxes show what a text detector sees: what each sign is, and how sure it is (0–1). Illustrative here; the photo
-  demo runs my real model. The haze is illustrative too, until SmokeTrail has Delhi's real PM2.5.
+  demo runs my real model. <span data-haze-caption>{hazeCaption(today)}</span>
 </p>
+<script type="application/json" data-haze-days set:html={JSON.stringify(season2019)} />
 
 <script>
+  import { hazeCaption, hazeLevel, pickDay, type PmDay } from '../lib/haze';
+
+  // Re-pick the haze for the visitor's own date (the HTML has the build date's).
+  {
+    const el = document.querySelector<HTMLElement>('[data-street]');
+    const days = JSON.parse(document.querySelector('[data-haze-days]')?.textContent || '[]') as PmDay[];
+    if (el && days.length) {
+      const day = pickDay(days, new Date());
+      el.style.setProperty('--haze', String(hazeLevel(day[1])));
+      const cap = document.querySelector('[data-haze-caption]');
+      if (cap) cap.textContent = hazeCaption(day);
+    }
+  }
+
   const street = document.querySelector<HTMLElement>('[data-street]');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 

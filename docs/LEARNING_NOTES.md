@@ -102,3 +102,11 @@ One trap found while building it: the run's final `diagnosis` field is updated w
 **A map without map tiles.** Loading OpenStreetMap tiles would send visitors' requests to a third party. Instead, a small script turns Natural Earth's public-domain country shapes into one SVG path (12 KB): read the shapefile, keep India, simplify the outline (Douglas–Peucker drops points that move the line less than about 4 km), and project longitude/latitude onto x/y. Placing the pin uses the same projection formula.
 
 **Lazy loading.** The page ships only a few hundred bytes per demo up front. Opening a demo runs `import()`, which fetches its code and data then. Without JavaScript, the static version inside each `<details>` is still complete.
+
+## SmokeTrail on the site
+
+**Why "association, not causation".** Fires, cold still air and smog all peak in October–November, so a raw correlation between fires and PM2.5 would mostly measure the season. SmokeTrail adjusts for weather, a seasonal curve, Diwali and year, and runs a placebo: fires downwind of Delhi can't blow smoke into it, so their estimated effect should be about zero, and it is (−2.3 µg/m³). That makes the upwind estimate (+43.9 µg/m³) believable, though it still can't rule out factors tied to wind direction itself.
+
+**Why the forecaster ignores the attribution signal.** The upwind features explain PM2.5 in the regression but didn't improve the forecast (MAE 31.6 → 32.3). Today's PM2.5 and the time of season already carry most of what tomorrow will look like. A feature can matter for explanation without helping prediction.
+
+**Reading the SHAP numbers.** The model predicts log(PM2.5), so a SHAP value φ multiplies the forecast by e^φ. "+49%" next to "Today's PM2.5" means today's level pushed tomorrow's forecast up by about half, compared with the model's average day.

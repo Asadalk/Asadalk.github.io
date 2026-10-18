@@ -172,37 +172,97 @@
   {
     "id": "smoketrail",
     "type": "project",
-    "status": "in-progress",
     "title": "SmokeTrail",
-    "summary": "Do upwind crop fires in Punjab and Haryana show up in Delhi's air the next day? A classical data science study, no LLMs.",
-    "repo": null,
+    "summary": "Do crop fires upwind in Punjab and Haryana show up in Delhi's air? A weather-adjusted attribution study and a next-day PM2.5 forecaster, built from raw satellite, weather and air-quality data. No LLMs.",
+    "repo": "https://github.com/Asadalk/smoketrail-delhi",
     "tags": [
-      "Regression",
-      "Time series",
-      "LightGBM",
-      "Geospatial"
+      "Causal-style regression",
+      "Forecasting",
+      "LightGBM + SHAP"
     ],
     "axes": {
-      "ml": 0.5,
+      "ml": 0.6,
       "dl": 0.0,
-      "software": 0.3,
+      "software": 0.4,
       "data": 1.0,
-      "research": 0.6
+      "research": 0.7
     },
-    "problem": "Every autumn, crop-residue fires in Punjab and Haryana coincide with Delhi's worst air. The question: how much higher is Delhi's daily PM2.5 on days with heavy upwind burning, after adjusting for weather, and can today's fires predict tomorrow's air?",
-    "plannedMethod": [
-      "Data: Kaggle 'Air Quality Data in India' (city_day), NASA FIRMS VIIRS fire detections, Open-Meteo historical weather. Sep 15 – Dec 15, 2015–2019.",
-      "Upwind-fire feature: fires inside a ±30° cone around the wind direction, 1–3 day lags, fires within 50 km of Delhi excluded.",
-      "OLS with robustness checks and a placebo test; LightGBM + SHAP forecasting with train 2015–17 / validate 2018 / test 2019.",
-      "Dashboard: Streamlit + pydeck (planned)."
+    "problem": "Every autumn, crop-residue fires in Punjab and Haryana coincide with Delhi's worst air. But fires, stagnant winter weather and smog all peak together, so a simple correlation proves nothing. Two questions: how much higher is Delhi's daily PM2.5 when there is heavy burning upwind, after adjusting for weather, and can today's fires help forecast tomorrow's PM2.5?",
+    "built": [
+      "A reproducible pipeline from raw data: Delhi daily PM2.5 (Kaggle city_day, from CPCB), 359,621 valid NASA FIRMS VIIRS fire detections in the Punjab–Haryana box, and hourly ERA5 weather from Open-Meteo, for 15 Sep–15 Dec, 2015–2019 (460 in-season days).",
+      "SQLite with SQL transformations: vector-averaged daily wind from u/v components, daily fire totals, and a modelling table joined onto a complete calendar. Cleaning rules set flags instead of deleting rows.",
+      "The key feature, upwind fire load: for each fire, distance and compass bearing from Delhi; a fire counts as upwind if it lies within ±30° of the direction the wind blows from; load = Σ fire radiative power / distance, with 1–3 day lags. The opposite cone gives a downwind placebo.",
+      "Attribution: OLS of PM2.5 on upwind load with weather controls (wind, humidity, temperature, boundary layer height, rain), a seasonal curve, Diwali and year effects, and Newey-West standard errors, plus 7 robustness checks and a simulation that checks how well calibrated the confidence intervals are.",
+      "Forecasting tomorrow's PM2.5: baselines first, then Ridge and LightGBM, with feature sets fixed in advance, tuning on 2018 only, and 2019 evaluated exactly once (logged audit trail). SHAP explanations, an ablation and an error analysis.",
+      "A Streamlit dashboard (fires, wind and cones on a map for any date; test-year forecasts; attribution charts) and 46 pytest tests covering geometry, joins, cleaning rules, leakage guards and estimator recovery."
     ],
-    "results": null,
+    "results": {
+      "caption": "Next-day PM2.5 forecast, 2019 test season (92 days, evaluated once). Source: the repo's README and reports/forecasting.md",
+      "columns": [
+        "Model",
+        "MAE (µg/m³)",
+        "RMSE",
+        "AQI-category accuracy"
+      ],
+      "rows": [
+        [
+          "Baseline: persistence (tomorrow = today)",
+          "38.1",
+          "65.6",
+          "59.8%"
+        ],
+        [
+          "His model: LightGBM, chosen on 2018",
+          "32.3",
+          "52.0",
+          "60.9%"
+        ]
+      ],
+      "findings": [
+        "Attribution: a sustained high upwind-fire spell (90th-percentile load on the day and the 3 days before) vs no upwind fires is associated with +43.9 µg/m³ daily PM2.5 (95% CI +26.9 to +61.0), adjusting for weather.",
+        "The downwind placebo is near zero: −2.3 µg/m³ (95% CI −5.4 to +0.8, joint p = 0.65).",
+        "Across 7 robustness checks (fire count instead of load, cones of ±20° and ±45°, excluding Diwali, excluding 2019, no boundary-layer control, more HAC lags) the upwind estimate stays between +41.1 and +50.7 µg/m³.",
+        "LightGBM cut MAE by 15.1% vs persistence. Adding the upwind features on top of total fire activity did not help forecasting (test MAE 31.6 → 32.3), even though they carry the attribution signal."
+      ],
+      "caveats": [
+        "This is a weather-adjusted association, not causation: controls and the placebo reduce confounding but cannot rule out factors tied to wind direction itself.",
+        "A single daily 10 m wind direction at Delhi stands in for smoke transport over 200–450 km.",
+        "Satellites miss fires under cloud or thick smoke, and Pakistani Punjab is excluded.",
+        "The calibration simulation found the 95% intervals exclude a true zero 8.5% of the time, so read them as roughly 90% intervals.",
+        "Small samples: 460 in-season days and one 92-day test season."
+      ]
+    },
+    "figures": [
+      {
+        "src": "/media/smoketrail/attribution-robustness.webp",
+        "width": 1100,
+        "height": 824,
+        "alt": "Chart of the estimated PM2.5 difference for a sustained high-fire spell under each specification: upwind estimates cluster around +40 to +50 µg/m³ with intervals above zero, while the downwind placebo sits near zero.",
+        "caption": "Upwind estimates stay positive under every robustness check; the downwind placebo stays near zero."
+      },
+      {
+        "src": "/media/smoketrail/fire-map.webp",
+        "width": 900,
+        "height": 1118,
+        "alt": "Hexagon density map of VIIRS fire detections across Punjab and Haryana, densest around Amritsar and Ludhiana, with Delhi and its 50 km exclusion circle marked in the south-east.",
+        "caption": "Where the fires are, 15 Sep–15 Dec 2015–2019 (NASA FIRMS VIIRS)."
+      }
+    ],
+    "stack": [
+      "Python 3.11",
+      "SQLite + SQL",
+      "pandas",
+      "statsmodels (OLS, Newey-West)",
+      "scikit-learn",
+      "LightGBM",
+      "SHAP",
+      "Streamlit + pydeck",
+      "pytest"
+    ],
     "demo": {
       "label": "Scrub through Delhi's air",
-      "phase": 6,
-      "blockedOn": "results"
-    },
-    "statusNote": "Project setup is done; data collection and modelling are under way. Results will appear here only once the code produces them."
+      "runsOn": "device"
+    }
   },
   {
     "id": "cellular",
