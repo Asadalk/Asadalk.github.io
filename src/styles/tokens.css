@@ -171,10 +171,10 @@
   --bd-neem: rgba(110, 128, 70, 0.34);
   --bd-mauve: rgba(120, 100, 140, 0.32);
   --bd-brick: rgba(169, 70, 45, 0.26);
-  --jaali-color: #8b7c8e;
-  --jaali-opacity: 0.14;
-  --tint-max: 0.74;
-  --tint-range: 0.46;
+  --jaali-color: #6b5a6e;
+  --jaali-opacity: 0.3;
+  --tint-max: 0.66;
+  --tint-range: 0.54;
 }
 
 @media (prefers-color-scheme: dark) {
