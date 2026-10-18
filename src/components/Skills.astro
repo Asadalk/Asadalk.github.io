@@ -4,7 +4,7 @@ import { skillGroups, proofLink } from '../lib/content';
 
 <div class="skills">
   {skillGroups.map((g) => (
-    <section class="group" id={g.id} aria-labelledby={`${g.id}-h`}>
+    <section class="group glass" id={g.id} aria-labelledby={`${g.id}-h`}>
       <h3 id={`${g.id}-h`}>{g.name}</h3>
       <dl>
         {g.skills.map((s) => (
@@ -24,7 +24,11 @@ import { skillGroups, proofLink } from '../lib/content';
 </div>
 
 <style>
-  .skills { display: grid; gap: 1.5rem; }
+  .skills { display: grid; gap: 1.1rem; }
+  /* Each skill group is its own pane of glass, like the project cards. */
+  .group { padding: 1.3rem 1.4rem 1rem; }
+  .group h3 { margin-bottom: 0.6rem; }
+  .row:last-child { border-bottom: 0; }
   @media (min-width: 48rem) { .skills { grid-template-columns: 1fr 1fr; } }
   dl { margin: 0; }
   .row {
