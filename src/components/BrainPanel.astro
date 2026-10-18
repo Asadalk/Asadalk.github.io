@@ -18,7 +18,7 @@ const labels = AXES.map((a, i) => {
 });
 ---
 
-<dialog class="brain-panel" data-brain-panel aria-labelledby="brain-h">
+<dialog class="brain-panel glass glass--strong" data-brain-panel aria-labelledby="brain-h">
   <div class="sheet">
     <header class="head">
       <h2 id="brain-h">What this site learned</h2>
@@ -69,10 +69,7 @@ const labels = AXES.map((a, i) => {
     max-height: min(85vh, 44rem);
     margin: 0 auto;
     padding: 0;
-    border: 1px solid var(--border);
-    border-bottom: 0;
-    border-radius: var(--radius) var(--radius) 0 0;
-    background: var(--bg);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     color: var(--text);
     overflow-y: auto;
   }

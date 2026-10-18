@@ -14,7 +14,7 @@ interface Props {
 const { id, kind, title, summary, tags = [], status, open = false } = Astro.props;
 ---
 
-<article class="card" id={id} data-item={id}>
+<article class="card glass" id={id} data-item={id}>
   <details open={open}>
     <summary>
       <span class="kind det-tag">{kind}</span>
@@ -34,15 +34,12 @@ const { id, kind, title, summary, tags = [], status, open = false } = Astro.prop
 
 <style>
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 1rem;
+    margin-bottom: 1.1rem;
   }
   summary {
     position: relative;
     display: block;
-    padding: 1.1rem 1.1rem 1rem;
+    padding: 1.4rem 1.4rem 1.2rem;
     cursor: pointer;
     list-style: none;
   }
@@ -60,7 +57,7 @@ const { id, kind, title, summary, tags = [], status, open = false } = Astro.prop
   .toggle::before { content: 'Read more ↓'; }
   details[open] .toggle::before { content: 'Collapse ↑'; }
   .body {
-    padding: 0 1.1rem 1.25rem;
+    padding: 0 1.4rem 1.5rem;
     border-top: 1px dashed var(--border);
     padding-top: 1rem;
   }

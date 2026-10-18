@@ -28,12 +28,14 @@ const brainData = {
 
 <Base>
   <header class="hero" slot="header">
-    <div class="wrap intro">
-      <p class="eyebrow mono">{site.name} · {site.tagline}</p>
-      <h1 data-headline>{site.headlines.default}</h1>
-      <div class="actions">
-        <a class="button button--primary" href="#scan">Scan a photo with my model</a>
-        <a class="button button--ghost" href="/resume/">Plain résumé view</a>
+    <div class="wrap">
+      <div class="intro glass glass--lens">
+        <p class="eyebrow mono">{site.name} · {site.tagline}</p>
+        <h1 data-headline>{site.headlines.default}</h1>
+        <div class="actions">
+          <a class="button button--primary" href="#scan">Scan a photo with my model</a>
+          <a class="button button--ghost" href="/resume/">Plain résumé view</a>
+        </div>
       </div>
     </div>
     <Street />
@@ -121,8 +123,10 @@ const brainData = {
 </script>
 
 <style>
-  .hero { padding: 2rem 0 0; }
-  @media (min-width: 48rem) { .hero { padding-top: 4.5rem; } }
+  .hero { padding: 1.25rem 0 0; }
+  @media (min-width: 48rem) { .hero { padding-top: 5rem; } }
+  .intro { padding: 1.4rem 1.4rem 0.4rem; margin-bottom: 1.25rem; }
+  @media (min-width: 48rem) { .intro { padding: 2rem 2.2rem 0.8rem; } }
   .intro h1 { max-width: 20ch; }
   .eyebrow { font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; }
   .lede { font-size: 1.15rem; }

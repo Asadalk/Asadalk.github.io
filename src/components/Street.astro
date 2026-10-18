@@ -79,11 +79,29 @@ const tall = tallScene(site.signboards);
 </script>
 
 <style>
+  /* The street sits behind a pane of glass: rounded, with a bright rim. */
   .street {
     position: relative;
     max-width: 75rem;
-    margin: 0 auto;
+    margin: 0 var(--gutter);
     overflow: hidden;
+    border-radius: var(--radius-lg);
+    box-shadow:
+      inset 0 0 0 1px var(--glass-edge),
+      0 24px 50px -26px var(--glass-shadow),
+      0 2px 8px -3px var(--glass-shadow);
+  }
+  .street::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(150deg, var(--glass-sheen) 0%, transparent 22%, transparent 80%, var(--glass-edge) 100%);
+    box-shadow: inset 0 1px 0.5px var(--glass-rim);
+  }
+  @media (min-width: 77rem) {
+    .street { margin: 0 auto; }
   }
   .street :global(.scene) {
     display: block;

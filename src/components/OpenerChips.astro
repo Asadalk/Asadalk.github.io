@@ -49,14 +49,17 @@ import { site } from '../lib/content';
   .opener-chip {
     min-height: 2.25rem;
     padding: 0 0.75rem;
-    border: 1px solid var(--border);
+    border: 0;
     border-radius: 999px;
-    background: var(--surface);
+    background: var(--glass-tint) linear-gradient(140deg, var(--glass-sheen), transparent 45%);
+    -webkit-backdrop-filter: blur(14px) saturate(170%);
+    backdrop-filter: blur(14px) saturate(170%);
+    box-shadow: inset 0 1px 0.5px var(--glass-rim), inset 0 0 0 1px var(--glass-edge), 0 6px 16px -10px var(--glass-shadow);
     color: var(--text);
     font-size: 0.72rem;
     cursor: pointer;
   }
-  .opener-chip:hover { border-color: var(--muted); }
+  .opener-chip:hover { background-color: var(--glass-tint-strong); }
   .opener-x {
     display: inline-flex;
     align-items: center;

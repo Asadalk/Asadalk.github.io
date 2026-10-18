@@ -9,7 +9,7 @@ const items = [
 ];
 ---
 
-<nav class="minibar" aria-label="Quick links">
+<nav class="minibar glass glass--lens" aria-label="Quick links">
   <ul>
     {items.map((i) => <li><a href={i.href}>{i.label}</a></li>)}
     <li>
@@ -28,23 +28,23 @@ const items = [
 </nav>
 
 <style>
+  /* A floating glass dock: bottom centre on phones, top right on desktop. */
   .minibar {
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: 50%;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    width: min(calc(100% - 20px), 30rem);
     z-index: 50;
-    background: color-mix(in srgb, var(--bg) 94%, transparent);
-    border-top: 1px solid var(--border);
-    padding-bottom: env(safe-area-inset-bottom);
+    border-radius: 999px;
+    padding: 4px;
   }
   ul {
     display: flex;
     justify-content: center;
     gap: 0.25rem;
     margin: 0 auto;
-    padding: 0 var(--gutter);
-    max-width: 64rem;
+    padding: 0;
     list-style: none;
   }
   li { flex: 1 1 0; max-width: 11rem; }
@@ -52,7 +52,8 @@ const items = [
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 48px;
+    min-height: 46px;
+    border-radius: 999px;
     color: var(--text);
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -61,18 +62,19 @@ const items = [
     text-align: center;
   }
   .icon { flex: none; color: var(--accent-ink); }
-  a:hover { color: var(--accent-ink); text-decoration: underline; }
+  a:hover { background: var(--glass-sheen); color: var(--accent-ink); }
   @media (min-width: 48rem) {
     .minibar {
-      top: 0;
+      top: 14px;
       bottom: auto;
-      border-top: 0;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0;
+      left: auto;
+      right: 20px;
+      transform: none;
+      width: auto;
     }
     ul { justify-content: flex-end; }
     li { flex: 0 0 auto; }
-    a { padding: 0 0.75rem; min-height: 44px; }
+    a { padding: 0 1rem; min-height: 42px; }
   }
   @media print { .minibar { display: none; } }
 </style>

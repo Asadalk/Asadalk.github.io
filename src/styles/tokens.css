@@ -147,3 +147,70 @@
   --haze-color: #6a5f74;
   --haze: 0.5;
 }
+
+/* Liquid glass. Translucent tint + blur + saturation over a living dusk
+   backdrop; a bright top rim and soft inner depth make each pane read as a
+   thick sheet of glass. --surface becomes translucent so every component
+   that already uses it turns glassy. */
+:root {
+  --surface: rgba(255, 251, 244, 0.5);
+  --glass-tint: rgba(255, 251, 244, 0.44);
+  --glass-tint-strong: rgba(255, 251, 244, 0.62);
+  --glass-sheen: rgba(255, 255, 255, 0.55);
+  --glass-rim: rgba(255, 255, 255, 0.85);
+  --glass-edge: rgba(255, 255, 255, 0.45);
+  --glass-depth: rgba(94, 84, 104, 0.28);
+  --glass-shadow: rgba(60, 40, 50, 0.22);
+  --glass-blur: 22px;
+  --radius-lg: 28px;
+  --radius-md: 18px;
+
+  --bd-base-1: #f1e6d4;
+  --bd-base-2: #ead9cc;
+  --bd-base-3: #ddd0e2;
+  --bd-sun: rgba(228, 140, 100, 0.55);
+  --bd-lime: rgba(200, 230, 74, 0.42);
+  --bd-neem: rgba(110, 128, 70, 0.34);
+  --bd-mauve: rgba(120, 100, 140, 0.32);
+  --bd-brick: rgba(169, 70, 45, 0.26);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --surface: rgba(34, 29, 40, 0.55);
+    --glass-tint: rgba(30, 26, 36, 0.46);
+    --glass-tint-strong: rgba(30, 26, 36, 0.66);
+    --glass-sheen: rgba(255, 255, 255, 0.14);
+    --glass-rim: rgba(255, 255, 255, 0.26);
+    --glass-edge: rgba(255, 255, 255, 0.12);
+    --glass-depth: rgba(0, 0, 0, 0.45);
+    --glass-shadow: rgba(0, 0, 0, 0.5);
+    --bd-base-1: #15121a;
+    --bd-base-2: #1d1722;
+    --bd-base-3: #18161f;
+    --bd-sun: rgba(224, 122, 88, 0.32);
+    --bd-lime: rgba(211, 238, 85, 0.16);
+    --bd-neem: rgba(157, 176, 106, 0.16);
+    --bd-mauve: rgba(150, 120, 190, 0.22);
+    --bd-brick: rgba(224, 122, 88, 0.18);
+  }
+}
+
+:root[data-theme='dark'] {
+  --surface: rgba(34, 29, 40, 0.55);
+  --glass-tint: rgba(30, 26, 36, 0.46);
+  --glass-tint-strong: rgba(30, 26, 36, 0.66);
+  --glass-sheen: rgba(255, 255, 255, 0.14);
+  --glass-rim: rgba(255, 255, 255, 0.26);
+  --glass-edge: rgba(255, 255, 255, 0.12);
+  --glass-depth: rgba(0, 0, 0, 0.45);
+  --glass-shadow: rgba(0, 0, 0, 0.5);
+  --bd-base-1: #15121a;
+  --bd-base-2: #1d1722;
+  --bd-base-3: #18161f;
+  --bd-sun: rgba(224, 122, 88, 0.32);
+  --bd-lime: rgba(211, 238, 85, 0.16);
+  --bd-neem: rgba(157, 176, 106, 0.16);
+  --bd-mauve: rgba(150, 120, 190, 0.22);
+  --bd-brick: rgba(224, 122, 88, 0.18);
+}

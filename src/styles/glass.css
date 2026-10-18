@@ -1,0 +1,144 @@
+/* Liquid glass over an Indian street at dusk.
+ *
+ * .backdrop  fixed, slowly drifting fields of the palette's colours: what the
+ *            glass refracts. Without something rich behind it, glass is grey.
+ * .glass     the material: translucent tint, blur + saturation of what is
+ *            behind, a bright top rim, a hairline edge, soft inner depth and a
+ *            lift shadow. Multiple backgrounds add the diagonal sheen, so the
+ *            material never needs ::before/::after (components keep those).
+ * .lg-refract (on <html>, Chromium only) adds true lens bending through the
+ *            SVG filter #lg-refract on small, important panes.
+ */
+
+html {
+  background: var(--bd-base-1);
+}
+
+body {
+  background: transparent;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(170deg, var(--bd-base-1) 0%, var(--bd-base-2) 48%, var(--bd-base-3) 100%);
+}
+
+.backdrop::before,
+.backdrop::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  will-change: transform;
+}
+
+.backdrop::before {
+  background:
+    radial-gradient(38% 34% at 82% 14%, var(--bd-sun), transparent 70%),
+    radial-gradient(34% 30% at 12% 58%, var(--bd-lime), transparent 70%),
+    radial-gradient(30% 26% at 55% 92%, var(--bd-brick), transparent 70%);
+  animation: drift-a 48s ease-in-out infinite alternate;
+}
+
+.backdrop::after {
+  background:
+    radial-gradient(36% 32% at 16% 12%, var(--bd-mauve), transparent 70%),
+    radial-gradient(34% 30% at 88% 78%, var(--bd-neem), transparent 70%);
+  animation: drift-b 62s ease-in-out infinite alternate;
+}
+
+@keyframes drift-a {
+  to { transform: translate3d(-6%, 4%, 0) rotate(4deg); }
+}
+@keyframes drift-b {
+  to { transform: translate3d(5%, -5%, 0) rotate(-3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop::before,
+  .backdrop::after { animation: none; }
+}
+
+/* ---------------------------------------------------------------- glass -- */
+.glass {
+  background-color: var(--glass-tint);
+  background-image: linear-gradient(140deg, var(--glass-sheen) 0%, transparent 34%, transparent 72%, var(--glass-edge) 100%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(175%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(175%);
+  border-radius: var(--radius-lg);
+  border: 0;
+  box-shadow:
+    inset 0 1px 0.5px var(--glass-rim),
+    inset 0 0 0 1px var(--glass-edge),
+    inset 0 -14px 28px -22px var(--glass-depth),
+    0 18px 40px -22px var(--glass-shadow),
+    0 2px 6px -2px var(--glass-shadow);
+}
+
+.glass--strong {
+  background-color: var(--glass-tint-strong);
+}
+
+/* True refraction (Chromium): the backdrop is bent through a liquid noise
+   displacement before it is blurred. Only on a few panes: it is GPU work. */
+html.lg-refract .glass--lens {
+  -webkit-backdrop-filter: url(#lg-refract) blur(calc(var(--glass-blur) * 0.6)) saturate(180%);
+  backdrop-filter: url(#lg-refract) blur(calc(var(--glass-blur) * 0.6)) saturate(180%);
+}
+
+/* No backdrop-filter support: fall back to a more opaque tint for legibility. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background-color: var(--glass-tint-strong); }
+}
+
+@media print {
+  .backdrop { display: none; }
+  .glass { background: #fff; box-shadow: none; backdrop-filter: none; }
+}
+
+/* -------------------------------------------------------------- buttons -- */
+/* Capsules of glass. The primary one is tinted with the deeper brick so its
+   label keeps AA contrast whatever drifts behind it. */
+.button {
+  border: 0;
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
+  backdrop-filter: blur(14px) saturate(170%);
+  box-shadow:
+    inset 0 1px 0.5px var(--glass-rim),
+    inset 0 0 0 1px var(--glass-edge),
+    0 10px 22px -14px var(--glass-shadow);
+  transition: transform 160ms var(--ease), background-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.button:active { transform: scale(0.97); }
+.button--primary {
+  background-color: color-mix(in srgb, var(--accent-ink) 92%, transparent);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.3), transparent 55%);
+  color: var(--on-accent);
+}
+.button--primary:hover { background-color: var(--accent-ink); }
+.button--ghost {
+  background-color: var(--glass-tint);
+  background-image: linear-gradient(140deg, var(--glass-sheen), transparent 45%);
+  color: var(--accent-ink);
+}
+.button--ghost:hover { background-color: var(--glass-tint-strong); }
+@media (prefers-reduced-motion: reduce) {
+  .button:active { transform: none; }
+}
+
+/* -------------------------------------------------------- form controls -- */
+.ask-input,
+.sh-text,
+.small select {
+  background: var(--glass-tint) linear-gradient(140deg, var(--glass-sheen), transparent 40%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  backdrop-filter: blur(16px) saturate(170%);
+  border: 0 !important;
+  box-shadow: inset 0 1px 0.5px var(--glass-rim), inset 0 0 0 1px var(--glass-edge), inset 0 2px 6px -3px var(--glass-depth);
+}
+.ask-input { border-radius: 999px !important; padding-left: 1.1rem !important; }
+.sh-text { border-radius: var(--radius-md) !important; }
