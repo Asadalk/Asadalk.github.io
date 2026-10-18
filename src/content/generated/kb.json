@@ -1,0 +1,452 @@
+[
+ {
+  "id": "c1",
+  "href": "/#about",
+  "title": "Who he is",
+  "text": "Asadullah Faisal (also called Faizal). AI & Data Science · IIT Jodhpur. I'm a final-year AI & Data Science student at IIT Jodhpur. I build machine learning systems and then measure where they break: a text detector for Indian street signs, an LLM agent that cannot act without permission, and the benchmarks that keep both honest."
+ },
+ {
+  "id": "c2",
+  "href": "/#about",
+  "title": "About Asadullah Faisal (1)",
+  "text": "My research, under Prof. Anand Mishra, is on finding text in photos of Indian streets. The result I am proudest of so far came from an audit, not a new model: the detector was skipping the normalization it was trained with, and fixing that one step raised recall without any retraining."
+ },
+ {
+  "id": "c3",
+  "href": "/#about",
+  "title": "About Asadullah Faisal (2)",
+  "text": "On the software side I like systems where the model is powerful but not trusted: OpsPilot lets an LLM investigate production incidents, while a server-side policy engine, a human reviewer and a verification step decide what actually happens."
+ },
+ {
+  "id": "c4",
+  "href": "/#about",
+  "title": "About Asadullah Faisal (3)",
+  "text": "I care about evaluation as much as building. Every project here comes with its numbers, including the ones that did not go my way."
+ },
+ {
+  "id": "c5",
+  "href": "/#education",
+  "title": "Education: highest degree",
+  "text": "Asadullah Faisal's highest education is a B.Tech, Artificial Intelligence & Data Science at Indian Institute of Technology Jodhpur (2023–2027), which he is currently pursuing: he is in his final year and has not graduated yet. He does not hold a master's or PhD."
+ },
+ {
+  "id": "c6",
+  "href": "/#education",
+  "title": "Education: coursework",
+  "text": "Coursework in Asadullah Faisal's B.Tech at IIT Jodhpur: Machine Learning, Deep Learning, Computer Vision, Pattern Recognition and Machine Learning, Natural Language Understanding, Artificial Intelligence, Probability & Statistics, Data Structures & Algorithms, Database Management Systems, Operating Systems, Computer Networks."
+ },
+ {
+  "id": "c7",
+  "href": "/#education",
+  "title": "Education: school",
+  "text": "Asadullah Faisal's schooling: Senior Secondary (BSEB) at Mirza Ghalib College, Gaya (2023); Secondary (CBSE) at GBRC, Gaya (2021)."
+ },
+ {
+  "id": "c8",
+  "href": "/#experience-research",
+  "title": "Experience: B.Tech research project",
+  "text": "Asadullah Faisal: B.Tech research project, IIT Jodhpur · advisor Prof. Anand Mishra, Aug 2026 – present."
+ },
+ {
+  "id": "c9",
+  "href": "/#experience-raid",
+  "title": "Experience: Member",
+  "text": "Asadullah Faisal: Member, RAID (Realm of AI and Data) club, IIT Jodhpur, Jun 2024 – Apr 2025."
+ },
+ {
+  "id": "c10",
+  "href": "/#education",
+  "title": "Achievement",
+  "text": "Asadullah Faisal — JEE Advanced 2023: Common Rank List (CRL) 3,077, top ~0.2% of candidates."
+ },
+ {
+  "id": "c11",
+  "href": "/#education",
+  "title": "Achievement",
+  "text": "Asadullah Faisal — JEE Main 2023: Common Rank List (CRL) ~8,000, top 0.7% of ~1.5 million applicants."
+ },
+ {
+  "id": "c12",
+  "href": "/#contact",
+  "title": "Contact",
+  "text": "Contact Asadullah Faisal by email at asadullah.faisal@proton.me. LinkedIn: https://linkedin.com/in/faizal-iitj. GitHub: https://github.com/Asadalk. LeetCode (C++ practice): https://leetcode.com/u/asad08/."
+ },
+ {
+  "id": "c13",
+  "href": "/#research-bstd",
+  "title": "Research overview",
+  "text": "Asadullah Faisal's research: Scene text detection in Indian languages. B.Tech Project with Prof. Anand Mishra, IIT Jodhpur, since August 2026 (ongoing). B.Tech research on finding text in Indian street photos: auditing the TextBPN++ detector, fixing a preprocessing mismatch, and fine-tuning faster detectors on the Bharat Scene Text Dataset."
+ },
+ {
+  "id": "c14",
+  "href": "/#research-bstd",
+  "title": "Research problem",
+  "text": "The problem in Asadullah Faisal's research: The Bharat Scene Text Dataset's 1,319 test images are high resolution. Once resized for a detector, small words shrink to a few pixels and get missed, and very large words break the detector too."
+ },
+ {
+  "id": "c15",
+  "href": "/#research-bstd",
+  "title": "Research: Audit",
+  "text": "In his research, Asadullah Faisal — Audit: Reproduced and audited the TextBPN++ detector on all 1,319 test images. Built a polygon-IoU evaluation harness with per-image error logs and text-size stratification, which exposed a recall collapse on small text (under 20 px: recall 0.35) and on very large text (over 320 px)."
+ },
+ {
+  "id": "c16",
+  "href": "/#research-bstd",
+  "title": "Research: Preprocessing fix",
+  "text": "In his research, Asadullah Faisal — Preprocessing fix: Traced a train/inference preprocessing mismatch: inference skipped the mean/std normalization the model was trained with. Fixing it raised detection recall from 0.621 to 0.670 and F1 from 0.656 to 0.675, without retraining."
+ },
+ {
+  "id": "c17",
+  "href": "/#research-bstd",
+  "title": "Research: Small text",
+  "text": "In his research, Asadullah Faisal — Small text: Scale-aware 1.5× upscaling lifted small-text F1 from 0.47 to 0.59. Tiled inference was tested and rejected: it added 67 false positives for 4 true positives."
+ },
+ {
+  "id": "c18",
+  "href": "/#research-bstd",
+  "title": "Research: Fine-tuning",
+  "text": "In his research, Asadullah Faisal — Fine-tuning: Fine-tuned YOLO11, docTR FAST and DPText-DETR on 4.7K training images, with polygon-to-box conversion, EXIF and coordinate correction, and a leak-free 90/10 split (test set held out). The fine-tuned YOLO raised end-to-end OCR word recall from 50.7% to 54.3% and F1 from 51.0% to 53.8%. It is now the toolkit fork's default detector (5.5 MB, release yolo11n-bstd-v1.0)."
+ },
+ {
+  "id": "c19",
+  "href": "/#research-bstd",
+  "title": "Research: Benchmark",
+  "text": "In his research, Asadullah Faisal — Benchmark: Benchmarked 10 text detectors (EAST, CRAFT, DBNet++ and others) and IoU-based polygon-fusion ensembles to map the precision–recall trade-off. A 5-model ensemble reached recall 56.7% but precision only 40.3%."
+ },
+ {
+  "id": "c20",
+  "href": "/#research-bstd",
+  "title": "Research results: TextBPN++ detection on the BSTD test set, before and after fixing the preprocessing mismatch (no retraining)",
+  "text": "Asadullah Faisal's research result. TextBPN++ detection on the BSTD test set, before and after fixing the preprocessing mismatch (no retraining): Setup As shipped, Recall 0.621, F1 0.656; Setup Normalization fixed, Recall 0.670, F1 0.675."
+ },
+ {
+  "id": "c21",
+  "href": "/#research-bstd",
+  "title": "Research results: Small-text F1",
+  "text": "Asadullah Faisal's research result. Small-text F1: Setup Baseline, Small-text F1 0.47; Setup Scale-aware 1.5× upscaling, Small-text F1 0.59. Tiled inference was rejected: +67 false positives for +4 true positives."
+ },
+ {
+  "id": "c22",
+  "href": "/#research-bstd",
+  "title": "Research results: End-to-end OCR (detection → script identification → PARSeq recognition)",
+  "text": "Asadullah Faisal's research result. End-to-end OCR (detection → script identification → PARSeq recognition): Detector Before fine-tuning, Word recall 50.7%, F1 51.0%; Detector Fine-tuned YOLO, Word recall 54.3%, F1 53.8%."
+ },
+ {
+  "id": "c23",
+  "href": "/#research-bstd",
+  "title": "Research results: Precision–recall trade-off of a 5-model polygon-fusion ensemble",
+  "text": "Asadullah Faisal's research result. Precision–recall trade-off of a 5-model polygon-fusion ensemble: Setup 5-model ensemble, Recall 56.7%, Precision 40.3%. Ensembling buys recall at a steep cost in precision."
+ },
+ {
+  "id": "c24",
+  "href": "/#research-bstd",
+  "title": "Research: ongoing work",
+  "text": "Asadullah Faisal's ongoing research work (in progress, no results yet): Working on a YOLO training recipe built around small-word crops."
+ },
+ {
+  "id": "c25",
+  "href": "/#research-bstd",
+  "title": "Research: tools",
+  "text": "Tools Asadullah Faisal uses in his research: PyTorch, Ultralytics YOLO, Detectron2, docTR, OpenCV, Shapely, CUDA (RTX A6000)."
+ },
+ {
+  "id": "c26",
+  "href": "/#research-bstd",
+  "title": "Research: credit",
+  "text": "IndicPhotoOCR, its paper and the Bharat Scene Text Dataset belong to the Bhashini / VL2G lab at IIT Jodhpur. Only the work listed here is mine. Paper: De, Penamakuri, Yadav, Rathore, Shah, Sharma, Agarwal, Kumar, Mishra. Bharat Scene Text: A Novel Comprehensive Dataset and Benchmark for Indian Language Scene Text Understanding. IJDAR, 2026."
+ },
+ {
+  "id": "c27",
+  "href": "/#opspilot",
+  "title": "Project: OpsPilot",
+  "text": "Asadullah Faisal's project OpsPilot: An AI operations assistant that investigates incidents with evidence, but can only act through a server-side policy engine, human approval and verified execution. Problem it addresses: An LLM agent that can restart services or roll back deployments is dangerous if the model decides what is safe. OpsPilot keeps the model in charge of investigating and the server in charge of permission."
+ },
+ {
+  "id": "c28",
+  "href": "/#opspilot",
+  "title": "OpsPilot: what he built",
+  "text": "In OpsPilot, Asadullah Faisal built: An agent loop with 6 typed, read-only tools (service health, metrics, log search, recent deployments, incident history, runbook search) over a simulated production environment. The model chooses which tools to call; the tools themselves are deterministic."
+ },
+ {
+  "id": "c29",
+  "href": "/#opspilot",
+  "title": "OpsPilot: what he built",
+  "text": "In OpsPilot, Asadullah Faisal built: Hybrid retrieval over runbooks and postmortems in PostgreSQL + pgvector: 128-dimension hashed bag-of-words vectors plus a keyword score. No learned embedding model, by design (ADR-0002)."
+ },
+ {
+  "id": "c30",
+  "href": "/#opspilot",
+  "title": "OpsPilot: what he built",
+  "text": "In OpsPilot, Asadullah Faisal built: Competing hypotheses, each with supporting and contradicting evidence, before a fix is proposed."
+ },
+ {
+  "id": "c31",
+  "href": "/#opspilot",
+  "title": "OpsPilot: what he built",
+  "text": "In OpsPilot, Asadullah Faisal built: A server-side policy engine (role × risk × environment). Risk comes from a server table, never from the model, so a spoofed 'LOW risk' claim cannot bypass it."
+ },
+ {
+  "id": "c32",
+  "href": "/#opspilot",
+  "title": "OpsPilot: what he built",
+  "text": "In OpsPilot, Asadullah Faisal built: Durable human approval, simulator execution, a verification step (SUCCESS / FAILED / INCONCLUSIVE), and append-only audit and agent-event tables enforced by database triggers."
+ },
+ {
+  "id": "c33",
+  "href": "/#opspilot",
+  "title": "OpsPilot: what he built",
+  "text": "In OpsPilot, Asadullah Faisal built: 116 pytest tests, including prompt-injection and approval-bypass suites."
+ },
+ {
+  "id": "c34",
+  "href": "/#opspilot",
+  "title": "OpsPilot: what he built",
+  "text": "In OpsPilot, Asadullah Faisal built: OpsBench 2.0.0: 100 scenarios across 12 categories, including prompt injection, misleading evidence and permission violations."
+ },
+ {
+  "id": "c35",
+  "href": "/#opspilot",
+  "title": "OpsPilot: results",
+  "text": "OpsPilot results. OpsBench 2.0.0, Groq openai/gpt-oss-120b, temperature 0. Source: backend/benchmarks/opsbench/v2/results/summary.md: System Plain LLM baseline, Task success 24%, Diagnosis 3%, Safety 26%; System OpsPilot (run 1), Task success 69%, Diagnosis 69%, Safety 86%; System OpsPilot (run 2), Task success 71%, Diagnosis 72%, Safety 86%."
+ },
+ {
+  "id": "c36",
+  "href": "/#opspilot",
+  "title": "OpsPilot: finding",
+  "text": "OpsPilot finding: Removing verification: 17 incidents marked resolved while the fault remained (0 with it)."
+ },
+ {
+  "id": "c37",
+  "href": "/#opspilot",
+  "title": "OpsPilot: finding",
+  "text": "OpsPilot finding: Removing retrieval: diagnosis fell from 69% to 44%."
+ },
+ {
+  "id": "c38",
+  "href": "/#opspilot",
+  "title": "OpsPilot: finding",
+  "text": "OpsPilot finding: A fixed investigation plan beat free planning: 81% task success and 97% safety with about 4× fewer tokens."
+ },
+ {
+  "id": "c39",
+  "href": "/#opspilot",
+  "title": "OpsPilot: finding",
+  "text": "OpsPilot finding: Misleading-evidence scenarios: 0/8. The agent still falls for planted evidence."
+ },
+ {
+  "id": "c40",
+  "href": "/#opspilot",
+  "title": "OpsPilot: caveats",
+  "text": "OpsPilot caveats: I wrote both the scenarios and the labels. Diagnosis and grounding are scored by term matching. The simulated reviewer approves unless a scenario says to reject. One scenario per run was rerun after network errors."
+ },
+ {
+  "id": "c41",
+  "href": "/#opspilot",
+  "title": "OpsPilot: tech stack",
+  "text": "OpsPilot tech stack: Next.js 14, TypeScript, FastAPI, PostgreSQL 16 + pgvector, Groq (openai/gpt-oss-120b), Gemini (supported, not benchmarked), JWT, Docker, pytest."
+ },
+ {
+  "id": "c42",
+  "href": "/#opspilot",
+  "title": "OpsPilot: code",
+  "text": "OpsPilot source code: https://github.com/Asadalk/OpsPilot"
+ },
+ {
+  "id": "c43",
+  "href": "/#semantic-hire",
+  "title": "Project: semantic-hire",
+  "text": "Asadullah Faisal's project semantic-hire: Ranks job descriptions against a resume by meaning plus verified skill overlap, with an LLM allowed to explain results but never to rank them. Problem it addresses: Keyword matching misses resumes that describe the right work in different words; pure embeddings ignore hard skill requirements."
+ },
+ {
+  "id": "c44",
+  "href": "/#semantic-hire",
+  "title": "semantic-hire: what he built",
+  "text": "In semantic-hire, Asadullah Faisal built: Embeds jobs (title + description + skills) and resumes with all-MiniLM-L6-v2, normalized, retrieved with an exact FAISS IndexFlatIP."
+ },
+ {
+  "id": "c45",
+  "href": "/#semantic-hire",
+  "title": "semantic-hire: what he built",
+  "text": "In semantic-hire, Asadullah Faisal built: Re-ranks the retrieved jobs by 0.7 × semantic score + 0.3 × skill overlap, where overlap is the share of the job's skills found in the resume."
+ },
+ {
+  "id": "c46",
+  "href": "/#semantic-hire",
+  "title": "semantic-hire: what he built",
+  "text": "In semantic-hire, Asadullah Faisal built: Dictionary-based skill extraction (49 skills) with boundary-aware matching, so 'Java' does not match inside 'JavaScript'."
+ },
+ {
+  "id": "c47",
+  "href": "/#semantic-hire",
+  "title": "semantic-hire: what he built",
+  "text": "In semantic-hire, Asadullah Faisal built: Optional Gemini explanation after ranking, validated so it can only cite skills the matcher actually verified. If Gemini fails, ranked results still return."
+ },
+ {
+  "id": "c48",
+  "href": "/#semantic-hire",
+  "title": "semantic-hire: what he built",
+  "text": "In semantic-hire, Asadullah Faisal built: Evaluation with Precision@K, Recall@K, MRR and NDCG@K on a hand-labelled query set."
+ },
+ {
+  "id": "c49",
+  "href": "/#semantic-hire",
+  "title": "semantic-hire: results",
+  "text": "semantic-hire results. 8 hand-labelled queries over 24 synthetic job descriptions, K = 5. Source: evaluation/results.json: Precision@5 0.650, Recall@5 0.881, MRR 1.000, NDCG@5 0.901."
+ },
+ {
+  "id": "c50",
+  "href": "/#semantic-hire",
+  "title": "semantic-hire: caveats",
+  "text": "semantic-hire caveats: A demonstration benchmark, not an estimate of production quality: 24 jobs and 8 queries, all written by me. Three queries have only 3 relevant jobs, so their Precision@5 cannot exceed 0.6."
+ },
+ {
+  "id": "c51",
+  "href": "/#semantic-hire",
+  "title": "semantic-hire: tech stack",
+  "text": "semantic-hire tech stack: Python, sentence-transformers, FAISS, FastAPI, Gemini (google-genai), Docker, pytest."
+ },
+ {
+  "id": "c52",
+  "href": "/#semantic-hire",
+  "title": "semantic-hire: code",
+  "text": "semantic-hire source code: https://github.com/Asadalk/semantic-hire"
+ },
+ {
+  "id": "c53",
+  "href": "/#smoketrail",
+  "title": "Project: SmokeTrail",
+  "text": "Asadullah Faisal's project SmokeTrail (in progress): Do upwind crop fires in Punjab and Haryana show up in Delhi's air the next day? A classical data science study, no LLMs. Problem it addresses: Every autumn, crop-residue fires in Punjab and Haryana coincide with Delhi's worst air. The question: how much higher is Delhi's daily PM2.5 on days with heavy upwind burning, after adjusting for weather, and can today's fires predict tomorrow's air?"
+ },
+ {
+  "id": "c54",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: plan",
+  "text": "Planned for SmokeTrail: Data: Kaggle 'Air Quality Data in India' (city_day), NASA FIRMS VIIRS fire detections, Open-Meteo historical weather. Sep 15 – Dec 15, 2015–2019."
+ },
+ {
+  "id": "c55",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: plan",
+  "text": "Planned for SmokeTrail: Upwind-fire feature: fires inside a ±30° cone around the wind direction, 1–3 day lags, fires within 50 km of Delhi excluded."
+ },
+ {
+  "id": "c56",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: plan",
+  "text": "Planned for SmokeTrail: OLS with robustness checks and a placebo test; LightGBM + SHAP forecasting with train 2015–17 / validate 2018 / test 2019."
+ },
+ {
+  "id": "c57",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: plan",
+  "text": "Planned for SmokeTrail: Dashboard: Streamlit + pydeck (planned)."
+ },
+ {
+  "id": "c58",
+  "href": "/#smoketrail",
+  "title": "SmokeTrail: status",
+  "text": "SmokeTrail status: Project setup is done; data collection and modelling are under way. Results will appear here only once the code produces them."
+ },
+ {
+  "id": "c59",
+  "href": "/#cellular",
+  "title": "Project: Cellular Network Metadata Processing System",
+  "text": "Asadullah Faisal's project Cellular Network Metadata Processing System: An Android app reads the phone's serving cell (LTE or 5G NR), a FastAPI service looks it up in PostgreSQL, and the tower location appears on an OpenStreetMap map. Problem it addresses: Show, end to end and explainably, how a phone's cell identity (MCC, MNC, TAC, CID) becomes an approximate location, without pretending to more precision than the data allows."
+ },
+ {
+  "id": "c60",
+  "href": "/#cellular",
+  "title": "Cellular Network Metadata Processing System: what he built",
+  "text": "In Cellular Network Metadata Processing System, Asadullah Faisal built: Kotlin Android client that reads the registered serving cell for LTE (CellInfoLte) and 5G NR (CellInfoNr, NCI as cell ID), handling Android API-level differences."
+ },
+ {
+  "id": "c61",
+  "href": "/#cellular",
+  "title": "Cellular Network Metadata Processing System: what he built",
+  "text": "In Cellular Network Metadata Processing System, Asadullah Faisal built: Retrofit 2.9 client posting the cell identity to a FastAPI /locate endpoint."
+ },
+ {
+  "id": "c62",
+  "href": "/#cellular",
+  "title": "Cellular Network Metadata Processing System: what he built",
+  "text": "In Cellular Network Metadata Processing System, Asadullah Faisal built: Exact-match lookup in PostgreSQL over Indian tower data (MCC 404/405) from a Kaggle dataset derived from OpenCellID."
+ },
+ {
+  "id": "c63",
+  "href": "/#cellular",
+  "title": "Cellular Network Metadata Processing System: what he built",
+  "text": "In Cellular Network Metadata Processing System, Asadullah Faisal built: osmdroid map with a marker and a fixed 1,000 m circle, deliberately not triangulated, to avoid false precision."
+ },
+ {
+  "id": "c64",
+  "href": "/#cellular",
+  "title": "Cellular Network Metadata Processing System: tech stack",
+  "text": "Cellular Network Metadata Processing System tech stack: Kotlin, Android, Retrofit, osmdroid, FastAPI, PostgreSQL."
+ },
+ {
+  "id": "c65",
+  "href": "/#cellular",
+  "title": "Cellular Network Metadata Processing System: code",
+  "text": "Cellular Network Metadata Processing System source code: https://github.com/Asadalk/Cellular-Network-Metadata-Processing-System"
+ },
+ {
+  "id": "c66",
+  "href": "/#skills-languages",
+  "title": "Skills: Languages",
+  "text": "Asadullah Faisal's skills in Languages: Python, C++, C, SQL, TypeScript, Kotlin."
+ },
+ {
+  "id": "c67",
+  "href": "/#skills-cv-dl",
+  "title": "Skills: Computer vision and deep learning",
+  "text": "Asadullah Faisal's skills in Computer vision and deep learning: PyTorch, Ultralytics YOLO, Detectron2, docTR, OpenCV, Shapely (polygon IoU), Object and text detection, Transfer learning and fine-tuning, IoU / NMS evaluation, tiled inference, CUDA (RTX A6000 training)."
+ },
+ {
+  "id": "c68",
+  "href": "/#skills-ml-llm",
+  "title": "Skills: ML, NLP and LLMs",
+  "text": "Asadullah Faisal's skills in ML, NLP and LLMs: LLM agents, RAG and hybrid retrieval, Sentence Transformers, embeddings, FAISS, Gemini and Groq APIs, Ranking metrics (P@K, MRR, NDCG), Benchmarks and ablations, scikit-learn, pandas, NumPy, Regression, LightGBM, SHAP (in progress)."
+ },
+ {
+  "id": "c69",
+  "href": "/#skills-engineering",
+  "title": "Skills: Software engineering",
+  "text": "Asadullah Faisal's skills in Software engineering: FastAPI, REST APIs, PostgreSQL, pgvector, Next.js, Docker, pytest, Android (Retrofit, osmdroid), Git, Linux."
+ },
+ {
+  "id": "c70",
+  "href": "/archive/#archive-nlu-assignment-2",
+  "title": "Smaller project: NLU-Assignment-2",
+  "text": "Asadullah Faisal's smaller project NLU-Assignment-2: Word2Vec (CBOW and skip-gram) trained from scratch in PyTorch and with gensim on text scraped from IIT Jodhpur web pages, plus character-level name generation with RNN, BLSTM and attention models. (Course assignment (NLU), solo)."
+ },
+ {
+  "id": "c71",
+  "href": "/archive/#archive-dl-phase-ii",
+  "title": "Smaller project: DL-PhaseII",
+  "text": "Asadullah Faisal's smaller project DL-PhaseII: Zero-shot comparison of SAM ViT-H, SAM ViT-B and MobileSAM on 10 COCO images: Dice, speed and encoder size. (Course project, team of 3 (pipeline, COCO integration and analysis were mine))."
+ },
+ {
+  "id": "c72",
+  "href": "/archive/#archive-sports-or-politics",
+  "title": "Smaller project: Sports-Or-Politics",
+  "text": "Asadullah Faisal's smaller project Sports-Or-Politics: BBC news sports-vs-politics classification comparing bag-of-words, TF-IDF and bigram features with Naive Bayes, logistic regression and linear SVM. (Course assignment, solo)."
+ },
+ {
+  "id": "c73",
+  "href": "/archive/#archive-socket-programming",
+  "title": "Smaller project: Socket_Programming",
+  "text": "Asadullah Faisal's smaller project Socket_Programming: C TCP server and client serving a menu of terminal games and equation solvers. (Course project, team of 4 (Maze Escape game, merging into one server-client, README were mine))."
+ },
+ {
+  "id": "c74",
+  "href": "/archive/#archive-csl1010",
+  "title": "Smaller project: Project-CSL1010",
+  "text": "Asadullah Faisal's smaller project Project-CSL1010: Text-based maze escape game in C with random obstacles, traps and seven levels. (First-year programming course project, solo)."
+ },
+ {
+  "id": "c75",
+  "href": "/archive/#archive-product-recommendation",
+  "title": "Smaller project: Product-Recomendation-System",
+  "text": "Asadullah Faisal's smaller project Product-Recomendation-System: E-commerce demo with React, Express and C++ recommendation routines; I built login/signup, purchase logging and the Python user-similarity recommender. (Team of 3, fork of a teammate's repo)."
+ }
+]

@@ -20,12 +20,16 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
     autocomplete="off"
     spellcheck="false"
     enterkeyhint="search"
-    placeholder="e.g. object detection research"
+    placeholder="e.g. What is his highest education?"
     aria-describedby="ask-status"
   />
   <button type="submit" class="button button--primary ask-go" data-ask-go>Ask</button>
   </form>
-  <p id="ask-status" class="ask-status muted" aria-live="polite">Searches everything on this page by meaning. Press Ask or Enter.</p>
+  <p id="ask-status" class="ask-status muted" aria-live="polite">Ask anything about me, in your own words. Press Ask or Enter.</p>
+  <div class="ask-answer glass" data-ask-answer hidden aria-live="polite">
+    <p class="ask-answer-text" data-ask-answer-text></p>
+    <p class="ask-answer-meta mono">Answered from this site's content · <span data-ask-sources></span></p>
+  </div>
   <ol class="ask-results" data-ask-results></ol>
   <script type="application/json" data-ask-docs set:html={JSON.stringify(docs)} />
 </div>
@@ -62,10 +66,13 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
 
     let seq = 0;
     const go = root.querySelector<HTMLButtonElement>('[data-ask-go]')!;
+    const answerBox = root.querySelector<HTMLElement>('[data-ask-answer]')!;
+    const answerText = root.querySelector<HTMLElement>('[data-ask-answer-text]')!;
+    const sourcesEl = root.querySelector<HTMLElement>('[data-ask-sources]')!;
     const form = root.querySelector<HTMLFormElement>('[data-ask-form]')!;
     const setBusy = (on: boolean) => {
       go.disabled = on;
-      go.textContent = on ? 'Searching…' : 'Ask';
+      go.textContent = on ? 'Thinking…' : 'Ask';
       root.classList.toggle('ask-busy', on);
     };
 
@@ -95,12 +102,50 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
       const mine = ++seq;
       if (query.length < 3) {
         list.replaceChildren();
+        answerBox.hidden = true;
         clearHits();
         status.textContent = query ? 'Type a few more letters.' : idle;
         return;
       }
       busy = true;
       setBusy(true);
+      status.textContent = 'Thinking…';
+      answerBox.hidden = true;
+      // 1) A written answer grounded in the site's facts (RAG on the API).
+      if (hasApi()) {
+        try {
+          const r = await api<{ answer: string; sources: { href: string; title: string }[] }>(
+            '/ask',
+            { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ question: query.slice(0, 300) }) },
+            { onSlow: () => (status.textContent = WAKING), timeoutMs: 90_000 },
+          );
+          if (mine !== seq) return;
+          list.replaceChildren();
+          clearHits();
+          answerText.textContent = r.answer;
+          sourcesEl.replaceChildren(
+            ...r.sources.flatMap((src, i) => {
+              const a = document.createElement('a');
+              a.href = src.href;
+              a.textContent = src.title;
+              const id = src.href.split('#')[1];
+              if (id) document.getElementById(id)?.classList.add('ask-hit');
+              return i ? [document.createTextNode(' · '), a] : [a];
+            }),
+          );
+          if (!r.sources.length) sourcesEl.textContent = 'no specific section';
+          answerBox.hidden = false;
+          status.textContent = '';
+          window.dispatchEvent(
+            new CustomEvent('ask', { detail: { query, results: r.sources.map((x) => ({ id: x.href.split('#')[1] })) } }),
+          );
+          busy = false;
+          setBusy(false);
+          return;
+        } catch {
+          // Fall through to plain semantic search below.
+        }
+      }
       status.textContent = 'Searching…';
       try {
         const { ids, vector } = await rank(query);
@@ -168,6 +213,10 @@ const docs = buildDocs({ research, projects, site, skillGroups, archive }).map((
   .ask-form { display: flex; gap: 0.5rem; }
   .ask-form .ask-input { flex: 1; min-width: 0; }
   .ask-go { flex: none; }
+  .ask-answer { margin-top: 0.85rem; padding: 1rem 1.15rem 0.8rem; border-radius: var(--radius-md); }
+  .ask-answer-text { margin: 0 0 0.6rem; font-size: 1.05rem; line-height: 1.55; }
+  .ask-answer-meta { margin: 0; font-size: 0.68rem; color: var(--muted); }
+  .ask-answer-meta a { color: var(--accent-ink); }
   .ask-go:disabled { opacity: 0.7; cursor: progress; }
   .ask-status { font-size: 0.85rem; margin: 0.4rem 0 0; }
   .ask-results { margin: 0.6rem 0 0; padding-left: 1.4rem; }

@@ -31,6 +31,7 @@ image = (
     .env({"SEMANTIC_HIRE_DIR": "/opt/semantic-hire", "OMP_NUM_THREADS": "2", "PYTHONUNBUFFERED": "1"})
     .add_local_file(HERE / "server.py", "/opt/app/server.py")
     .add_local_file(HERE / "embeddings.json", "/opt/app/embeddings.json")
+    .add_local_file(HERE / "kb.json", "/opt/app/kb.json")
 )
 
 app = modal.App("portfolio-api")
@@ -50,7 +51,15 @@ def _server(serve: str):
 # Two deployments of the same server.py. Search and the matcher need only the
 # small MiniLM model, so they get a light container that restores from its
 # memory snapshot in seconds. OCR (~4 GB of models) has its own.
-@app.cls(image=image, cpu=1.0, memory=2048, timeout=120, scaledown_window=300, enable_memory_snapshot=True)
+@app.cls(
+    image=image,
+    cpu=1.0,
+    memory=2048,
+    timeout=120,
+    scaledown_window=300,
+    enable_memory_snapshot=True,
+    secrets=[modal.Secret.from_name("portfolio-groq")],  # GROQ_API_KEY for /ask
+)
 @modal.concurrent(max_inputs=8)
 class Light:
     @modal.enter(snap=True)
@@ -58,6 +67,7 @@ class Light:
         server = _server("light")
         server.retriever()
         server.items()
+        server.kb()
         self.app = server.app
 
     @modal.asgi_app(label="portfolio-api")
