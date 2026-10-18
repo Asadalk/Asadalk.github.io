@@ -7,7 +7,7 @@ import Scene from './Scene.astro';
 import { site } from '../lib/content';
 import { wideScene, tallScene } from '../lib/street';
 import pm from '../content/data/smoketrail/pm25-daily.json';
-import { hazeCaption, hazeLevel, pickDay, type PmDay } from '../lib/haze';
+import { hazeCaption, hazeLevel, hazeTag, pickDay, type PmDay } from '../lib/haze';
 
 const wide = wideScene(site.signboards);
 const tall = tallScene(site.signboards);
@@ -23,15 +23,17 @@ const today = pickDay(season2019, new Date());
     <Scene scene={tall} />
     <Scene scene={wide} />
   </div>
+  <a class="air-tag" href="#smoketrail" data-haze-tag title="Where this smog comes from: my SmokeTrail project">{hazeTag(today)}</a>
 </nav>
 <p class="legend wrap">
   The boxes show what a text detector sees: what each sign is, and how sure it is (0–1). Illustrative here; the photo
-  demo runs my real model. <span data-haze-caption>{hazeCaption(today)}</span>
+  demo runs my real model.
 </p>
+<p class="legend wrap haze-line" data-haze-caption>{hazeCaption(today)}</p>
 <script type="application/json" data-haze-days set:html={JSON.stringify(season2019)} />
 
 <script>
-  import { hazeCaption, hazeLevel, pickDay, type PmDay } from '../lib/haze';
+  import { hazeCaption, hazeLevel, hazeTag, pickDay, type PmDay } from '../lib/haze';
 
   // Re-pick the haze for the visitor's own date (the HTML has the build date's).
   {
@@ -42,6 +44,8 @@ const today = pickDay(season2019, new Date());
       el.style.setProperty('--haze', String(hazeLevel(day[1])));
       const cap = document.querySelector('[data-haze-caption]');
       if (cap) cap.textContent = hazeCaption(day);
+      const tag = document.querySelector('[data-haze-tag]');
+      if (tag) tag.textContent = hazeTag(day);
     }
   }
 
@@ -183,6 +187,28 @@ const today = pickDay(season2019, new Date());
     .street :global(.tag) { animation: none; opacity: 1; }
   }
 
+  /* Air-quality tag in the sky corner: what the smog is, linking to its source. */
+  .air-tag {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    z-index: 2;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--text);
+    text-decoration: none;
+    background: var(--glass-tint-strong);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    backdrop-filter: blur(10px) saturate(160%);
+    box-shadow: inset 0 1px 0.5px var(--glass-rim), inset 0 0 0 1px var(--glass-edge), 0 6px 14px -8px var(--glass-shadow);
+  }
+  .air-tag:hover { background: var(--glass-tint); text-decoration: underline; }
+  @media (min-width: 48rem) {
+    .air-tag { top: 14px; left: 16px; font-size: 0.72rem; }
+  }
+  .haze-line { margin-top: 0.15rem !important; }
   .legend {
     margin: 0.6rem auto 0;
     font-size: 0.78rem;

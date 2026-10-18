@@ -94,8 +94,8 @@
   --road: #9a92a3;
   --kerb: #766d80;
   --wire: #221e1c;
-  --haze-color: #b3a8be;
-  --haze: 0.55;
+  --haze-color: #bba68f;
+  --haze: 0.45;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -119,8 +119,8 @@
     --road: #24212a;
     --kerb: #36313e;
     --wire: #0c0b0e;
-    --haze-color: #6a5f74;
-    --haze: 0.5;
+    --haze-color: #5a4c45;
+    --haze: 0.45;
   }
 }
 
@@ -144,8 +144,8 @@
   --road: #24212a;
   --kerb: #36313e;
   --wire: #0c0b0e;
-  --haze-color: #6a5f74;
-  --haze: 0.5;
+  --haze-color: #5a4c45;
+  --haze: 0.45;
 }
 
 /* Liquid glass. Translucent tint + blur + saturation over a living dusk

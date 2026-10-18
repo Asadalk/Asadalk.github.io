@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import pm from '../../src/content/data/smoketrail/pm25-daily.json';
-import { aqiCategory, hazeCaption, hazeLevel, pickDay, type PmDay } from '../../src/lib/haze';
+import { aqiCategory, hazeCaption, hazeLevel, hazeTag, pickDay, type PmDay } from '../../src/lib/haze';
 
 const days = (pm.days as PmDay[]).filter(([d]) => d.startsWith('2019-'));
 
@@ -23,8 +23,12 @@ describe('hero haze from SmokeTrail data', () => {
     expect(aqiCategory(25)).toBe('good');
     expect(aqiCategory(100)).toBe('poor');
     expect(aqiCategory(300)).toBe('severe');
-    expect(hazeLevel(0)).toBe(0.12);
-    expect(hazeLevel(1000)).toBe(0.9);
+    expect(hazeLevel(0)).toBe(0.1);
+    expect(hazeLevel(1000)).toBe(0.95);
+    // Moderate air must already look hazy; severe noticeably thicker.
+    expect(hazeLevel(77)).toBeGreaterThan(0.4);
+    expect(hazeLevel(400) - hazeLevel(77)).toBeGreaterThan(0.3);
     expect(hazeCaption(['2019-11-03', 494.4])).toContain('PM2.5 494');
+    expect(hazeTag(['2019-11-03', 494.4])).toBe('Delhi air · 3 Nov 2019 · PM2.5 494 · severe');
   });
 });

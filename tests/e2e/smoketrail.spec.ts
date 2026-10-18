@@ -14,9 +14,12 @@ test('scrubbing the 2019 season updates the forecast and its SHAP drivers', asyn
   await expect(st.locator('[data-st-drivers] li').first()).toContainText(d.drivers[0].feature);
 });
 
-test('the hero haze is labelled with real SmokeTrail data', async ({ page }) => {
+test('the hero smog is labelled with real SmokeTrail data and links to it', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('[data-haze-caption]')).toContainText(/Delhi's real air on \d+ \w+ 2019: PM2\.5 \d+ µg\/m³/);
+  await expect(page.locator('[data-haze-caption]')).toContainText(/as thick as Delhi's air was on \d+ \w+ 2019 \(PM2\.5 \d+ µg\/m³/);
+  const tag = page.locator('[data-haze-tag]');
+  await expect(tag).toHaveText(/^Delhi air · \d+ \w+ 2019 · PM2\.5 \d+ · (good|satisfactory|moderate|poor|very poor|severe)$/);
+  await expect(tag).toHaveAttribute('href', '#smoketrail');
 });
 
 test.describe('without JavaScript', () => {

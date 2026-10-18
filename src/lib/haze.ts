@@ -14,9 +14,15 @@ export function aqiCategory(pm: number): string {
   return 'severe';
 }
 
-/** Haze opacity: clear-ish at good air, thick at severe. */
+/** Smog opacity: a square-root curve so moderate air already looks hazy and
+ *  severe air (400+) looks thick; clean air stays nearly clear. */
 export function hazeLevel(pm: number): number {
-  return Math.round((0.12 + 0.78 * Math.min(pm, 400) / 400) * 100) / 100;
+  return Math.round((0.1 + 0.85 * Math.sqrt(Math.min(Math.max(pm, 0), 450) / 450)) * 100) / 100;
+}
+
+export function hazeTag([date, pm]: PmDay): string {
+  const when = new Date(date + 'T00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  return `Delhi air · ${when} · PM2.5 ${Math.round(pm)} · ${aqiCategory(pm)}`;
 }
 
 const dayOfYear = (m: number, d: number) => Date.UTC(2019, m - 1, d) / 86_400_000 - Date.UTC(2019, 0, 1) / 86_400_000;
@@ -41,5 +47,5 @@ export function pickDay(days: PmDay[], today: Date, year = 2019): PmDay {
 
 export function hazeCaption([date, pm]: PmDay): string {
   const when = new Date(date + 'T00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  return `The haze is Delhi's real air on ${when}: PM2.5 ${Math.round(pm)} µg/m³ (${aqiCategory(pm)}), from CPCB data in my SmokeTrail project.`;
+  return `The smog over this street is real data: it is as thick as Delhi's air was on ${when} (PM2.5 ${Math.round(pm)} µg/m³, ${aqiCategory(pm)}), from my SmokeTrail project. It changes with the date you visit.`;
 }
